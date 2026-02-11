@@ -5,9 +5,9 @@ public class GravityManager : MonoBehaviour
 {
     public static GravityManager Instance;
 
-    public static float G = 6.674e-11f; // Scaled gravity constant
+    public static float G = 6.674e-8f; // Scaled gravity constant
 
-    public float gravityMultiplier = 1e5f; // Tune this for fun & stability
+    public float gravityMultiplier = 1e13f; // Tune this for fun & stability
     public float softening = 0.1f; // Prevents singularities / explosions
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
@@ -15,6 +15,23 @@ public class GravityManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+
+    void Update()
+    {
+        // Change simulation speed with number keys 1, 2, 3, etc.
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SetSimulationSpeed(1f);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SetSimulationSpeed(2f);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SetSimulationSpeed(3f);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) SetSimulationSpeed(4f);
+        if (Input.GetKeyDown(KeyCode.Alpha5)) SetSimulationSpeed(5f);
+    }
+
+    public void SetSimulationSpeed(float speed)
+    {
+        Time.timeScale = speed;
+        Time.fixedDeltaTime = 0.02f / speed; // Keep physics stable
+        Debug.Log("Simulation speed set to " + speed + "x");
     }
 
     public static void Register(GravityBody body)

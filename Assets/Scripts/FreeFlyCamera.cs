@@ -4,8 +4,8 @@ public class FreeFlyCamera : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 50f;
-    public float boostMultiplier = 5f;
-    public float acceleration = 10f;
+    public float boostMultiplier = 500f;
+    public float acceleration = 100f;
 
     [Header("Mouse Look")]
     public float mouseSensitivity = 3f;
