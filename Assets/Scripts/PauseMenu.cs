@@ -3,8 +3,7 @@ using UnityEngine;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pauseMenuUI;
-
-    public static bool GameIsPaused = false;
+    public GameObject optionMenuUI;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,7 +16,13 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsPaused)
+            if (optionMenuUI.activeSelf)
+            {
+                pauseMenuUI.SetActive(true);
+                optionMenuUI.SetActive(false);
+            }
+
+            else if (pauseMenuUI.activeSelf)
             {
                 Resume();
             }
@@ -30,16 +35,20 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
-        pauseMenuUI.SetActive(false);
+        pauseMenuUI.SetActive(!pauseMenuUI.activeSelf);
         Time.timeScale = 1f;
-        GameIsPaused = false;
+
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
     }
 
     public void Pause()
     {
-        pauseMenuUI.SetActive(true);
-        Time.timeScale = 1f;
-        GameIsPaused = true;
+        pauseMenuUI.SetActive(!pauseMenuUI.activeSelf);
+        Time.timeScale = 0f;
+
+        //Cursor.lockState = CursorLockMode.None;
+        //Cursor.visible = true;
     }
 
     public void QuitGame()
@@ -47,4 +56,11 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Ending Simulator !");
         Application.Quit();
     }
+
+    public void Options()
+    {
+        pauseMenuUI.SetActive(false);
+        optionMenuUI.SetActive(true);
+    }
+
 }
