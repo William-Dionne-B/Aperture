@@ -2,16 +2,13 @@ using UnityEngine;
 
 public class PauseMenu : MonoBehaviour
 {
+    [Header("UI References")] // Comme un titre
     public GameObject pauseMenuUI;
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public static bool isPaused = false;
 
     // Update is called once per frame
     void Update()
@@ -20,20 +17,15 @@ public class PauseMenu : MonoBehaviour
         {
             if (keysMenuUI.activeSelf)
             {
-                pauseMenuUI.SetActive(false);
-                optionMenuUI.SetActive(true);
-                guideMenuUI.SetActive(false);
-                keysMenuUI.SetActive(false);
+                OpenOptions();
             }
 
             else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf)
             {
-                pauseMenuUI.SetActive(true);
-                optionMenuUI.SetActive(false);
-                guideMenuUI.SetActive(false);
+                OpenPauseMenu();
             }
 
-            else if (pauseMenuUI.activeSelf)
+            else if (isPaused)
             {
                 Resume();
             }
@@ -44,10 +36,13 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    // --- FONCTIONS PRINCIPALES ---
+
     public void Resume()
     {
-        pauseMenuUI.SetActive(!pauseMenuUI.activeSelf);
+        DesactivateAllMenus();
         Time.timeScale = 1f;
+        isPaused = false;
 
         //Cursor.lockState = CursorLockMode.Locked;
         //Cursor.visible = false;
@@ -55,12 +50,15 @@ public class PauseMenu : MonoBehaviour
 
     public void Pause()
     {
-        pauseMenuUI.SetActive(!pauseMenuUI.activeSelf);
+        OpenPauseMenu();
         Time.timeScale = 0f;
+        isPaused = true;
 
         //Cursor.lockState = CursorLockMode.None;
         //Cursor.visible = true;
     }
+
+    // --- NAVIGATION ENTRE LES MENUS ---
 
     public void QuitGame()
     {
@@ -69,25 +67,36 @@ public class PauseMenu : MonoBehaviour
         Application.Quit();
     }
 
-    public void Options()
+    public void OpenOptions()
     {
-        pauseMenuUI.SetActive(false);
+        DesactivateAllMenus();
         optionMenuUI.SetActive(true);
     }
 
-    public void Guide()
+    public void OpenGuide()
     {
-        pauseMenuUI.SetActive(false);
-        optionMenuUI.SetActive(false);
+        DesactivateAllMenus();
         guideMenuUI.SetActive(true);
     }
 
-    public void Keys()
+    public void OpenKeys()
+    {
+        DesactivateAllMenus();
+        keysMenuUI.SetActive(true);
+    }
+
+    public void OpenPauseMenu()
+    {
+        DesactivateAllMenus();
+        pauseMenuUI.SetActive(true);
+    }
+
+    private void DesactivateAllMenus()
     {
         pauseMenuUI.SetActive(false);
         optionMenuUI.SetActive(false);
         guideMenuUI.SetActive(false);
-        keysMenuUI.SetActive(true);
+        keysMenuUI.SetActive(false);
     }
 
     public void Reset()
@@ -95,22 +104,9 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Reset !");
     }
 
-    public void BackOption()
+    public void SaveOptions()
     {
-        optionMenuUI.SetActive(false);
-        pauseMenuUI.SetActive(true);
         Debug.Log("Settings Saved !");
-    }
-
-    public void BackGuide()
-    {
-        guideMenuUI.SetActive(false);
-        pauseMenuUI.SetActive(true);
-    }
-
-    public void BackKeys()
-    {
-        keysMenuUI.SetActive(false);
-        optionMenuUI.SetActive(true);
+        OpenPauseMenu();
     }
 }

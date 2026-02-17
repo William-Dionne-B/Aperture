@@ -856,7 +856,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1420217104}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: Guide
+        m_MethodName: OpenGuide
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2461,7 +2461,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1420217104}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: Keys
+        m_MethodName: OpenKeys
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2630,7 +2630,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1420217104}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: BackKeys
+        m_MethodName: OpenOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4071,7 +4071,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1420217104}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: Options
+        m_MethodName: OpenOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4482,7 +4482,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1420217104}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: BackOption
+        m_MethodName: SaveOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4690,7 +4690,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1420217104}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: BackGuide
+        m_MethodName: OpenPauseMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
