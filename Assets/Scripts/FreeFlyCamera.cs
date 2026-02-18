@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 public class FreeFlyCamera : MonoBehaviour
 {
     [Header("Movement")]
@@ -15,7 +15,7 @@ public class FreeFlyCamera : MonoBehaviour
     private float yaw;
     private float pitch;
 
-    void Start()
+  void Start()
     {
         if (lockCursor)
         {
@@ -23,9 +23,21 @@ public class FreeFlyCamera : MonoBehaviour
             Cursor.visible = false;
         }
 
-        yaw = transform.eulerAngles.y;
-        pitch = transform.eulerAngles.x;
+        // Start a coroutine to reset rotation after a short delay
+        StartCoroutine(ResetRotationAfterDelay(0.1f));
     }
+
+    private IEnumerator ResetRotationAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Set rotation to 0,0,0
+        transform.rotation = Quaternion.Euler(45f, 0f, 0f);
+        yaw = 0f;
+        pitch = 45f;
+    }
+
+
 
     void Update()
     {
