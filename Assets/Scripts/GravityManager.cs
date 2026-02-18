@@ -1,5 +1,7 @@
+using NUnit.Framework.Constraints;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GravityManager : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class GravityManager : MonoBehaviour
 
     public float gravityMultiplier = 1e13f; // Tune this for fun & stability
     public float softening = 0.1f; // Prevents singularities / explosions
+    public float Timestep = 3600f;
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
 
@@ -47,15 +50,16 @@ public class GravityManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        int count = bodies.Count;
+        //int count = bodies.Count;
 
-        for (int i = 0; i < count; i++)
-        {
-            for (int j = i + 1; j < count; j++)
-            {
-                ApplyGravity(bodies[i], bodies[j]);
-            }
-        }
+        //for (int i = 0; i < count; i++)
+        //{
+        //    for (int j = i + 1; j < count; j++)
+        //    {
+        //        ApplyGravity(bodies[i], bodies[j]);
+        //    }
+        //}
+        Step(Timestep);
     }
 
     void ApplyGravity(GravityBody a, GravityBody b)
@@ -73,5 +77,58 @@ public class GravityManager : MonoBehaviour
 
         a.rb.AddForce(force);
         b.rb.AddForce(-force);
+    }
+
+    void Step(float dt)
+    {
+        int count = bodies.Count;
+
+        Vector3[] oldAcc = new Vector3[count];
+
+        for (int i = 0; i < count; i++) 
+        {
+            oldAcc[i] = ComputeAcc(i);
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            GravityBody p  = bodies[i];
+            Vector3 a = oldAcc[i];
+
+            p.rb.position += p.rb.linearVelocity * dt + 0.5f * a * dt * dt;
+            p.rb.linearVelocity += 0.5f * a * dt;
+        }
+
+        Vector3[] newAccel = new Vector3[count];
+        for (int i = 0; i < count; i++)
+        {
+            newAccel[i] = ComputeAcc(i);
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            GravityBody p = bodies[i];
+            p.rb.linearVelocity += 0.5f * newAccel[i] * dt;
+        }
+        
+    }
+
+    Vector3 ComputeAcc(int index)
+    {
+        GravityBody pi = bodies[index];
+        Vector3 acc = Vector3.zero;
+
+        for (int j = 0; j < bodies.Count; j++)
+        {
+            if (j == index) continue;
+
+            GravityBody pj = bodies[j];
+            Vector3 r = pj.rb.position - pi.rb.position;
+            float distSqr = r.sqrMagnitude + Softening * Softening;
+            float invDistCube = 1f / Mathf.Pow(distSqr, 1.5f);
+            acc += G * pj.Mass * r * invDistCube;
+        }
+
+        return acc;
     }
 }
