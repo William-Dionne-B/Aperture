@@ -2,14 +2,19 @@ using UnityEngine;
 
 public class FreeFlyCamera : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Movement")] 
     public float moveSpeed = 50f;
     public float boostMultiplier = 500f;
     public float acceleration = 100f;
 
-    [Header("Mouse Look")]
+    [Header("Mouse Look")] 
     public float mouseSensitivity = 3f;
     public bool lockCursor = true;
+
+    public KeyCode unlockCursorKey = KeyCode.LeftAlt;
+    public KeyCode shiftKey = KeyCode.LeftShift;
+    public KeyCode speedUp = KeyCode.UpArrow;
+    public KeyCode speedDown = KeyCode.DownArrow;
 
     private Vector3 velocity;
     private float yaw;
@@ -19,8 +24,7 @@ public class FreeFlyCamera : MonoBehaviour
     {
         if (lockCursor)
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            LockCursor();
         }
 
         yaw = transform.eulerAngles.y;
@@ -29,6 +33,26 @@ public class FreeFlyCamera : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(unlockCursorKey))
+        {
+            ToggleCursor();
+        }
+
+        if (Input.GetKeyDown(speedUp))
+        {
+            ChangerVitesse(Mathf.Clamp(moveSpeed + 10f, 10f, 500f));
+        }
+
+        if (Input.GetKeyDown(speedDown))
+        {
+            ChangerVitesse(Mathf.Clamp(moveSpeed - 10f, 10f, 500f)); 
+        }
+
+        if (PauseMenu.isPaused || Cursor.visible)
+        {
+            return;
+        }
+
         HandleMouseLook();
         HandleMovement();
     }
@@ -48,11 +72,11 @@ public class FreeFlyCamera : MonoBehaviour
     void HandleMovement()
     {
         float x = Input.GetAxisRaw("Horizontal"); // A / D
-        float z = Input.GetAxisRaw("Vertical");   // W / S
+        float z = Input.GetAxisRaw("Vertical"); // W / S
 
         float y = 0f;
-        if (Input.GetKey(KeyCode.E)) y += 1f;      // Up
-        if (Input.GetKey(KeyCode.Q)) y -= 1f;      // Down
+        if (Input.GetKey(KeyCode.E)) y += 1f; // Up
+        if (Input.GetKey(KeyCode.Q)) y -= 1f; // Down
 
         Vector3 input = new Vector3(x, y, z).normalized;
 
@@ -64,5 +88,35 @@ public class FreeFlyCamera : MonoBehaviour
         velocity = Vector3.Lerp(velocity, targetVelocity, acceleration * Time.deltaTime);
 
         transform.position += velocity * Time.deltaTime;
+    }
+
+    void ToggleCursor()
+    {
+        // Si le curseur est verrouillé, on le libère. Sinon, on le verrouille.
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            UnlockCursor();
+        }
+        else
+        {
+            LockCursor();
+        }
+    }
+
+    void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void ChangerVitesse(float newSpeed)
+    {
+        moveSpeed = newSpeed;
     }
 }
