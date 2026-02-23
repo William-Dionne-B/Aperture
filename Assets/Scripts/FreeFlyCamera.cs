@@ -38,14 +38,26 @@ public class FreeFlyCamera : MonoBehaviour
             ToggleCursor();
         }
 
-        if (Input.GetKeyDown(speedUp))
+        if (Input.GetKeyDown(shiftKey))
         {
-            ChangerVitesse(Mathf.Clamp(moveSpeed + 10f, 10f, 500f));
+            ChangerVitesse(Mathf.Clamp(moveSpeed + 15f, 10f, 500f));
+        }
+        
+        if (Input.GetKeyUp(shiftKey))
+        {
+            ChangerVitesse(Mathf.Clamp(moveSpeed - 15f, 10f, 500f));
+        }
+        
+        if (Input.GetKey(speedUp))
+        {
+            float newSpeed = moveSpeed + (100f * Time.deltaTime);
+            ChangerVitesse(Mathf.Clamp(newSpeed, 10f, 500f));
         }
 
-        if (Input.GetKeyDown(speedDown))
+        if (Input.GetKey(speedDown))
         {
-            ChangerVitesse(Mathf.Clamp(moveSpeed - 10f, 10f, 500f)); 
+            float newSpeed = moveSpeed - (100f * Time.deltaTime);
+            ChangerVitesse(Mathf.Clamp(newSpeed, 10f, 500f));
         }
 
         if (PauseMenu.isPaused || Cursor.visible)

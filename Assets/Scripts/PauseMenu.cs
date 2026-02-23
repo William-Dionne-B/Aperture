@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -7,6 +9,10 @@ public class PauseMenu : MonoBehaviour
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
+    
+    [Header("Options Settings")]
+    public Slider speedSlider;
+    public FreeFlyCamera cameraScript;
 
     public static bool isPaused = false;
 
@@ -71,6 +77,11 @@ public class PauseMenu : MonoBehaviour
     {
         DesactivateAllMenus();
         optionMenuUI.SetActive(true);
+
+        if (speedSlider != null && cameraScript != null)
+        {
+            speedSlider.value = cameraScript.moveSpeed;
+        }    
     }
 
     public void OpenGuide()
@@ -101,6 +112,7 @@ public class PauseMenu : MonoBehaviour
 
     public void Reset()
     {
+        speedSlider.value = 50;
         Debug.Log("Reset !");
     }
 
