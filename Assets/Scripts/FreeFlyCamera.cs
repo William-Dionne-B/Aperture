@@ -8,20 +8,23 @@ public class FreeFlyCamera : MonoBehaviour
     public float acceleration = 100f;
 
     [Header("Mouse Look")] 
-    public float mouseSensitivity = 3f;
+    public float mouseSensitivity = 4.5f;
     public bool lockCursor = true;
 
     public KeyCode unlockCursorKey = KeyCode.LeftAlt;
-    public KeyCode shiftKey = KeyCode.LeftShift;
     public KeyCode speedUp = KeyCode.UpArrow;
     public KeyCode speedDown = KeyCode.DownArrow;
 
     private Vector3 velocity;
     private float yaw;
     private float pitch;
+    
+    public Camera playerCamera;
 
     void Start()
     {
+        playerCamera = GetComponent<Camera>();
+        
         if (lockCursor)
         {
             LockCursor();
@@ -38,16 +41,18 @@ public class FreeFlyCamera : MonoBehaviour
             ToggleCursor();
         }
 
-        if (Input.GetKeyDown(shiftKey))
+        if (PauseMenu.isPaused || Cursor.visible)
         {
-            ChangerVitesse(Mathf.Clamp(moveSpeed + 15f, 10f, 500f));
+            return;
         }
         
-        if (Input.GetKeyUp(shiftKey))
-        {
-            ChangerVitesse(Mathf.Clamp(moveSpeed - 15f, 10f, 500f));
-        }
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
         
+        if (scroll != 0f)
+        {
+            ChangerFieldOfView(Mathf.Clamp(playerCamera.fieldOfView + (scroll * -50f), 30f, 110f));
+        }
+
         if (Input.GetKey(speedUp))
         {
             float newSpeed = moveSpeed + (100f * Time.deltaTime);
@@ -58,11 +63,6 @@ public class FreeFlyCamera : MonoBehaviour
         {
             float newSpeed = moveSpeed - (100f * Time.deltaTime);
             ChangerVitesse(Mathf.Clamp(newSpeed, 10f, 500f));
-        }
-
-        if (PauseMenu.isPaused || Cursor.visible)
-        {
-            return;
         }
 
         HandleMouseLook();
@@ -125,6 +125,16 @@ public class FreeFlyCamera : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+    public void ChangerFieldOfView(float newFieldOfView)
+    {
+        playerCamera.fieldOfView = newFieldOfView;
+    }
+
+    public void ChangerMouseSensitivity(float newMouseSensitivity)
+    {
+        mouseSensitivity = newMouseSensitivity;
     }
 
     public void ChangerVitesse(float newSpeed)

@@ -11,6 +11,8 @@ public class PauseMenu : MonoBehaviour
     public GameObject keysMenuUI;
     
     [Header("Options Settings")]
+    public Slider fieldOfViewSlider;
+    public Slider mouseSensitivitySlider;
     public Slider speedSlider;
     public FreeFlyCamera cameraScript;
 
@@ -78,10 +80,20 @@ public class PauseMenu : MonoBehaviour
         DesactivateAllMenus();
         optionMenuUI.SetActive(true);
 
+        if (fieldOfViewSlider != null && cameraScript != null)
+        {
+            fieldOfViewSlider.value = cameraScript.playerCamera.fieldOfView;
+        }
+        
+        if (mouseSensitivitySlider != null && cameraScript != null)
+        {
+            mouseSensitivitySlider.value = cameraScript.mouseSensitivity;
+        }
+        
         if (speedSlider != null && cameraScript != null)
         {
             speedSlider.value = cameraScript.moveSpeed;
-        }    
+        }
     }
 
     public void OpenGuide()
@@ -112,7 +124,9 @@ public class PauseMenu : MonoBehaviour
 
     public void Reset()
     {
-        speedSlider.value = 50;
+        fieldOfViewSlider.value = 60f;
+        mouseSensitivitySlider.value = 4.5f;
+        speedSlider.value = 50f;
         Debug.Log("Reset !");
     }
 
