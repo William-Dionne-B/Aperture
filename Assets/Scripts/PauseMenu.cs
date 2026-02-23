@@ -9,6 +9,7 @@ public class PauseMenu : MonoBehaviour
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
+    public GameObject timeMenuUI;
     
     [Header("Options Settings")]
     public Slider fieldOfViewSlider;
@@ -49,6 +50,7 @@ public class PauseMenu : MonoBehaviour
     public void Resume()
     {
         DesactivateAllMenus();
+        timeMenuUI.SetActive(true);
         Time.timeScale = 1f;
         isPaused = false;
 
@@ -59,6 +61,7 @@ public class PauseMenu : MonoBehaviour
     public void Pause()
     {
         OpenPauseMenu();
+        timeMenuUI.SetActive(false);
         Time.timeScale = 0f;
         isPaused = true;
 
