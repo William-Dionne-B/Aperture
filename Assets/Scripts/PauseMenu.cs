@@ -6,20 +6,40 @@ public class PauseMenu : MonoBehaviour
 {
     [Header("UI References")] // Comme un titre
     public GameObject pauseMenuUI;
+
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
     public GameObject timeMenuUI;
-    
-    [Header("Options Settings")]
-    public Slider fieldOfViewSlider;
+
+    [Header("Options Settings")] public Slider fieldOfViewSlider;
     public Slider mouseSensitivitySlider;
     public Slider speedSlider;
     public FreeFlyCamera cameraScript;
 
     public static bool isPaused = false;
 
-    // Update is called once per frame
+
+    void Start()
+    {
+        if (mouseSensitivitySlider != null && cameraScript != null)
+        {
+            mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity", 4.5f);
+        }
+
+        if (fieldOfViewSlider != null && cameraScript != null)
+        {
+            fieldOfViewSlider.value = PlayerPrefs.GetFloat("FieldOfView", 60f);
+        }
+
+        if (speedSlider != null && cameraScript != null)
+        {
+            speedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 50f);
+        }
+        
+        DesactivateAllMenus();
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -87,12 +107,12 @@ public class PauseMenu : MonoBehaviour
         {
             fieldOfViewSlider.value = cameraScript.playerCamera.fieldOfView;
         }
-        
+
         if (mouseSensitivitySlider != null && cameraScript != null)
         {
             mouseSensitivitySlider.value = cameraScript.mouseSensitivity;
         }
-        
+
         if (speedSlider != null && cameraScript != null)
         {
             speedSlider.value = cameraScript.moveSpeed;
@@ -135,7 +155,28 @@ public class PauseMenu : MonoBehaviour
 
     public void SaveOptions()
     {
+        if (mouseSensitivitySlider != null && cameraScript != null)
+        {
+            PlayerPrefs.SetFloat("MouseSensitivity", mouseSensitivitySlider.value);
+            cameraScript.mouseSensitivity = mouseSensitivitySlider.value;
+        }
+
+        if (fieldOfViewSlider != null && cameraScript != null)
+        {
+            PlayerPrefs.SetFloat("FieldOfView", fieldOfViewSlider.value);
+            cameraScript.playerCamera.fieldOfView = fieldOfViewSlider.value;
+        }
+
+        if (speedSlider != null && cameraScript != null)
+        {
+            PlayerPrefs.SetFloat("MoveSpeed", speedSlider.value);
+            cameraScript.moveSpeed = speedSlider.value;
+        }
+
+        PlayerPrefs.Save();
+
         Debug.Log("Settings Saved !");
+
         OpenPauseMenu();
     }
 }

@@ -25,6 +25,10 @@ public class FreeFlyCamera : MonoBehaviour
     {
         playerCamera = GetComponent<Camera>();
         
+        mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 4.5f);
+        playerCamera.fieldOfView = PlayerPrefs.GetFloat("FieldOfView", 60f);
+        moveSpeed = PlayerPrefs.GetFloat("MoveSpeed", 50f);
+        
         if (lockCursor)
         {
             LockCursor();

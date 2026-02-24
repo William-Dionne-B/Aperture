@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 64710621}
   - component: {fileID: 64710620}
   m_Layer: 5
-  m_Name: TimeFrame
+  m_Name: TimeMenuUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5493,6 +5493,7 @@ MonoBehaviour:
   optionMenuUI: {fileID: 31848795}
   guideMenuUI: {fileID: 1107897008}
   keysMenuUI: {fileID: 71393734}
+  timeMenuUI: {fileID: 64710618}
   fieldOfViewSlider: {fileID: 1113819303}
   mouseSensitivitySlider: {fileID: 1518176734}
   speedSlider: {fileID: 170620187}
@@ -6013,9 +6014,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 556519349}
   m_Direction: 0
   m_MinValue: 1
-  m_MaxValue: 30
+  m_MaxValue: 15
   m_WholeNumbers: 0
-  m_Value: 3
+  m_Value: 4.5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
