@@ -108,7 +108,6 @@ public class FreeFlyCamera : MonoBehaviour
 
     void ToggleCursor()
     {
-        // Si le curseur est verrouillé, on le libère. Sinon, on le verrouille.
         if (Cursor.lockState == CursorLockMode.Locked)
         {
             UnlockCursor();
