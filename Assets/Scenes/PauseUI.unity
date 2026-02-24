@@ -665,7 +665,7 @@ MonoBehaviour:
   m_MinValue: 10
   m_MaxValue: 500
   m_WholeNumbers: 0
-  m_Value: 50
+  m_Value: 100
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -766,7 +766,7 @@ GameObject:
   m_Component:
   - component: {fileID: 209973244}
   m_Layer: 5
-  m_Name: ForwardBackwardKey
+  m_Name: Key (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3290,7 +3290,7 @@ GameObject:
   m_Component:
   - component: {fileID: 911283158}
   m_Layer: 5
-  m_Name: UpDownKey
+  m_Name: Key (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5735,7 +5735,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1433375498}
   m_Layer: 5
-  m_Name: LeftRightKey
+  m_Name: Key (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6016,7 +6016,7 @@ MonoBehaviour:
   m_MinValue: 1
   m_MaxValue: 15
   m_WholeNumbers: 0
-  m_Value: 4.5
+  m_Value: 3.5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -7652,7 +7652,7 @@ MonoBehaviour:
   moveSpeed: 50
   boostMultiplier: 500
   acceleration: 100
-  mouseSensitivity: 3
+  mouseSensitivity: 3.5
   lockCursor: 1
   unlockCursorKey: 9
   speedUp: 273
@@ -7883,7 +7883,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2032468089}
   m_Layer: 5
-  m_Name: ViewKey
+  m_Name: Key (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

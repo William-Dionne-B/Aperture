@@ -3,15 +3,15 @@ using UnityEngine;
 public class FreeFlyCamera : MonoBehaviour
 {
     [Header("Movement")] 
-    public float moveSpeed = 50f;
-    public float boostMultiplier = 500f;
-    public float acceleration = 100f;
+    public float moveSpeed = 100f;
+    public float boostMultiplier = 25f;
+    public float acceleration = 5f;
 
     [Header("Mouse Look")] 
-    public float mouseSensitivity = 4.5f;
+    public float mouseSensitivity = 3.5f;
     public bool lockCursor = true;
 
-    public KeyCode unlockCursorKey = KeyCode.LeftAlt;
+    public KeyCode unlockCursorKey = KeyCode.Tab;
     public KeyCode speedUp = KeyCode.UpArrow;
     public KeyCode speedDown = KeyCode.DownArrow;
 
@@ -25,9 +25,9 @@ public class FreeFlyCamera : MonoBehaviour
     {
         playerCamera = GetComponent<Camera>();
         
-        mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 4.5f);
+        mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 3.5f);
         playerCamera.fieldOfView = PlayerPrefs.GetFloat("FieldOfView", 60f);
-        moveSpeed = PlayerPrefs.GetFloat("MoveSpeed", 50f);
+        moveSpeed = PlayerPrefs.GetFloat("MoveSpeed", 100f);
         
         if (lockCursor)
         {

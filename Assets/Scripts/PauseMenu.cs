@@ -24,7 +24,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (mouseSensitivitySlider != null && cameraScript != null)
         {
-            mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity", 4.5f);
+            mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity", 3.5f);
         }
 
         if (fieldOfViewSlider != null && cameraScript != null)
@@ -34,7 +34,7 @@ public class PauseMenu : MonoBehaviour
 
         if (speedSlider != null && cameraScript != null)
         {
-            speedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 50f);
+            speedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 100f);
         }
         
         DesactivateAllMenus();
@@ -148,8 +148,8 @@ public class PauseMenu : MonoBehaviour
     public void Reset()
     {
         fieldOfViewSlider.value = 60f;
-        mouseSensitivitySlider.value = 4.5f;
-        speedSlider.value = 50f;
+        mouseSensitivitySlider.value = 3.5f;
+        speedSlider.value = 100f;
         Debug.Log("Reset !");
     }
 
