@@ -79,4 +79,27 @@ public class GravityManager : MonoBehaviour
         a.rb.AddForce(force);
         b.rb.AddForce(-force);
     }
+
+        public static Vector3 GetCenterOfMass()
+        {
+            if (bodies.Count == 0)
+                return Vector3.zero;
+
+            Vector3 weightedSum = Vector3.zero;
+            float totalMass = 0f;
+
+            foreach (var body in bodies)
+            {
+                if (body != null && body.rb != null)
+                {
+                    weightedSum += body.rb.position * body.rb.mass;
+                    totalMass += body.rb.mass;
+                }
+            }
+
+            if (totalMass == 0f)
+                return Vector3.zero;
+
+            return weightedSum / totalMass;
+        }
 }
