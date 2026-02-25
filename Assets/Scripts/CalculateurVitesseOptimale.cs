@@ -2,13 +2,7 @@ using UnityEngine;
 
 public static class CalculateurVitesseOptimale
 {
-    /// <summary>
-    /// Calculates optimal circular orbital velocity for a given position around a central body.
-    /// </summary>
-    /// <param name="position">Position of the orbiting body</param>
-    /// <param name="masseCentrale">Mass of the central body</param>
-    /// <param name="positionCentrale">Position of the central body</param>
-    /// <returns>Orbital velocity vector</returns>
+
     public static Vector3 CalculerVitesseOrbitaleStatique(Vector3 position, float masseCentrale, Vector3 positionCentrale)
     {
         Vector3 versCentre = positionCentrale - position;
