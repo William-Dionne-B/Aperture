@@ -13,12 +13,10 @@ public class PlanetSpawner : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            // Create a plane in front of the camera
             Plane spawnPlane = new Plane(
-                -Camera.main.transform.forward,
-                Camera.main.transform.position +
-                Camera.main.transform.forward * spawnDistance
-            );
+                Vector3.up,
+                Vector3.zero
+            );      
 
             if (spawnPlane.Raycast(ray, out float distance))
             {
