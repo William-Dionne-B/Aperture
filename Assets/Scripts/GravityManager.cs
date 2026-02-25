@@ -22,16 +22,21 @@ public class GravityManager : MonoBehaviour
     {
         // Change simulation speed with number keys 1, 2, 3, etc.
         if (Input.GetKeyDown(KeyCode.Alpha1)) SetSimulationSpeed(1f);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SetSimulationSpeed(2f);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SetSimulationSpeed(3f);
-        if (Input.GetKeyDown(KeyCode.Alpha4)) SetSimulationSpeed(4f);
-        if (Input.GetKeyDown(KeyCode.Alpha5)) SetSimulationSpeed(5f);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SetSimulationSpeed(3f);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SetSimulationSpeed(6f);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) SetSimulationSpeed(8f);
+        if (Input.GetKeyDown(KeyCode.Alpha5)) SetSimulationSpeed(10f);
     }
 
     public void SetSimulationSpeed(float speed)
     {
         Time.timeScale = speed;
-        Time.fixedDeltaTime = 0.02f / speed; // Keep physics stable
+        
+        if (speed > 0f)
+        {
+            Time.fixedDeltaTime = 0.02f / speed; 
+        }
+        
         Debug.Log("Simulation speed set to " + speed + "x");
     }
 
