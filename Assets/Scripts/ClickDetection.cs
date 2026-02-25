@@ -14,8 +14,8 @@ public class ClickDetection : MonoBehaviour
 
     private GameObject currentLookedAt;
 
-    // Objet sélectionné (conservé après le clic gauche)
-    private GameObject selectedObject;
+    [SerializeField]
+    public GameObject selectedObject;
 
     // Nouvelle table pour restaurer proprement les matériaux originaux par Renderer
     private readonly Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
