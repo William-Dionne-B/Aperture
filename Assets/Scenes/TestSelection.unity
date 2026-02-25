@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 867050362}
   - component: {fileID: 867050361}
   - component: {fileID: 867050360}
+  - component: {fileID: 867050364}
   m_Layer: 0
   m_Name: Cooler garry
   m_TagString: Untagged
@@ -227,6 +228,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &867050364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 867050359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mass: 100
+  speedMagnitude: 10
+  radius: 50
+  objectName: 
 --- !u!1 &1253262993
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,6 +547,7 @@ GameObject:
   - component: {fileID: 1455889725}
   - component: {fileID: 1455889724}
   - component: {fileID: 1455889723}
+  - component: {fileID: 1455889727}
   m_Layer: 0
   m_Name: Garry
   m_TagString: Untagged
@@ -626,6 +644,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1455889727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455889722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mass: 50
+  speedMagnitude: 30
+  radius: 37
+  objectName: Krypton
 --- !u!1 &1906521610
 GameObject:
   m_ObjectHideFlags: 0

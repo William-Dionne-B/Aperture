@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 public class ClickDetection : MonoBehaviour
@@ -103,6 +104,9 @@ public class ClickDetection : MonoBehaviour
                         selectedObject = hitObj;
                         AddSelectionOutlineToObject(selectedObject);
                         Debug.Log("Objet sélectionné : " + selectedObject.name);
+
+                        // Appel du debug spécifique à la sélection (n'utilise que la sélection)
+                        debugOnSelection();
                     }
                 }
             }
@@ -286,6 +290,45 @@ public class ClickDetection : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void debugOnSelection()
+    {
+        // Utilise uniquement l'objet `selectedObject`.
+        if (selectedObject == null)
+        {
+            Debug.LogWarning("debugOnSelection appelé mais aucun objet sélectionné.");
+            return;
+        }
+
+        var props = selectedObject.GetComponent<ObjectProperties>();
+        if (props == null)
+        {
+            Debug.LogWarning("Objet sélectionné ne contient pas de ObjectProperties : " + selectedObject.name);
+            return;
+        }
+
+        // Récupère tous les champs instance (public et non-public) et filtre ceux sérialisés
+        var fields = props.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        Debug.Log($"Debug sélection : {selectedObject.name} ---");
+        foreach (var f in fields)
+        {
+            // Conserve les champs publics OU marqués [SerializeField]
+            bool isSerialized = f.IsPublic || f.IsDefined(typeof(SerializeField), false);
+            if (!isSerialized) continue;
+
+            object value;
+            try
+            {
+                value = f.GetValue(props);
+            }
+            catch
+            {
+                value = "<inaccessible>";
+            }
+
+            Debug.Log($"[Selection Debug] {f.Name} = {value}");
         }
     }
 }
