@@ -30,7 +30,12 @@ public class GravityManager : MonoBehaviour
     public void SetSimulationSpeed(float speed)
     {
         Time.timeScale = speed;
-        Time.fixedDeltaTime = 0.02f / speed; // Keep physics stable
+        
+        if (speed > 0f)
+        {
+            Time.fixedDeltaTime = 0.02f / speed; 
+        }
+        
         Debug.Log("Simulation speed set to " + speed + "x");
     }
 
