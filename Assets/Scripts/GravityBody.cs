@@ -9,12 +9,14 @@ public class GravityBody : MonoBehaviour
     public float Mass = 1f;
 
     [HideInInspector] public Rigidbody rb;
+    [HideInInspector] public LineRenderer line;
 
     private bool initialized = false;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        line = GetComponent<LineRenderer>();
         rb.mass = Mass;
         rb.linearVelocity = initialVelocity;
         rb.useGravity = false;
