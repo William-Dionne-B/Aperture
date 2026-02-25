@@ -3,7 +3,8 @@ using UnityEngine;
 public class PlanetSpawner : MonoBehaviour
 {
     public GameObject planetPrefab;
-    public float spawnDistance = 200f;
+    public float sunMass = 1000000;
+    public Transform sunTransform;
 
     private int planetCount = 0;
 
@@ -31,6 +32,27 @@ public class PlanetSpawner : MonoBehaviour
 
                 planetCount++;
                 planet.name = "Planet_" + planetCount;
+
+                // Calculate and apply orbital velocity using the calculator
+                Vector3 sunPosition = sunTransform != null ? sunTransform.position : Vector3.zero;
+                Vector3 vitesseOrbitale = CalculateurVitesseOptimale.CalculerVitesseOrbitaleStatique(
+                    spawnPosition, 
+                    sunMass, 
+                    sunPosition
+                );
+
+                // Apply velocity to the planet
+                GravityBody gravityBody = planet.GetComponent<GravityBody>();
+                if (gravityBody != null)
+                {
+                    gravityBody.initialVelocity = vitesseOrbitale;
+                    gravityBody.applyInitialVelocity = true;
+                    
+                    if (gravityBody.rb != null)
+                    {
+                        gravityBody.rb.linearVelocity = vitesseOrbitale;
+                    }
+                }
             }
         }
     }
