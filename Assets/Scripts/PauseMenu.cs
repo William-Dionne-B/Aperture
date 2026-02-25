@@ -22,6 +22,20 @@ public class PauseMenu : MonoBehaviour
     
     [Header("External Scripts")]
     public FreeFlyCamera cameraScript;
+    
+    [Header("Icones du Bouton Pause")]
+    public Image imageBoutonFastBackward;
+    public Image imageBoutonPause;
+    public Image imageBoutonResume;
+    public Image imageBoutonFastForward;
+    public Sprite iconFastBackward;
+    public Sprite iconFastBackwardIsSelected;
+    public Sprite iconPause;
+    public Sprite iconPauseIsSelected;
+    public Sprite iconResume;
+    public Sprite iconResumeIsSelected;
+    public Sprite iconFastForward;
+    public Sprite iconFastForwardIsSelected;
 
     // --- Variables Globales ---
     public static bool isPaused = false;
@@ -73,6 +87,17 @@ public class PauseMenu : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        if (imageBoutonFastBackward != null && imageBoutonPause != null && imageBoutonResume != null && imageBoutonFastForward && iconFastBackward != null && iconPause != null && iconResumeIsSelected != null && iconFastForward != null)
+        {
+            Debug.Log("AAA");
+            imageBoutonFastBackward.overrideSprite = iconFastBackward;
+            imageBoutonPause.overrideSprite = iconPause;
+            imageBoutonResume.overrideSprite = iconResumeIsSelected;
+            imageBoutonFastForward.overrideSprite = iconFastForward;
+            Debug.Log("BBB");
+        }
+        
     }
 
     /// <summary>

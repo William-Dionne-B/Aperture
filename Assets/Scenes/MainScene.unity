@@ -7435,6 +7435,18 @@ MonoBehaviour:
   mouseSensitivitySlider: {fileID: 1946620928}
   speedSlider: {fileID: 1288067524}
   cameraScript: {fileID: 1701653280}
+  imageBoutonFastBackward: {fileID: 472283585}
+  imageBoutonPause: {fileID: 1932003802}
+  imageBoutonResume: {fileID: 231356310}
+  imageBoutonFastForward: {fileID: 1288676965}
+  iconFastBackward: {fileID: 21300000, guid: 5eab22254600b114da31763c59005f6f, type: 3}
+  iconFastBackwardIsSelected: {fileID: 21300000, guid: 9f338a25237edf142a4f115c5dc158b5, type: 3}
+  iconPause: {fileID: 21300000, guid: 2092813b451000647bd6434698cda1a7, type: 3}
+  iconPauseIsSelected: {fileID: 21300000, guid: a6782f947fbda094d938d8ed38b1cdc3, type: 3}
+  iconResume: {fileID: 21300000, guid: 5f0407ae8f4ac8b4489dd82366888650, type: 3}
+  iconResumeIsSelected: {fileID: 21300000, guid: 743fb373d19261d4e9de73b6812ea8b3, type: 3}
+  iconFastForward: {fileID: 21300000, guid: acbcbedd71e0ba847a865adf0a913506, type: 3}
+  iconFastForwardIsSelected: {fileID: 21300000, guid: b428cffaf2af8364dac9b0e8b0c81320, type: 3}
 --- !u!1 &1379643849
 GameObject:
   m_ObjectHideFlags: 0
