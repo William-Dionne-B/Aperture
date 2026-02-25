@@ -1203,7 +1203,7 @@ MonoBehaviour:
   mass: 12.39
   speedMagnitude: 2.05
   radius: 5.3
-  objectName: 
+  objectName: Kevin
 --- !u!1 &148390325
 GameObject:
   m_ObjectHideFlags: 0
@@ -3410,7 +3410,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -20.003204, y: -1.0064392}
+  m_AnchoredPosition: {x: -28.3, y: -32.8}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &376532215
@@ -3914,7 +3914,7 @@ MonoBehaviour:
   mass: 190.34
   speedMagnitude: 40.33
   radius: 47.83
-  objectName: 
+  objectName: Donald J. Trump
 --- !u!1 &414182406
 GameObject:
   m_ObjectHideFlags: 0
@@ -12123,8 +12123,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -13259,7 +13259,7 @@ MonoBehaviour:
   mass: 21.63
   speedMagnitude: 2.93
   radius: 45.25
-  objectName: 
+  objectName: Robert
 --- !u!1 &1863143423
 GameObject:
   m_ObjectHideFlags: 0
@@ -13375,7 +13375,7 @@ MonoBehaviour:
   m_ResetOnDeActivation: 1
   m_KeepTextSelectionVisible: 0
   m_RestoreOriginalTextOnEscape: 1
-  m_isRichTextEditingAllowed: 0
+  m_isRichTextEditingAllowed: 1
   m_LineLimit: 0
   isAlert: 0
   m_InputValidator: {fileID: 0}
@@ -13435,7 +13435,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.3, y: 8.3}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1869711950
@@ -15203,7 +15203,7 @@ MonoBehaviour:
   mass: 65.17
   speedMagnitude: 0.15
   radius: 5.03
-  objectName: 
+  objectName: Garry
 --- !u!1 &2007359081
 GameObject:
   m_ObjectHideFlags: 0
@@ -15901,10 +15901,10 @@ MonoBehaviour:
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 0, g: 1, b: 0.18060637, a: 1}
-    topRight: {r: 0, g: 0.17717361, b: 1, a: 1}
-    bottomLeft: {r: 0.03184688, g: 1, b: 0, a: 1}
-    bottomRight: {r: 0, g: 1, b: 0.023376703, a: 1}
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 0.8773585, g: 0.8773585, b: 0.8773585, a: 1}
+    bottomLeft: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 1}
+    bottomRight: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -15914,10 +15914,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.75
+  m_fontSize: 18
   m_fontSizeBase: 20.75
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
