@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GravityManager : MonoBehaviour
@@ -86,57 +87,89 @@ public class GravityManager : MonoBehaviour
 
     void OrbitPredictor(GravityBody mainBody) 
     {
-        float constanteGravitationnelle = 0.1f;
-        int simulationSteps = 1000;
-        float timeStep = 0.02f;
+        float constanteGravitationnelle = 200000;
+        int simulationSteps = 5000;
+        float timeStep = 0.04f;
 
-        Dictionary<GravityBody, Vector3> positions = new Dictionary<GravityBody, Vector3>();
-        Dictionary<GravityBody, Vector3> vitesses = new Dictionary<GravityBody, Vector3>();
+        int count = bodies.Count;
 
-        foreach (var body in bodies)
+        Vector3[] positions = new Vector3[count];
+        Vector3[] vitesses = new Vector3[count];
+        float[] masses = new float[count];
+
+        for (int i = 0; i < count; i++)
         {
-            positions[body] = body.rb.position;
-            vitesses[body] = body.rb.linearVelocity;
+            positions[i] = bodies[i].rb.position;
+            vitesses[i] = bodies[i].rb.linearVelocity;
+            masses[i] = bodies[i].rb.mass;
         }
 
-        List<Vector3> pointsOrbites = new List<Vector3>();
+        Vector3[] accelerations = new Vector3[count];
+        Vector3[] newAccelerations = new Vector3[count];
 
-        for (int step = 0; simulationSteps < simulationSteps; simulationSteps++) 
+        for (int i = 0; i < count; i++)
         {
-            Dictionary<GravityBody, Vector3> accelerations = new Dictionary<GravityBody, Vector3>();
+            accelerations[i] = Vector3.zero;
 
-            foreach (var body in bodies)
+            for (int j = 0; j < count; j++)
             {
-                Vector3 accelerationTotale = Vector3.zero;
+                if (i == j) continue;
 
-                foreach (var other in bodies) 
+                Vector3 direction = positions[j] - positions[i];
+                float distance = direction.magnitude + 0.001f;
+
+                accelerations[i] += constanteGravitationnelle * masses[j] /
+                                    (distance * distance) *
+                                    direction.normalized;
+            }
+        }
+
+        int targetIndex = bodies.IndexOf(mainBody);
+        List<Vector3> orbitPoints = new List<Vector3>();
+
+        for (int step = 0; step < simulationSteps; step++)
+        {
+            //position
+            for (int i = 0; i < count; i++)
+            {
+                positions[i] += vitesses[i] * timeStep + 0.5f * accelerations[i] * timeStep * timeStep;
+            }
+
+            //accel
+            for (int i = 0; i < count; i++)
+            {
+                newAccelerations[i] = Vector3.zero;
+
+                for (int j = 0; j < count; j++)
                 {
-                    if (body == other) continue;
+                    if (i == j) continue;
 
-                    Vector3 direction = positions[other] - positions[body];
-                    float dist = direction.magnitude + 0.001f;
+                    Vector3 direction = positions[j] - positions[i];
+                    float distance = direction.magnitude + 0.001f;
 
-                    accelerationTotale += constanteGravitationnelle *
-                                          other.Mass /
-                                          (dist * dist) *
-                                          direction.normalized;
+                    newAccelerations[i] += constanteGravitationnelle * masses[j] /
+                                           (distance * distance) *
+                                           direction.normalized;
                 }
-
-                accelerations[body] = accelerationTotale;
             }
 
-            foreach (var body in bodies) 
+            //vitesse
+            for (int i = 0; i < count; i++)
             {
-                vitesses[body] += accelerations[body] * timeStep;
-                positions[body] += vitesses[body] * timeStep;
+                vitesses[i] += 0.5f *
+                                 (accelerations[i] + newAccelerations[i]) *
+                                 timeStep;
+
+                accelerations[i] = newAccelerations[i];
             }
 
-            pointsOrbites.Add(positions[mainBody]);
+
+            orbitPoints.Add(positions[targetIndex]);
         }
 
-        LineRenderer line = mainBody.line;
-        line.useWorldSpace = true;
-        line.positionCount = pointsOrbites.Count;
-        line.SetPositions(pointsOrbites.ToArray());
+
+        mainBody.line.useWorldSpace = true;
+        mainBody.line.positionCount = orbitPoints.Count;
+        mainBody.line.SetPositions(orbitPoints.ToArray());
     }
 }
