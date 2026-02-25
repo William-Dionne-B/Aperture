@@ -12,6 +12,7 @@ public class PauseMenu : MonoBehaviour
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
+    public GameObject audioMenuUI;
     public GameObject timeMenuUI;
 
     [Header("Options UI Elements")] 
@@ -119,6 +120,12 @@ public class PauseMenu : MonoBehaviour
         DesactivateAllMenus();
         keysMenuUI.SetActive(true);
     }
+
+    public void OpenAudio()
+    {
+        DesactivateAllMenus();
+        audioMenuUI.SetActive(true);
+    }
     
     /// <summary>
     /// Ouvre le menu des options et synchronise la valeur des sliders avec la caméra.
@@ -145,6 +152,7 @@ public class PauseMenu : MonoBehaviour
         optionMenuUI.SetActive(false);
         guideMenuUI.SetActive(false);
         keysMenuUI.SetActive(false);
+        audioMenuUI.SetActive(false);
     }
 
     // ==========================================
