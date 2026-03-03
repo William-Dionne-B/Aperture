@@ -3401,7 +3401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialVelocity: {x: 0, y: 0, z: 0}
   applyInitialVelocity: 1
-  Mass: 1
+  Mass: 50
   rb: {fileID: 0}
   line: {fileID: 0}
 --- !u!54 &633136388
@@ -3412,7 +3412,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 633136382}
   serializedVersion: 4
-  m_Mass: 1000000
+  m_Mass: 1e+9
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -4898,9 +4898,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialVelocity: {x: 0, y: 0, z: 32}
+  initialVelocity: {x: 0, y: 0, z: 200}
   applyInitialVelocity: 1
-  Mass: 1
+  Mass: 5
   rb: {fileID: 0}
   line: {fileID: 0}
 --- !u!54 &916402427
@@ -5013,7 +5013,7 @@ Transform:
   m_GameObject: {fileID: 916402425}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 409.7, y: 0, z: 0}
+  m_LocalPosition: {x: 1103, y: 0, z: -1}
   m_LocalScale: {x: 0.351, y: 0.351, z: 0.351}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -5091,8 +5091,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.05107555
-        value: 0.20454623
+        time: 1
+        value: 1
         inSlope: 0
         outSlope: 0
         tangentMode: 0
