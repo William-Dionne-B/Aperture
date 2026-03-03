@@ -87,9 +87,9 @@ public class GravityManager : MonoBehaviour
 
     void OrbitPredictor(GravityBody mainBody) 
     {
-        float constanteGravitationnelle = 200000;
-        int simulationSteps = 5000;
-        float timeStep = 0.04f;
+        float constanteGravitationnelle = 1500000;
+        int simulationSteps = 150;
+        float timeStep = 0.1f;
 
         int count = bodies.Count;
 
