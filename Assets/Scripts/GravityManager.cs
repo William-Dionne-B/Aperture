@@ -13,6 +13,7 @@ public class GravityManager : MonoBehaviour
     public float Timestep = 3600f;
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
+    public static IReadOnlyList<GravityBody> Bodies => bodies;
 
     void Awake()
     {

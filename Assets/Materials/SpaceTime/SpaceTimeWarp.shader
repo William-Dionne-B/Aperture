@@ -2,30 +2,51 @@ Shader "Unlit/SpaceTimeWarp"
 {
     Properties
     {
-        _MassCount ("Mass Count", Int) = 0
-        _Strength ("Strength", Float) = 1
-        _Falloff ("Falloff", Float) = 1
+        _Strength ("Gravity Strength", Float) = 100
+        _Falloff ("Gravity Falloff", Float) = 1.5
+        _WarpMultiplier ("Warp Multiplier", Float) = 6
+        _MinDistance ("Min Distance", Float) = 0.5
+        _WellSoftening ("Well Softening", Float) = 30
+
+        _GridScale ("Grid Scale", Float) = 0.02
+        _LineWidth ("Line Width", Float) = 0.001
+
+        _LineColor ("Line Color", Color) = (0.3,0.7,1,1)
     }
 
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
         LOD 100
 
         Pass
         {
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
+            Cull Off
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
 
+            #include "UnityCG.cginc"
+
             #define MAX_MASSES 10
+
+            float _Strength;
+            float _Falloff;
+            float _WarpMultiplier;
+            float _MinDistance;
+            float _WellSoftening;
+
+            float _GridScale;
+            float _LineWidth;
+
+            float4 _LineColor;
 
             float4 _MassPositions[MAX_MASSES];
             float _MassValues[MAX_MASSES];
             int _MassCount;
-
-            float _Strength;
-            float _Falloff;
 
             struct appdata
             {
@@ -35,34 +56,56 @@ Shader "Unlit/SpaceTimeWarp"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
+                float3 worldPos : TEXCOORD0;
             };
 
             v2f vert (appdata v)
             {
                 v2f o;
 
-                float3 pos = v.vertex.xyz;
+                float3 localPos = v.vertex.xyz;
                 float warp = 0;
+                float3 worldPosTemp = mul(unity_ObjectToWorld, float4(localPos, 1)).xyz;
+                int massCount = clamp(_MassCount, 0, MAX_MASSES);
 
-                for (int i = 0; i < _MassCount; i++)
+                // Apply gravity wells
+                for (int i = 0; i < massCount; i++)
                 {
                     float3 massPos = _MassPositions[i].xyz;
                     float mass = _MassValues[i];
 
-                    float dist = distance(pos, massPos);
-                    warp += -_Strength * mass / (pow(dist, _Falloff) + 0.01);
+                    float dist = distance(worldPosTemp, massPos);
+                    float minDist = max(_MinDistance, 0.0001);
+                    float softening = max(_WellSoftening, minDist);
+                    float distSq = max(dist * dist, minDist * minDist);
+                    float denom = pow(distSq + softening * softening, _Falloff * 0.5);
+
+                    warp += -_Strength * _WarpMultiplier * mass / denom;
                 }
 
-                pos.y += warp;
+                localPos.y += warp;
 
-                o.vertex = UnityObjectToClipPos(float4(pos,1));
+                float4 world = mul(unity_ObjectToWorld, float4(localPos,1));
+                o.worldPos = world.xyz;
+
+                o.vertex = UnityWorldToClipPos(world);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return fixed4(0.1, 0.4, 1.0, 1.0);
+                // Grid calculation in world space (XZ plane)
+                float2 uv = i.worldPos.xz * _GridScale;
+
+                float lineX = abs(frac(uv.x) - 0.5);
+                float lineY = abs(frac(uv.y) - 0.5);
+                float lineDistance = min(lineX, lineY);
+                float antialias = max(fwidth(lineDistance), 0.0001);
+                float lineMask = 1.0 - smoothstep(_LineWidth, _LineWidth + antialias, lineDistance);
+
+                return float4(_LineColor.rgb, _LineColor.a * lineMask);
             }
+
             ENDCG
         }
     }
