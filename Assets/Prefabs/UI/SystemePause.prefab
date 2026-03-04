@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6379576133243848007
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5621474790411720760}
+  - component: {fileID: 2463033890477353017}
+  m_Layer: 0
+  m_Name: SystemePause
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5621474790411720760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6379576133243848007}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 93.06201, y: 112.50726, z: -2.7958148}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2463033890477353017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6379576133243848007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1312f4019920e89439dacf79b93e25b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseMenuUI: {fileID: 0}
+  optionMenuUI: {fileID: 0}
+  guideMenuUI: {fileID: 0}
+  keysMenuUI: {fileID: 0}
+  audioMenuUI: {fileID: 0}
+  timeMenuUI: {fileID: 0}
+  fieldOfViewSlider: {fileID: 0}
+  mouseSensitivitySlider: {fileID: 0}
+  speedSlider: {fileID: 0}
+  cameraScript: {fileID: 0}
+  imageBoutonFastBackward: {fileID: 0}
+  imageBoutonPause: {fileID: 0}
+  imageBoutonResume: {fileID: 0}
+  imageBoutonFastForward: {fileID: 0}
+  iconFastBackward: {fileID: 21300000, guid: 5eab22254600b114da31763c59005f6f, type: 3}
+  iconFastBackwardIsSelected: {fileID: 21300000, guid: 9f338a25237edf142a4f115c5dc158b5, type: 3}
+  iconPause: {fileID: 21300000, guid: 2092813b451000647bd6434698cda1a7, type: 3}
+  iconPauseIsSelected: {fileID: 21300000, guid: a6782f947fbda094d938d8ed38b1cdc3, type: 3}
+  iconResume: {fileID: 21300000, guid: 5f0407ae8f4ac8b4489dd82366888650, type: 3}
+  iconResumeIsSelected: {fileID: 21300000, guid: 743fb373d19261d4e9de73b6812ea8b3, type: 3}
+  iconFastForward: {fileID: 21300000, guid: acbcbedd71e0ba847a865adf0a913506, type: 3}
+  iconFastForwardIsSelected: {fileID: 21300000, guid: b428cffaf2af8364dac9b0e8b0c81320, type: 3}
