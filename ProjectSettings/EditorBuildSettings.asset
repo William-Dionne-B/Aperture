@@ -5,9 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/MenuAccueil.unity
+    guid: 5426934741f2e484ab4cc807e210ae08
+  - enabled: 1
+    path: Assets/Scenes/1Etoile1Planete.unity
+    guid: 42c1c5fff1e14bf4f849e6f2c8c137a4
+  - enabled: 1
+    path: Assets/Scenes/SystemeSolaire.unity
+    guid: 091acb722985c9245a15eb536b182777
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
