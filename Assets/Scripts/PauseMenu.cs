@@ -121,7 +121,7 @@ public class PauseMenu : MonoBehaviour
     {
         // TODO: Ajouter la logique de sauvegarde de l'univers ici
         Debug.Log("Ending Simulator !");
-        Application.Quit();
+        MainMenuManager.loadScene("MenuAccueil");
     }
 
     // ==========================================

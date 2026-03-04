@@ -5,7 +5,8 @@ public class MainMenuManager : MonoBehaviour
 {
     public void OnStartButtonPressed()
     {
-        loadScene("SystemeSolaire");
+        // loadScene("SystemeSolaire");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
 
     public void OnQuitButtonPressed()
@@ -17,7 +18,7 @@ public class MainMenuManager : MonoBehaviour
         #endif
     }
 
-    public void loadScene(string sceneName)
+    public static void loadScene(string sceneName)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
