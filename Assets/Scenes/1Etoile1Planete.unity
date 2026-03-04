@@ -3401,7 +3401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialVelocity: {x: 0, y: 0, z: 0}
   applyInitialVelocity: 1
-  Mass: 50
+  Mass: 100
   rb: {fileID: 0}
   line: {fileID: 0}
 --- !u!54 &633136388
@@ -4900,7 +4900,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialVelocity: {x: 0, y: 0, z: 200}
   applyInitialVelocity: 1
-  Mass: 5
+  Mass: 0.16601
   rb: {fileID: 0}
   line: {fileID: 0}
 --- !u!54 &916402427
@@ -9408,8 +9408,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2eebbc1b5e46cc419ea6e3303ec1336, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planetPrefab: {fileID: 2563120141751923440, guid: f651cfd9c798fae4d9ae52efd1722307, type: 3}
-  spawnDistance: 100
+  celestialPrefabs: []
+  sunMass: 1000000
+  sunTransform: {fileID: 0}
 --- !u!1 &1714691415
 GameObject:
   m_ObjectHideFlags: 0
