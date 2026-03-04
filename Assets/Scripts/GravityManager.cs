@@ -64,6 +64,7 @@ public class GravityManager : MonoBehaviour
             }
 
             OrbitPredictor(bodies[i]);
+            //OrbitPredictorIndividual();
         }
 
     }
@@ -192,5 +193,146 @@ public class GravityManager : MonoBehaviour
         mainBody.line.useWorldSpace = true;
         mainBody.line.positionCount = orbitPoints.Count;
         mainBody.line.SetPositions(orbitPoints.ToArray());
+    }
+
+    void OrbitPredictorIndividual()
+    {
+        float Gconst = gravityMultiplier * G;
+        float timeStep = 0.95f;
+        int maxSteps = 480;
+
+        int count = bodies.Count;
+
+        Vector3[] positions = new Vector3[count];
+        Vector3[] velocities = new Vector3[count];
+        float[] masses = new float[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            positions[i] = bodies[i].rb.position;
+            velocities[i] = bodies[i].rb.linearVelocity;
+            masses[i] = bodies[i].rb.mass;
+        }
+
+        Vector3[] accelerations = ComputeAccelerations(positions, masses, Gconst);
+
+        Vector3 barycenter = ComputeBarycenter(positions, masses);
+
+        Vector3[] startDirections = new Vector3[count];
+        float[] accumulatedAngles = new float[count];
+        float[] previousAngles = new float[count];
+        bool[] completed = new bool[count];
+
+        List<Vector3>[] orbitPoints = new List<Vector3>[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            startDirections[i] = (positions[i] - barycenter).normalized;
+            accumulatedAngles[i] = 0f;
+            previousAngles[i] = 0f;
+            completed[i] = false;
+            orbitPoints[i] = new List<Vector3>();
+        }
+
+        int remaining = count;
+
+        for (int step = 0; step < maxSteps && remaining > 0; step++)
+        {
+            // Position update (Velocity Verlet)
+            for (int i = 0; i < count; i++)
+                positions[i] += velocities[i] * timeStep + 0.5f * accelerations[i] * timeStep * timeStep;
+
+            Vector3[] newAccelerations = ComputeAccelerations(positions, masses, Gconst);
+
+            for (int i = 0; i < count; i++)
+            {
+                velocities[i] += 0.5f * (accelerations[i] + newAccelerations[i]) * timeStep;
+                accelerations[i] = newAccelerations[i];
+            }
+
+            barycenter = ComputeBarycenter(positions, masses);
+
+            for (int i = 0; i < count; i++)
+            {
+                if (completed[i]) continue;
+
+                orbitPoints[i].Add(positions[i]);
+
+                Vector3 currentDir = (positions[i] - barycenter).normalized;
+
+                Vector3 orbitNormal = Vector3.Cross(
+                    positions[i] - barycenter,
+                    velocities[i]
+                ).normalized;
+
+                float angle = Vector3.SignedAngle(startDirections[i], currentDir, orbitNormal);
+                float deltaAngle = Mathf.DeltaAngle(previousAngles[i], angle);
+
+                accumulatedAngles[i] += deltaAngle;
+                previousAngles[i] = angle;
+
+                if (Mathf.Abs(accumulatedAngles[i]) >= 360f)
+                {
+                    completed[i] = true;
+                    remaining--;
+                    continue;
+                }
+
+                float distance = Vector3.Distance(positions[i], barycenter);
+                if (distance > 10000f)
+                {
+                    completed[i] = true;
+                    remaining--;
+                }
+            }
+        }
+
+        // Draw all orbits
+        for (int i = 0; i < count; i++)
+        {
+            bodies[i].line.useWorldSpace = true;
+            bodies[i].line.positionCount = orbitPoints[i].Count;
+            bodies[i].line.SetPositions(orbitPoints[i].ToArray());
+        }
+    }
+
+    Vector3 ComputeBarycenter(Vector3[] positions, float[] masses)
+    {
+        Vector3 center = Vector3.zero;
+        float totalMass = 0f;
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            center += positions[i] * masses[i];
+            totalMass += masses[i];
+        }
+
+        return center / totalMass;
+    }
+
+    Vector3[] ComputeAccelerations(Vector3[] positions, float[] masses, float G)
+    {
+        int count = positions.Length;
+        Vector3[] accelerations = new Vector3[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            for (int j = i + 1; j < count; j++)
+            {
+                Vector3 direction = positions[j] - positions[i];
+                float distance = direction.magnitude + 0.001f;
+
+                Vector3 forceDir = direction.normalized;
+                float force = G * masses[i] * masses[j] / (distance * distance);
+
+                Vector3 accelI = force / masses[i] * forceDir;
+                Vector3 accelJ = force / masses[j] * -forceDir;
+
+                accelerations[i] += accelI;
+                accelerations[j] += accelJ;
+            }
+        }
+
+        return accelerations;
     }
 }
