@@ -108,9 +108,9 @@ public class GravityManager : MonoBehaviour
             return weightedSum / totalMass;
         }
 
-    void OrbitPredictor(GravityBody mainBody) 
+    void OrbitPredictor(GravityBody mainBody)
     {
-        float constanteGravitationnelle = 1.5e6f;
+        float constanteGravitationnelle = gravityMultiplier * G;
         int simulationSteps = 150;
         float timeStep = 0.1f;
 
@@ -193,5 +193,4 @@ public class GravityManager : MonoBehaviour
         mainBody.line.positionCount = orbitPoints.Count;
         mainBody.line.SetPositions(orbitPoints.ToArray());
     }
-
 }
