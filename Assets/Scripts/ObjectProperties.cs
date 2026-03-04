@@ -9,6 +9,8 @@ public class ObjectProperties : MonoBehaviour
     [SerializeField]
     public float radius;
     [SerializeField]
+    public float distanceSoleil;
+    [SerializeField]
     public string objectName;
 
     private GameObject thisObject; // L'objet parent du script
@@ -16,14 +18,15 @@ public class ObjectProperties : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Assigne le parent si présent, sinon garde le GameObject courant
+        // Assigne le parent si prï¿½sent, sinon garde le GameObject courant
         thisObject = (transform.parent != null) ? transform.parent.gameObject : this.gameObject;
 
-        // Vérifications de la validité des propriétés procurés au lancement
+        // Vï¿½rifications de la validitï¿½ des propriï¿½tï¿½s procurï¿½s au lancement
         if (mass <= 0) mass = 1;
         if (speedMagnitude < 0) speedMagnitude = 0;
         if (radius <= 0) radius = 1;
-        if (string.IsNullOrEmpty(objectName)) objectName = "Bla bla bla"; //TODO : donner un prénom et nom de famille au hazard à partir d'une banque de noms?
+        if (distanceSoleil < 0) distanceSoleil = 0;
+        if (string.IsNullOrEmpty(objectName)) objectName = "Bla bla bla"; //TODO : donner un prï¿½nom et nom de famille au hazard ï¿½ partir d'une banque de noms?
     }
 
     // Update is called once per frame
