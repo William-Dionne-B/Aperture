@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class ObjectProperties : MonoBehaviour
@@ -9,29 +11,84 @@ public class ObjectProperties : MonoBehaviour
     [SerializeField]
     public float radius;
     [SerializeField]
-    public float distanceSoleil;
+    public GameObject EtoileParent;
+    [SerializeField]
+    public float distanceToEtoile;
     [SerializeField]
     public string objectName;
 
     private GameObject thisObject; // L'objet parent du script
+    private Transform thisTransform;
+    private Rigidbody thisRigidbody;
+    private GravityBody thisGravityBody;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Assigne le parent si pr�sent, sinon garde le GameObject courant
+        // Assigne le parent si présent, sinon garde le GameObject courant
         thisObject = (transform.parent != null) ? transform.parent.gameObject : this.gameObject;
 
-        // V�rifications de la validit� des propri�t�s procur�s au lancement
+        // Cache des composants fréquemment utilisés
+        thisTransform = thisObject.GetComponent<Transform>();
+        thisRigidbody = thisObject.GetComponent<Rigidbody>();
+        thisGravityBody = thisObject.GetComponent<GravityBody>();
+
+        // Vérifications de la validité des propriétés procurés au lancement
         if (mass <= 0) mass = 1;
+        if (distanceToEtoile < 0) distanceToEtoile = 0;
         if (speedMagnitude < 0) speedMagnitude = 0;
         if (radius <= 0) radius = 1;
-        if (distanceSoleil < 0) distanceSoleil = 0;
-        if (string.IsNullOrEmpty(objectName)) objectName = "Bla bla bla"; //TODO : donner un pr�nom et nom de famille au hazard � partir d'une banque de noms?
+        if (string.IsNullOrEmpty(objectName)) objectName = "Bla bla bla"; //TODO : donner un prénom et nom de famille au hazard à partir d'une banque de noms?
+
+        // Démarre la mise à jour de la vitesse à 10 Hz si un Rigidbody est présent
+        if (thisRigidbody != null)
+        {
+            StartCoroutine(UpdateSpeedRoutine());
+        }
+        else
+        {
+            // Si pas de Rigidbody, on garde speedMagnitude à 0 (ou valeur définie)
+            speedMagnitude = 0f;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        thisObject.GetComponent<Transform>().localScale = new Vector3(2*radius, 2*radius, 2*radius);
+        // Applique l'échelle
+        if (thisTransform != null)
+            thisTransform.localScale = new Vector3(2 * radius, 2 * radius, 2 * radius);
+
+        // Met à jour la masse du Rigidbody et du GravityBody chaque frame si présents
+        if (thisRigidbody != null)
+            thisRigidbody.mass = mass;
+
+        if (thisGravityBody != null)
+            thisGravityBody.Mass = mass;
+
+        // Calcul de la distance à l'étoile parente
+        if (EtoileParent != null && thisTransform != null)
+        {
+            Vector3 posEtoile = EtoileParent.transform.position;
+            Vector3 posBody = thisTransform.position;
+            Vector3 s = posEtoile - posBody;
+
+            distanceToEtoile = s.magnitude;
+        }
+    }
+
+    // Coroutine qui met à jour speedMagnitude 10 fois par seconde (toutes les 0.1s)
+    private IEnumerator UpdateSpeedRoutine()
+    {
+        var wait = new WaitForSeconds(0.1f); // 10 Hz
+        while (true)
+        {
+            if (thisRigidbody != null)
+                speedMagnitude = thisRigidbody.linearVelocity.magnitude;
+            else
+                speedMagnitude = 0f;
+
+            yield return wait;
+        }
     }
 }

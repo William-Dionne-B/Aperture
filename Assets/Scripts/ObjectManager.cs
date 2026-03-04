@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class ObjectManager : MonoBehaviour
 {
 
-    private GameObject selection; // Objet s�lectionn�
+    private GameObject selection; // Objet sélectionné
 
     public GameObject MainCamera; // Camera principale
 
@@ -18,22 +18,21 @@ public class ObjectManager : MonoBehaviour
     public GameObject mass; // Champ de texte pour la masse
 
     public GameObject radius; // Champ de texte pour le rayon
-    
-    public GameObject distanceSoleil;
 
     public GameObject obj_name; // Champ de texte pour le nom TODO : faire marcher le changement de nom
 
-    // R�f�rences li�es aux listeners pour pouvoir d�tacher proprement
+    public GameObject dist_etoile; // Champ de texte pour la distance à l'étoile (lecture seule)
+
+    // Références liées aux listeners pour pouvoir détacher proprement
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
     TMP_InputField radiusTmp; InputField radiusUi; UnityAction<string> radiusListener;
     TMP_InputField nameTmp; InputField nameUi; UnityAction<string> nameListener;
-    TMP_InputField distanceSoleilTmp; InputField distanceSoleilUi; UnityAction<string> distanceSoleilListener;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (selection == null) Debug.Log("S�lection inexistante");
+        if (selection == null) Debug.Log("Sélection inexistante");
         updateUIVisibility();
     }
 
@@ -42,7 +41,7 @@ public class ObjectManager : MonoBehaviour
     {
         if (MainCamera == null)
         {
-            Debug.LogWarning("MainCamera non assign�e dans ObjectManager.");
+            Debug.LogWarning("MainCamera non assignée dans ObjectManager.");
             return;
         }
 
@@ -53,15 +52,15 @@ public class ObjectManager : MonoBehaviour
             return;
         }
 
-        // Utilise le champ public `selectedObject` d�fini dans ClickDetection
+        // Utilise le champ public `selectedObject` défini dans ClickDetection
         var selected = click.selectedObject;
         if (selection != selected)
         {
             selection = selected;
-            BindFieldListeners(); // r�associe les listeners pour la nouvelle s�lection / nouveau contexte UI
+            BindFieldListeners(); // réassocie les listeners pour la nouvelle sélection / nouveau contexte UI
         }
 
-        // Ne met pas � jour l'UI si l'utilisateur est en train d'�diter un champ
+        // Ne met pas à jour l'UI si l'utilisateur est en train d'éditer un champ
         if (IsAnyFieldEditing())
         {
             return;
@@ -74,7 +73,7 @@ public class ObjectManager : MonoBehaviour
     {
         if (InfoUI == null)
         {
-            Debug.LogWarning("InfoUI non assign�e dans ObjectManager.");
+            Debug.LogWarning("InfoUI non assignée dans ObjectManager.");
             return;
         }
 
@@ -85,12 +84,39 @@ public class ObjectManager : MonoBehaviour
             var props = selection.GetComponent<ObjectProperties>();
             if (props != null)
             {
-                // Met � jour les champs UI avec les valeurs des propri�t�s (utilise les champs tels que d�finis dans ObjectProperties)
+                // Met à jour les champs UI avec les valeurs des propriétés (utilise les champs tels que définis dans ObjectProperties)
                 SetText(mass, props.mass.ToString("G"));
                 SetText(speed, props.speedMagnitude.ToString("G"));
                 SetText(radius, props.radius.ToString("G"));
-                SetText(radius, props.distanceSoleil.ToString("G"));
                 SetText(obj_name, props.objectName);
+
+                // Calcul robuste/affichage de la distance à l'étoile :
+                // - si l'EtoileParent est fourni, calcule la distance à la position courante et met à jour la propriété.
+                // - sinon affiche la valeur existante ou "N/A".
+                if (props.EtoileParent != null)
+                {
+                    try
+                    {
+                        Vector3 posEtoile = props.EtoileParent.transform.position;
+                        Vector3 posBody = selection.transform.position;
+                        float dist = Vector3.Distance(posEtoile, posBody);
+                        props.distanceToEtoile = dist;
+                        SetText(dist_etoile, dist.ToString("G"));
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"Impossible de calculer la distance à l'étoile : {ex.Message}");
+                        SetText(dist_etoile, "N/A");
+                    }
+                }
+                else
+                {
+                    // Affiche la valeur déjà calculée ou "N/A" si invalide
+                    if (props.distanceToEtoile >= 0f)
+                        SetText(dist_etoile, props.distanceToEtoile.ToString("G"));
+                    else
+                        SetText(dist_etoile, "N/A");
+                }
             }
             else
             {
@@ -98,8 +124,8 @@ public class ObjectManager : MonoBehaviour
                 SetText(mass, "");
                 SetText(speed, "");
                 SetText(radius, "");
-                SetText(distanceSoleil, "");
-                Debug.LogWarning("ObjectProperties manquant sur l'objet s�lectionn�.");
+                SetText(dist_etoile, "");
+                Debug.LogWarning("ObjectProperties manquant sur l'objet sélectionné.");
             }
         }
         else
@@ -108,7 +134,7 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
-    // Essaie de mettre � jour le texte sur plusieurs types courants :
+    // Essaie de mettre à jour le texte sur plusieurs types courants :
     // TMP_InputField, legacy InputField, TMP_Text, Text, ou leurs enfants.
     void SetText(GameObject field, string value)
     {
@@ -165,18 +191,18 @@ public class ObjectManager : MonoBehaviour
         Debug.LogWarning($"Champ UI \"{field.name}\" n'a pas de composant Text, TMP ou InputField.");
     }
 
-    // Retourne true si l'un des champs assign�s est en cours d'�dition (focus)
+    // Retourne true si l'un des champs assignés est en cours d'édition (focus)
     bool IsAnyFieldEditing()
     {
         if (IsFieldEditing(mass)) return true;
         if (IsFieldEditing(speed)) return true;
         if (IsFieldEditing(radius)) return true;
-        if (IsFieldEditing(distanceSoleil)) return true;
         if (IsFieldEditing(obj_name)) return true;
+        if (IsFieldEditing(dist_etoile)) return true;
         return false;
     }
 
-    // V�rifie un GameObject pour TMP_InputField ou InputField et teste la propri�t� isFocused
+    // Vérifie un GameObject pour TMP_InputField ou InputField et teste la propriété isFocused
     bool IsFieldEditing(GameObject field)
     {
         if (field == null) return false;
@@ -187,7 +213,7 @@ public class ObjectManager : MonoBehaviour
         var uiInput = field.GetComponent<InputField>();
         if (uiInput != null) return uiInput.isFocused;
 
-        // Cas o� le composant InputField est sur un enfant (ex: structure TMP Input Field)
+        // Cas où le composant InputField est sur un enfant (ex: structure TMP Input Field)
         tmpInput = field.GetComponentInChildren<TMP_InputField>();
         if (tmpInput != null) return tmpInput.isFocused;
 
@@ -197,7 +223,7 @@ public class ObjectManager : MonoBehaviour
         return false;
     }
 
-    // Lie les callbacks OnEndEdit aux champs (d�tache d'abord les anciens listeners)
+    // Lie les callbacks OnEndEdit aux champs (détache d'abord les anciens listeners)
     void BindFieldListeners()
     {
         UnbindAllFieldListeners();
@@ -243,20 +269,6 @@ public class ObjectManager : MonoBehaviour
             radiusListener = (s) => OnRadiusEndEdit(s);
             radiusUi.onEndEdit.AddListener(radiusListener);
         }
-        
-        // distanceSoleil
-        distanceSoleilTmp = GetTMPInput(distanceSoleil);
-        distanceSoleilUi = GetLegacyInput(distanceSoleil);
-        if (distanceSoleilTmp != null)
-        {
-            distanceSoleilListener = (s) => OnDistanceSoleilEndEdit(s);
-            distanceSoleilTmp.onEndEdit.AddListener(distanceSoleilListener);
-        }
-        else if (distanceSoleilUi != null)
-        {
-            distanceSoleilListener = (s) => OnDistanceSoleilEndEdit(s);
-            distanceSoleilUi.onEndEdit.AddListener(distanceSoleilListener);
-        }
 
         // name
         nameTmp = GetTMPInput(obj_name);
@@ -290,10 +302,6 @@ public class ObjectManager : MonoBehaviour
         if (nameTmp != null && nameListener != null) nameTmp.onEndEdit.RemoveListener(nameListener);
         if (nameUi != null && nameListener != null) nameUi.onEndEdit.RemoveListener(nameListener);
         nameTmp = null; nameUi = null; nameListener = null;
-        
-        if (distanceSoleilTmp != null && distanceSoleilListener != null) distanceSoleilTmp.onEndEdit.RemoveListener(distanceSoleilListener);
-        if (distanceSoleilUi != null && distanceSoleilListener != null) distanceSoleilUi.onEndEdit.RemoveListener(distanceSoleilListener);
-        distanceSoleilTmp = null; distanceSoleilUi = null; distanceSoleilListener = null;
     }
 
     TMP_InputField GetTMPInput(GameObject field)
@@ -312,7 +320,7 @@ public class ObjectManager : MonoBehaviour
         return field.GetComponentInChildren<InputField>();
     }
 
-    // Callbacks de fin d'�dition � valident et appliquent si valide, sinon restaurent l'affichage
+    // Callbacks de fin d'édition  valident et appliquent si valide, sinon restaurent l'affichage
     void OnMassEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -362,29 +370,12 @@ public class ObjectManager : MonoBehaviour
         updateUIVisibility();
     }
 
-    void OnDistanceSoleilEndEdit(string input)
-    {
-        var props = selection?.GetComponent<ObjectProperties>();
-        if (props == null) return;
-
-        if (TryParseFloatFlexible(input, out float v))
-        {
-            props.distanceSoleil = v;
-        }
-        else
-        {
-            SetText(distanceSoleil, props.distanceSoleil.ToString("G"));
-        }
-
-        updateUIVisibility();
-    }
-
     void OnNameEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
         if (props == null) return;
 
-        // Accepte toute cha�ne non nulle ; si vous voulez interdire vide, changez la condition
+        // Accepte toute chaîne non nulle ; si vous voulez interdire vide, changez la condition
         if (input != null)
         {
             props.objectName = input;
@@ -396,7 +387,7 @@ public class ObjectManager : MonoBehaviour
         updateUIVisibility();
     }
 
-    // Essaie plusieurs cultures pour �tre tol�rant (ex : virgule ou point)
+    // Essaie plusieurs cultures pour être tolérant (ex : virgule ou point)
     bool TryParseFloatFlexible(string s, out float result)
     {
         if (string.IsNullOrWhiteSpace(s))
@@ -405,15 +396,15 @@ public class ObjectManager : MonoBehaviour
             return false;
         }
 
-        // Premi�re passe: culture courante (utile pour les utilisateurs fr-FR avec virgule)
+        // Première passe: culture courante (utile pour les utilisateurs fr-FR avec virgule)
         if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out result))
             return true;
 
-        // Deuxi�me passe: invariant (point)
+        // Deuxième passe: invariant (point)
         if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
             return true;
 
-        // Troisi�me passe: remplace virgule par point (au cas o�)
+        // Troisième passe: remplace virgule par point (au cas où)
         var replaced = s.Replace(',', '.');
         if (float.TryParse(replaced, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
             return true;
