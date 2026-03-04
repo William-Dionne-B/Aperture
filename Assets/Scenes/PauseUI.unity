@@ -491,7 +491,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 315}
+  m_AnchoredPosition: {x: 0, y: 235}
   m_SizeDelta: {x: 160, y: 15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &64710620
@@ -9793,6 +9793,18 @@ MonoBehaviour:
   mouseSensitivitySlider: {fileID: 1518176734}
   speedSlider: {fileID: 170620187}
   cameraScript: {fileID: 1938951649}
+  imageBoutonFastBackward: {fileID: 0}
+  imageBoutonPause: {fileID: 0}
+  imageBoutonResume: {fileID: 0}
+  imageBoutonFastForward: {fileID: 0}
+  iconFastBackward: {fileID: 0}
+  iconFastBackwardIsSelected: {fileID: 0}
+  iconPause: {fileID: 0}
+  iconPauseIsSelected: {fileID: 0}
+  iconResume: {fileID: 0}
+  iconResumeIsSelected: {fileID: 0}
+  iconFastForward: {fileID: 0}
+  iconFastForwardIsSelected: {fileID: 0}
 --- !u!4 &1420217105
 Transform:
   m_ObjectHideFlags: 0
