@@ -80,13 +80,13 @@ public class FreeFlyCamera : MonoBehaviour
 
         if (Input.GetKey(speedUp))
         {
-            float newSpeed = moveSpeed + (100f * Time.deltaTime);
+            float newSpeed = moveSpeed + (100f * Time.unscaledDeltaTime);
             ChangerVitesse(Mathf.Clamp(newSpeed, 10f, 500f));
         }
 
         if (Input.GetKey(speedDown))
         {
-            float newSpeed = moveSpeed - (100f * Time.deltaTime);
+            float newSpeed = moveSpeed - (100f * Time.unscaledDeltaTime);
             ChangerVitesse(Mathf.Clamp(newSpeed, 10f, 500f));
         }
     }
@@ -96,8 +96,8 @@ public class FreeFlyCamera : MonoBehaviour
     /// </summary>
     void HandleMouseLook()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 100f * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 100f * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 100f * Time.unscaledDeltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 100f * Time.unscaledDeltaTime;
 
         yaw += mouseX;
         pitch -= mouseY;
@@ -125,9 +125,9 @@ public class FreeFlyCamera : MonoBehaviour
             speed *= boostMultiplier;
 
         Vector3 targetVelocity = transform.TransformDirection(input) * speed;
-        velocity = Vector3.Lerp(velocity, targetVelocity, acceleration * Time.deltaTime);
+        velocity = Vector3.Lerp(velocity, targetVelocity, acceleration * Time.unscaledDeltaTime);
 
-        transform.position += velocity * Time.deltaTime;
+        transform.position += velocity * Time.unscaledDeltaTime;
     }
 
     // ==========================================
