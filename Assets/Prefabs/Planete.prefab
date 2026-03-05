@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
-  heightOffset: 2
+  heightOffsetPercentage: 0.2
   minScale: 0.5
   maxScale: 20
   scaleMultiplier: 0.1
@@ -297,7 +297,7 @@ MonoBehaviour:
   mass: 0
   speedMagnitude: 0
   radius: 0
-  EtoileParent: {fileID: 0}
+  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
   distanceToEtoile: 0
   objectName: "Plan\xE8te Robert"
 --- !u!1 &3975878714945128468
