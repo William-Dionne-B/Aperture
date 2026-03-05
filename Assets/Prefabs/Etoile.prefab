@@ -281,7 +281,7 @@ MonoBehaviour:
   radius: 15
   EtoileParent: {fileID: 0}
   distanceToEtoile: 0
-  objectName: "\xC9toile Epstein"
+  objectName: Sol
 --- !u!1 &8308709504518242150
 GameObject:
   m_ObjectHideFlags: 0

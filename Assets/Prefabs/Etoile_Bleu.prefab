@@ -279,9 +279,9 @@ MonoBehaviour:
   mass: 1000000
   speedMagnitude: 0
   radius: 15
-  EtoileParent: {fileID: 0}
+  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
   distanceToEtoile: 0
-  objectName: "\xC9toile de David"
+  objectName: "\xC9toile Bleu"
 --- !u!1 &8308709504518242150
 GameObject:
   m_ObjectHideFlags: 0
