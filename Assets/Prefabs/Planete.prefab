@@ -299,7 +299,7 @@ MonoBehaviour:
   radius: 0
   EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
   distanceToEtoile: 0
-  objectName: "Plan\xE8te Robert"
+  objectName: "Plan\xE8te X"
 --- !u!1 &3975878714945128468
 GameObject:
   m_ObjectHideFlags: 0

@@ -282,7 +282,7 @@ MonoBehaviour:
   radius: 15
   EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
   distanceToEtoile: 0
-  objectName: "\xC9toile Bleu"
+  objectName: Bleu
 --- !u!114 &7738383565594045505
 MonoBehaviour:
   m_ObjectHideFlags: 0
