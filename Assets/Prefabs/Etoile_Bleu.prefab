@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1262627819960287473}
   - component: {fileID: 5893172788963099703}
   - component: {fileID: 2183513946539248318}
+  - component: {fileID: 7738383565594045505}
   m_Layer: 0
   m_Name: Etoile_Bleu
   m_TagString: Untagged
@@ -282,6 +283,23 @@ MonoBehaviour:
   EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
   distanceToEtoile: 0
   objectName: "\xC9toile Bleu"
+--- !u!114 &7738383565594045505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544941027984095034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
+  heightOffsetPercentage: 0.65
+  minScale: 0.5
+  maxScale: 50
+  scaleMultiplier: 0.1
 --- !u!1 &8308709504518242150
 GameObject:
   m_ObjectHideFlags: 0

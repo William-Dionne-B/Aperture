@@ -38,7 +38,16 @@ public class ObjectProperties : MonoBehaviour
         if (distanceToEtoile < 0) distanceToEtoile = 0;
         if (speedMagnitude < 0) speedMagnitude = 0;
         if (radius <= 0) radius = 1;
-        if (string.IsNullOrEmpty(objectName)) objectName = "Bla bla bla"; //TODO : donner un prénom et nom de famille au hazard à partir d'une banque de noms?
+        if (string.IsNullOrEmpty(objectName)) 
+        {
+            objectName = thisObject.name; 
+        }
+        
+        else 
+        {
+            thisObject.name = objectName;
+        }
+        //TODO : donner un prénom et nom de famille au hazard à partir d'une banque de noms?
 
         // Démarre la mise à jour de la vitesse à 10 Hz si un Rigidbody est présent
         if (thisRigidbody != null)

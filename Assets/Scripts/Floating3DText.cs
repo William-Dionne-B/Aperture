@@ -4,18 +4,17 @@ using TMPro;
 public class Floating3DText : MonoBehaviour
 {
     [Header("Text Settings")]
-    public GameObject textPrefab;       
-    
-    [Tooltip("Ex: 0.2 signifie que le texte flotte 20% plus haut que le rayon de la planète")]
+    public GameObject textPrefab;
     public float heightOffsetPercentage = 0.65f;
 
     [Header("Scaling Settings")]
-    public float minScale = 0.5f;       
-    public float maxScale = 50f;
+    public float minScale = 0.1f;       
+    public float maxScale = 500f;
     public float scaleMultiplier = 0.5f; 
 
     private Transform player;
     private Transform textTransform;
+    private TextMeshPro textMesh;
 
     void Start()
     {
@@ -24,19 +23,23 @@ public class Floating3DText : MonoBehaviour
         GameObject textObj = Instantiate(textPrefab, transform.position, Quaternion.identity);
 
         textTransform = textObj.transform;
-        textTransform.SetParent(transform);
 
-        TextMeshPro tmp = textObj.GetComponent<TextMeshPro>();
-        if (tmp != null)
+        textMesh = textObj.GetComponent<TextMeshPro>();
+        if (textMesh != null)
         {
-            tmp.text = gameObject.name;
+            textMesh.text = gameObject.name;
         }
     }
 
     void Update()
     {
         if (textTransform == null || player == null) return;
-       
+
+        if (textMesh != null && textMesh.text != gameObject.name)
+        {
+            textMesh.text = gameObject.name;
+        }    
+        
         float rayonActuel = transform.lossyScale.y / 2f;
 
         float ecartDeFlottaison = rayonActuel * heightOffsetPercentage;
@@ -46,14 +49,16 @@ public class Floating3DText : MonoBehaviour
         textTransform.forward = player.forward;
 
         float tailleDesiree = rayonActuel * scaleMultiplier;
-        
         tailleDesiree = Mathf.Clamp(tailleDesiree, minScale, maxScale);
 
-        Vector3 parentScale = transform.lossyScale;
-        textTransform.localScale = new Vector3(
-            tailleDesiree / parentScale.x,
-            tailleDesiree / parentScale.y,
-            tailleDesiree / parentScale.z
-        );
+        textTransform.localScale = new Vector3(tailleDesiree, tailleDesiree, tailleDesiree);
+    }
+    
+    void OnDestroy()
+    {
+        if (textTransform != null)
+        {
+            Destroy(textTransform.gameObject);
+        }
     }
 }

@@ -376,9 +376,11 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
 
         // Accepte toute chaîne non nulle ; si vous voulez interdire vide, changez la condition
-        if (input != null)
+        if (!string.IsNullOrWhiteSpace(input))
         {
             props.objectName = input;
+
+            selection.name = input;
         }
         else
         {
