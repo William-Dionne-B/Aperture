@@ -124,6 +124,17 @@ public class ClickDetection : MonoBehaviour
                 currentLookedAt = null;
                 Debug.Log("Ne regarde plus : " + oldName);
             }
+
+            // Si on clique dans le vide, désélectionne l'objet sélectionné
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (selectedObject != null)
+                {
+                    RemoveSelectionOutlineFromObject(selectedObject);
+                    Debug.Log("Objet désélectionné (clic dans le vide) : " + selectedObject.name);
+                    selectedObject = null;
+                }
+            }
         }
     }
 
