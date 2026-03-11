@@ -35,11 +35,8 @@ public class Floating3DText : MonoBehaviour
     {
         if (textTransform == null || player == null) return;
 
-        if (textMesh != null && textMesh.text != gameObject.name)
-        {
-            textMesh.text = gameObject.name;
-        }    
-        
+        textMesh.text = gameObject.GetComponent<ObjectProperties>().objectName;
+           
         float rayonActuel = transform.lossyScale.y / 2f;
 
         float ecartDeFlottaison = rayonActuel * heightOffsetPercentage;
