@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ClickDetection : MonoBehaviour
 {
@@ -19,6 +21,9 @@ public class ClickDetection : MonoBehaviour
 
     // Nouvelle table pour restaurer proprement les matériaux originaux par Renderer
     private readonly Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
+
+    // Coroutine en attente pour la désélection différée
+    private Coroutine pendingDeselectionCoroutine;
 
     void Start()
     {
@@ -90,6 +95,13 @@ public class ClickDetection : MonoBehaviour
             // Au clic gauche, gère la sélection (outline de sélection)
             if (Input.GetMouseButtonDown(0))
             {
+                // Annule toute désélection différée en cours si on clique sur un objet
+                if (pendingDeselectionCoroutine != null)
+                {
+                    StopCoroutine(pendingDeselectionCoroutine);
+                    pendingDeselectionCoroutine = null;
+                }
+
                 if (hitObj != null)
                 {
                     // Si on avait une sélection différente, la retirer
@@ -125,17 +137,51 @@ public class ClickDetection : MonoBehaviour
                 Debug.Log("Ne regarde plus : " + oldName);
             }
 
-            // Si on clique dans le vide, désélectionne l'objet sélectionné
+            // Si on clique dans le vide, lance la désélection différée (2 frames)
             if (Input.GetMouseButtonDown(0))
             {
-                if (selectedObject != null)
+                // Si on a cliqué sur l'UI, ne pas désélectionner — annuler la coroutine éventuelle et sortir
+                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 {
-                    RemoveSelectionOutlineFromObject(selectedObject);
-                    Debug.Log("Objet désélectionné (clic dans le vide) : " + selectedObject.name);
-                    selectedObject = null;
+                    if (pendingDeselectionCoroutine != null)
+                    {
+                        StopCoroutine(pendingDeselectionCoroutine);
+                        pendingDeselectionCoroutine = null;
+                    }
+                }
+                else
+                {
+                    if (selectedObject != null)
+                    {
+                        // Si une coroutine est déjà en cours, on la remplace
+                        if (pendingDeselectionCoroutine != null)
+                        {
+                            StopCoroutine(pendingDeselectionCoroutine);
+                            pendingDeselectionCoroutine = null;
+                        }
+
+                        pendingDeselectionCoroutine = StartCoroutine(DelayedDeselect(selectedObject));
+                    }
                 }
             }
         }
+    }
+
+    private IEnumerator DelayedDeselect(GameObject obj)
+    {
+        // Attendre 2 frames
+        yield return null;
+        yield return null;
+
+        // Si la sélection est toujours la même (aucune nouvelle sélection), désélectionner proprement
+        if (selectedObject == obj && selectedObject != null)
+        {
+            RemoveSelectionOutlineFromObject(selectedObject);
+            Debug.Log("Objet désélectionné (clic dans le vide après 2 frames) : " + selectedObject.name);
+            selectedObject = null;
+        }
+
+        pendingDeselectionCoroutine = null;
     }
 
     private void AddOutlineToObject(GameObject obj)
