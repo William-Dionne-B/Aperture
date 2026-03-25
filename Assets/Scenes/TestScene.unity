@@ -1339,6 +1339,8 @@ MonoBehaviour:
   mass: 12.39
   speedMagnitude: 2.05
   radius: 5.3
+  EtoileParent: {fileID: 0}
+  distanceToEtoile: 0
   objectName: Kevin
 --- !u!1 &148390325
 GameObject:
@@ -4025,6 +4027,8 @@ MonoBehaviour:
   mass: 190.34
   speedMagnitude: 40.33
   radius: 47.83
+  EtoileParent: {fileID: 0}
+  distanceToEtoile: 0
   objectName: Bob
 --- !u!1 &414182406
 GameObject:
@@ -11823,9 +11827,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13532f53dd4f72048ae15d92297294d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlinerMat: {fileID: 2100000, guid: c35fd50b767eb5f47b478ea9044ee28c, type: 2}
-  selectionOutlineMat: {fileID: 2100000, guid: fbb6c056ad0145d4497529df36456e40, type: 2}
   selectedObject: {fileID: 0}
+  selectionSprite: {fileID: 21300000, guid: 67e21294a3178fa4b94518d58c2353dd, type: 3}
+  selectionSpriteOffset: {x: 0, y: 1.5, z: 0}
+  selectionSpriteScale: 0.25
+  selectionSpriteMinScale: 0.15
+  hoverRotationSpeed: 180
 --- !u!114 &1516865756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12953,6 +12960,7 @@ MonoBehaviour:
   mass: {fileID: 618839833}
   radius: {fileID: 2144062955}
   obj_name: {fileID: 1863143423}
+  dist_etoile: {fileID: 0}
 --- !u!1 &1697864680
 GameObject:
   m_ObjectHideFlags: 0
@@ -14146,6 +14154,8 @@ MonoBehaviour:
   mass: 21.63
   speedMagnitude: 2.93
   radius: 45.25
+  EtoileParent: {fileID: 0}
+  distanceToEtoile: 0
   objectName: Soleil
 --- !u!1 &1863143423
 GameObject:
@@ -16142,6 +16152,8 @@ MonoBehaviour:
   mass: 65.17
   speedMagnitude: 0.15
   radius: 5.03
+  EtoileParent: {fileID: 0}
+  distanceToEtoile: 0
   objectName: Garry
 --- !u!1 &2008604737
 GameObject:

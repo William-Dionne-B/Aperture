@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,383 +7,198 @@ public class ClickDetection : MonoBehaviour
 {
     private Camera mainCam;
 
-    [SerializeField]
-    private Material outlinerMat; // Assignez `Outliner_MAT` dans l'inspecteur.
-    [SerializeField]
-    private Material selectionOutlineMat; // Assignez le matériau d'outline de sélection.
-
     private GameObject currentLookedAt;
-
-    [SerializeField]
     public GameObject selectedObject;
 
-    // Nouvelle table pour restaurer proprement les matériaux originaux par Renderer
-    private readonly Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
+    private GameObject selectionSpriteGO;
+    private GameObject spriteTarget;
 
-    // Coroutine en attente pour la désélection différée
     private Coroutine pendingDeselectionCoroutine;
+
+    [SerializeField] private Sprite selectionSprite;
+    [SerializeField] private Vector3 selectionSpriteOffset = Vector3.zero;
+
+    [SerializeField] private float selectionSpriteScale = 0.5f;
+    [SerializeField] private float selectionSpriteMinScale = 0.4f;
+
+    [SerializeField] private float hoverRotationSpeed = 45f;
 
     void Start()
     {
         mainCam = Camera.main;
-        if (mainCam == null)
-            Debug.LogWarning("Aucune Camera avec le tag 'MainCamera' trouvée.");
-
-        if (outlinerMat == null)
-        {
-            outlinerMat = Resources.Load<Material>("Outliner_MAT");
-        }
-
-        if (outlinerMat == null)
-        {
-            outlinerMat = Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name.Contains("Outliner_MAT") || m.name.Contains("Outliner"));
-        }
-
-        if (outlinerMat == null)
-            Debug.LogWarning("Outliner mat est nul-part");
-
-        // Charge le matériau de sélection (fallback similaire)
-        if (selectionOutlineMat == null)
-        {
-            selectionOutlineMat = Resources.Load<Material>("SelectionOutliner_MAT");
-        }
-
-        if (selectionOutlineMat == null)
-        {
-            selectionOutlineMat = Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name.Contains("SelectionOutliner") || m.name.Contains("Selection_Outline") || m.name.Contains("SelectionOutline") || m.name.Contains("Selection"));
-        }
-
-        if (selectionOutlineMat == null)
-            Debug.LogWarning("Selection outline mat est nul-part");
+        CreateSelectionSpheres();
     }
 
     void Update()
     {
         if (mainCam == null) return;
 
-        // Centre de l'écran
-        Vector3 screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
-        Ray ray = mainCam.ScreenPointToRay(screenCenter);
+        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit clickHit, Mathf.Infinity))
+        GameObject hitObj = null;
+
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            GameObject hitObj = clickHit.collider.gameObject;
-            // Si on regarde un nouvel objet
-            if (hitObj != currentLookedAt)
+            hitObj = GetRootObject(hit.collider.gameObject);
+
+            if (hitObj != null)
             {
-                // Retire l'outline de l'ancien uniquement si ce n'était pas l'objet sélectionné
-                if (currentLookedAt != null)
-                {
-                    string oldName = currentLookedAt.name;
-                    if (currentLookedAt != selectedObject)
-                    {
-                        RemoveOutlineFromObject(currentLookedAt);
-                    }
-                    Debug.Log("Ne regarde plus : " + oldName); // Debug quand on ne regarde plus, nom objet
-                }
-
-                // Ajoute l'outline au nouvel objet seulement si ce n'est pas déjà l'objet sélectionné
-                if (hitObj != selectedObject)
-                    AddOutlineToObject(hitObj);
-
                 currentLookedAt = hitObj;
-                Debug.Log("Regarde : " + hitObj.name); // debug quand on regarde un objet, nom objet
-            }
 
-            // Au clic gauche, gère la sélection (outline de sélection)
-            if (Input.GetMouseButtonDown(0))
-            {
-                // Annule toute désélection différée en cours si on clique sur un objet
-                if (pendingDeselectionCoroutine != null)
+                if (Input.GetMouseButtonDown(0))
                 {
-                    StopCoroutine(pendingDeselectionCoroutine);
-                    pendingDeselectionCoroutine = null;
-                }
+                    if (pendingDeselectionCoroutine != null)
+                        StopCoroutine(pendingDeselectionCoroutine);
 
-                if (hitObj != null)
-                {
-                    // Si on avait une sélection différente, la retirer
-                    if (selectedObject != null && selectedObject != hitObj)
-                    {
-                        RemoveSelectionOutlineFromObject(selectedObject);
-                    }
-
-                    // Si on sélectionne un nouvel objet (ou le même), appliquer l'outline de sélection
                     if (selectedObject != hitObj)
-                    {
                         selectedObject = hitObj;
-                        AddSelectionOutlineToObject(selectedObject);
-                        Debug.Log("Objet sélectionné : " + selectedObject.name);
-
-                        // Appel du debug spécifique à la sélection (n'utilise que la sélection)
-                        debugOnSelection();
-                    }
                 }
             }
         }
         else
         {
-            // Si on ne regarde rien, retire l'outline de l'ancien uniquement s'il n'est pas sélectionné
-            if (currentLookedAt != null)
-            {
-                string oldName = currentLookedAt.name;
-                if (currentLookedAt != selectedObject)
-                {
-                    RemoveOutlineFromObject(currentLookedAt);
-                }
-                currentLookedAt = null;
-                Debug.Log("Ne regarde plus : " + oldName);
-            }
+            currentLookedAt = null;
 
-            // Si on clique dans le vide, lance la désélection différée (2 frames)
             if (Input.GetMouseButtonDown(0))
             {
-                // Si on a cliqué sur l'UI, ne pas désélectionner — annuler la coroutine éventuelle et sortir
-                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                {
-                    if (pendingDeselectionCoroutine != null)
-                    {
-                        StopCoroutine(pendingDeselectionCoroutine);
-                        pendingDeselectionCoroutine = null;
-                    }
-                }
-                else
+                if (EventSystem.current == null || !EventSystem.current.IsPointerOverGameObject())
                 {
                     if (selectedObject != null)
-                    {
-                        // Si une coroutine est déjà en cours, on la remplace
-                        if (pendingDeselectionCoroutine != null)
-                        {
-                            StopCoroutine(pendingDeselectionCoroutine);
-                            pendingDeselectionCoroutine = null;
-                        }
-
                         pendingDeselectionCoroutine = StartCoroutine(DelayedDeselect(selectedObject));
-                    }
                 }
             }
         }
+
+        GameObject target = currentLookedAt != null ? currentLookedAt : selectedObject;
+
+        if (target != null)
+        {
+            if (selectionSpriteGO == null || spriteTarget != target)
+            {
+                CreateSelectionSprite(target);
+                spriteTarget = target;
+            }
+
+            UpdateSprite(target);
+        }
+        else
+        {
+            RemoveSprite();
+        }
+    }
+
+    void CreateSelectionSpheres()
+    {
+        ObjectProperties[] objects = FindObjectsOfType<ObjectProperties>();
+
+        foreach (var obj in objects)
+        {
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
+            sphere.name = "SelectionSphere";
+            sphere.transform.SetParent(obj.transform);
+            sphere.transform.localPosition = Vector3.zero;
+            sphere.transform.localRotation = Quaternion.identity;
+
+            float radius = GetObjectRadius(obj.gameObject);
+
+            Destroy(sphere.GetComponent<MeshRenderer>());
+
+            SphereCollider col = sphere.GetComponent<SphereCollider>();
+            col.isTrigger = true;
+            col.radius = radius * 3.0f;
+
+            sphere.layer = LayerMask.NameToLayer("Default");
+        }
+    }
+
+    GameObject GetRootObject(GameObject obj)
+    {
+        ObjectProperties prop = obj.GetComponentInParent<ObjectProperties>();
+        return prop != null ? prop.gameObject : null;
+    }
+
+    float GetObjectRadius(GameObject obj)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length == 0)
+            return 1f;
+
+        Bounds b = renderers[0].bounds;
+        foreach (var r in renderers)
+            b.Encapsulate(r.bounds);
+
+        return b.size.magnitude * 0.5f;
     }
 
     private IEnumerator DelayedDeselect(GameObject obj)
     {
-        // Attendre 2 frames
         yield return null;
         yield return null;
 
-        // Si la sélection est toujours la même (aucune nouvelle sélection), désélectionner proprement
-        if (selectedObject == obj && selectedObject != null)
-        {
-            RemoveSelectionOutlineFromObject(selectedObject);
-            Debug.Log("Objet désélectionné (clic dans le vide après 2 frames) : " + selectedObject.name);
+        if (selectedObject == obj)
             selectedObject = null;
-        }
-
-        pendingDeselectionCoroutine = null;
     }
 
-    private void AddOutlineToObject(GameObject obj)
+    private void CreateSelectionSprite(GameObject obj)
     {
-        if (obj == null || outlinerMat == null) return;
+        RemoveSprite();
 
-        // Si l'objet est sélectionné, on ne doit pas ajouter l'outline temporaire
-        if (obj == selectedObject) return;
+        if (selectionSprite == null || obj == null) return;
 
-        var renderers = obj.GetComponentsInChildren<Renderer>();
-        foreach (var rend in renderers)
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+
+        Vector3 center = obj.transform.position;
+
+        if (renderers.Length > 0)
         {
-            if (rend == null) continue;
+            Bounds b = renderers[0].bounds;
+            foreach (var r in renderers)
+                b.Encapsulate(r.bounds);
 
-            // Sauvegarde l'état original si ce Renderer n'a pas encore été modifié
-            if (!originalMaterials.ContainsKey(rend))
-            {
-                var original = rend.materials; // cela renvoie une copie des matériaux actuels
-                var copy = new Material[original.Length];
-                original.CopyTo(copy, 0);
-                originalMaterials[rend] = copy;
-            }
-
-            var mats = rend.materials;
-            // Vérifie présence du matériau d'outline (tolère les instances en regardant si le nom contient)
-            bool already = mats.Any(m => m != null && (m == outlinerMat || m.name.Contains(outlinerMat.name)));
-            if (!already)
-            {
-                var newMats = new Material[mats.Length + 1];
-                mats.CopyTo(newMats, 0);
-                newMats[newMats.Length - 1] = outlinerMat;
-                rend.materials = newMats;
-            }
+            center = b.center;
         }
+
+        selectionSpriteGO = new GameObject("SelectionSprite");
+
+        var sr = selectionSpriteGO.AddComponent<SpriteRenderer>();
+        sr.sprite = selectionSprite;
+        sr.sortingOrder = 1000;
+
+        selectionSpriteGO.transform.position = center + selectionSpriteOffset;
     }
 
-    private void AddSelectionOutlineToObject(GameObject obj)
+    private void UpdateSprite(GameObject target)
     {
-        if (obj == null || selectionOutlineMat == null) return;
+        if (selectionSpriteGO == null) return;
 
-        var renderers = obj.GetComponentsInChildren<Renderer>();
-        foreach (var rend in renderers)
+        float distance = Vector3.Distance(mainCam.transform.position, target.transform.position);
+
+        float scale = Mathf.Max(distance * selectionSpriteScale, selectionSpriteMinScale);
+        selectionSpriteGO.transform.localScale = Vector3.one * scale;
+
+        Vector3 dir = mainCam.transform.position - selectionSpriteGO.transform.position;
+        Quaternion lookRot = Quaternion.LookRotation(dir);
+
+        if (currentLookedAt == target)
         {
-            if (rend == null) continue;
-
-            // Sauvegarde l'état original si ce Renderer n'a pas encore été modifié
-            if (!originalMaterials.ContainsKey(rend))
-            {
-                var original = rend.materials;
-                var copy = new Material[original.Length];
-                original.CopyTo(copy, 0);
-                originalMaterials[rend] = copy;
-            }
-
-            var mats = rend.materials;
-
-            // Si le renderer contient déjà le matériau de sélection, rien à faire
-            bool alreadySelection = mats.Any(m => m != null && (m == selectionOutlineMat || m.name.Contains(selectionOutlineMat.name)));
-            if (alreadySelection) continue;
-
-            // Si le renderer a l'outline temporaire, on le remplace par l'outline de sélection
-            int outIndex = -1;
-            for (int i = 0; i < mats.Length; i++)
-            {
-                var m = mats[i];
-                if (m != null && (m == outlinerMat || m.name.Contains(outlinerMat.name)))
-                {
-                    outIndex = i;
-                    break;
-                }
-            }
-
-            if (outIndex >= 0)
-            {
-                mats[outIndex] = selectionOutlineMat;
-                rend.materials = mats;
-            }
-            else
-            {
-                // Sinon on ajoute l'outline de sélection à la fin
-                var newMats = new Material[mats.Length + 1];
-                mats.CopyTo(newMats, 0);
-                newMats[newMats.Length - 1] = selectionOutlineMat;
-                rend.materials = newMats;
-            }
+            selectionSpriteGO.transform.rotation =
+                lookRot * Quaternion.Euler(0, 0, Time.time * hoverRotationSpeed);
+        }
+        else
+        {
+            selectionSpriteGO.transform.rotation = lookRot;
         }
     }
 
-    private void RemoveSelectionOutlineFromObject(GameObject obj)
+    private void RemoveSprite()
     {
-        if (obj == null || selectionOutlineMat == null) return;
-
-        var renderers = obj.GetComponentsInChildren<Renderer>();
-        foreach (var rend in renderers)
+        if (selectionSpriteGO != null)
         {
-            if (rend == null) continue;
-
-            // Si on a sauvegardé les matériaux originaux, restaure-les proprement
-            if (originalMaterials.TryGetValue(rend, out var original))
-            {
-                rend.materials = original;
-                originalMaterials.Remove(rend);
-            }
-            else
-            {
-                // Fallback : suppression par comparaison tolérante aux instances
-                var mats = rend.materials;
-                if (mats.Any(m => m == selectionOutlineMat || (m != null && m.name.Contains(selectionOutlineMat.name))))
-                {
-                    var list = new List<Material>(mats);
-                    list.RemoveAll(m => m == selectionOutlineMat || (m != null && m.name.Contains(selectionOutlineMat.name)));
-
-                    if (list.Count == 0)
-                    {
-                        rend.materials = new Material[0];
-                    }
-                    else
-                    {
-                        rend.materials = list.ToArray();
-                    }
-                }
-            }
-        }
-
-        // Si on regarde encore cet objet, réappliquer l'outline de regard (temporaire)
-        if (currentLookedAt == obj)
-        {
-            AddOutlineToObject(obj);
-        }
-    }
-
-    private void RemoveOutlineFromObject(GameObject obj)
-    {
-        if (obj == null || outlinerMat == null) return;
-
-        var renderers = obj.GetComponentsInChildren<Renderer>();
-        foreach (var rend in renderers)
-        {
-            if (rend == null) continue;
-
-            // Si on a sauvegardé les matériaux originaux, restaure-les proprement
-            if (originalMaterials.TryGetValue(rend, out var original))
-            {
-                rend.materials = original;
-                originalMaterials.Remove(rend);
-            }
-            else
-            {
-                // Fallback : suppression par comparaison tolérante aux instances
-                var mats = rend.materials;
-                if (mats.Any(m => m == outlinerMat || (m != null && m.name.Contains(outlinerMat.name))))
-                {
-                    var list = new List<Material>(mats);
-                    list.RemoveAll(m => m == outlinerMat || (m != null && m.name.Contains(outlinerMat.name)));
-
-                    if (list.Count == 0)
-                    {
-                        rend.materials = new Material[0];
-                    }
-                    else
-                    {
-                        rend.materials = list.ToArray();
-                    }
-                }
-            }
-        }
-    }
-
-    private void debugOnSelection()
-    {
-        // Utilise uniquement l'objet `selectedObject`.
-        if (selectedObject == null)
-        {
-            Debug.LogWarning("debugOnSelection appelé mais aucun objet sélectionné.");
-            return;
-        }
-
-        var props = selectedObject.GetComponent<ObjectProperties>();
-        if (props == null)
-        {
-            Debug.LogWarning("Objet sélectionné ne contient pas de ObjectProperties : " + selectedObject.name);
-            return;
-        }
-
-        // Récupère tous les champs instance (public et non-public) et filtre ceux sérialisés
-        var fields = props.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        Debug.Log($"Debug sélection : {selectedObject.name} ---");
-        foreach (var f in fields)
-        {
-            // Conserve les champs publics OU marqués [SerializeField]
-            bool isSerialized = f.IsPublic || f.IsDefined(typeof(SerializeField), false);
-            if (!isSerialized) continue;
-
-            object value;
-            try
-            {
-                value = f.GetValue(props);
-            }
-            catch
-            {
-                value = "<inaccessible>";
-            }
-
-            Debug.Log($"[Selection Debug] {f.Name} = {value}");
+            Destroy(selectionSpriteGO);
+            selectionSpriteGO = null;
+            spriteTarget = null;
         }
     }
 }
