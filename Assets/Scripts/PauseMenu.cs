@@ -64,7 +64,7 @@ public class PauseMenu : MonoBehaviour
         // Gestion de la touche Échap pour la navigation en arrière
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (keysMenuUI.activeSelf) OpenOptions();
+            if (keysMenuUI.activeSelf || audioMenuUI.activeSelf) OpenOptions();
             else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
             else if (isPaused) Resume();
             else Pause();

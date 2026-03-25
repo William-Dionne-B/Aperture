@@ -27,6 +27,8 @@ public class FreeFlyCamera : MonoBehaviour
     private Vector3 velocity;
     private float yaw;
     private float pitch;
+    
+    private static bool isPaused = false;
 
     // ==========================================
     // MÉTHODES UNITY
@@ -55,6 +57,23 @@ public class FreeFlyCamera : MonoBehaviour
 
         if (PauseMenu.isPaused || Cursor.visible)
             return;
+        
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (isPaused)
+            {
+                TimeManager.Resume();
+                isPaused = false;
+            }
+            
+                
+            else
+            {
+                TimeManager.Pause();
+                isPaused = true;
+            }
+            
+        }
 
         HandleInputs();
         
@@ -96,8 +115,8 @@ public class FreeFlyCamera : MonoBehaviour
     /// </summary>
     void HandleMouseLook()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 100f * Time.unscaledDeltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 100f * Time.unscaledDeltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 1f;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 1f;
 
         yaw += mouseX;
         pitch -= mouseY;
