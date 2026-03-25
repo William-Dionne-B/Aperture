@@ -5,17 +5,21 @@ using UnityEngine;
 public class ObjectProperties : MonoBehaviour
 {
     [SerializeField]
-    public float mass;
+    public string objectName;
     [SerializeField]
     public float speedMagnitude;
     [SerializeField]
-    public float radius;
+    public float mass;
     [SerializeField]
-    public GameObject EtoileParent;
+    public float radius;
     [SerializeField]
     public float distanceToEtoile;
     [SerializeField]
-    public string objectName;
+    public float gravityMagnitude;
+    [SerializeField]
+    public float temperatureMagnitude;
+    [SerializeField]
+    public GameObject EtoileParent;
 
     private GameObject thisObject; // L'objet parent du script
     private Transform thisTransform;
