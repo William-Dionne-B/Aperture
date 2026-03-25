@@ -87,6 +87,17 @@ public class ClickDetection : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        GameObject target = currentLookedAt != null ? currentLookedAt : selectedObject;
+
+        if (target != null && selectionSpriteGO != null)
+        {
+            Vector3 center = target.transform.position;
+            selectionSpriteGO.transform.position = center + selectionSpriteOffset;
+        }
+    }
+
     void CreateSelectionSpheres()
     {
         ObjectProperties[] objects = FindObjectsOfType<ObjectProperties>();
@@ -120,16 +131,8 @@ public class ClickDetection : MonoBehaviour
 
     float GetObjectRadius(GameObject obj)
     {
-        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
-
-        if (renderers.Length == 0)
-            return 1f;
-
-        Bounds b = renderers[0].bounds;
-        foreach (var r in renderers)
-            b.Encapsulate(r.bounds);
-
-        return b.size.magnitude * 0.5f;
+        float radius = obj.GetComponent<ObjectProperties>().radius;
+        return radius;
     }
 
     private IEnumerator DelayedDeselect(GameObject obj)
@@ -147,18 +150,7 @@ public class ClickDetection : MonoBehaviour
 
         if (selectionSprite == null || obj == null) return;
 
-        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
-
         Vector3 center = obj.transform.position;
-
-        if (renderers.Length > 0)
-        {
-            Bounds b = renderers[0].bounds;
-            foreach (var r in renderers)
-                b.Encapsulate(r.bounds);
-
-            center = b.center;
-        }
 
         selectionSpriteGO = new GameObject("SelectionSprite");
 
