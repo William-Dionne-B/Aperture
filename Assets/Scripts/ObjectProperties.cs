@@ -17,6 +17,8 @@ public class ObjectProperties : MonoBehaviour
     [SerializeField]
     public float gravityMagnitude;
     [SerializeField]
+    public float temperatureMagnitude;
+    [SerializeField]
     public GameObject EtoileParent;
 
     private GameObject thisObject; // L'objet parent du script
