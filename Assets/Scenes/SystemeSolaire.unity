@@ -16669,9 +16669,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13532f53dd4f72048ae15d92297294d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlinerMat: {fileID: 2100000, guid: c35fd50b767eb5f47b478ea9044ee28c, type: 2}
-  selectionOutlineMat: {fileID: 2100000, guid: fbb6c056ad0145d4497529df36456e40, type: 2}
   selectedObject: {fileID: 0}
+  selectionSprite: {fileID: 21300000, guid: 67e21294a3178fa4b94518d58c2353dd, type: 3}
+  selectionSpriteOffset: {x: 0, y: 0, z: 0}
+  selectionSpriteScale: 0.5
+  selectionSpriteMinScale: 0.4
+  hoverRotationSpeed: 45
 --- !u!1 &1713689688
 GameObject:
   m_ObjectHideFlags: 0
