@@ -28,7 +28,7 @@ public class FreeFlyCamera : MonoBehaviour
     private float yaw;
     private float pitch;
     
-    private static bool isPaused = false;
+    // private static bool isPaused = false;
 
     // ==========================================
     // MÉTHODES UNITY
@@ -55,25 +55,25 @@ public class FreeFlyCamera : MonoBehaviour
         if (Input.GetKeyDown(unlockCursorKey))
             ToggleCursor();
 
-        if (PauseMenu.isPaused || Cursor.visible)
+        if (Cursor.visible)
             return;
         
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (isPaused)
-            {
-                TimeManager.Resume();
-                isPaused = false;
-            }
-            
-                
-            else
-            {
-                TimeManager.Pause();
-                isPaused = true;
-            }
-            
-        }
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     if (PauseMenu.isPaused)
+        //     {
+        //         TimeManager.Resume();
+        //         PauseMenu.isPaused = false;
+        //     }
+        //     
+        //         
+        //     else
+        //     {
+        //         TimeManager.Pause();
+        //         PauseMenu.isPaused = true;
+        //     }
+        //     
+        // }
 
         HandleInputs();
         

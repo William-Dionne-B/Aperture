@@ -69,6 +69,27 @@ public class PauseMenu : MonoBehaviour
             else if (isPaused) Resume();
             else Pause();
         }
+        
+        else if (Input.GetKeyDown(KeyCode.Space) && !(keysMenuUI.activeSelf || audioMenuUI.activeSelf || optionMenuUI.activeSelf || guideMenuUI.activeSelf))
+        {
+            if (isPaused)
+            {
+                TimeManager.Resume();
+                isPaused = false;
+                imageBoutonPause.overrideSprite = iconPause;
+                imageBoutonResume.overrideSprite = iconResumeIsSelected;
+            }
+            
+                
+            else
+            {
+                TimeManager.Pause();
+                isPaused = true;
+                imageBoutonPause.overrideSprite = iconPauseIsSelected;
+                imageBoutonResume.overrideSprite = iconResume;
+            }
+            
+        }
     }
 
     // ==========================================
