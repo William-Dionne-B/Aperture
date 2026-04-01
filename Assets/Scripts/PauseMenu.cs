@@ -64,10 +64,31 @@ public class PauseMenu : MonoBehaviour
         // Gestion de la touche Échap pour la navigation en arrière
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (keysMenuUI.activeSelf) OpenOptions();
+            if (keysMenuUI.activeSelf || audioMenuUI.activeSelf) OpenOptions();
             else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
             else if (isPaused) Resume();
             else Pause();
+        }
+        
+        else if (Input.GetKeyDown(KeyCode.Space) && !(keysMenuUI.activeSelf || audioMenuUI.activeSelf || optionMenuUI.activeSelf || guideMenuUI.activeSelf))
+        {
+            if (isPaused)
+            {
+                TimeManager.Resume();
+                isPaused = false;
+                imageBoutonPause.overrideSprite = iconPause;
+                imageBoutonResume.overrideSprite = iconResumeIsSelected;
+            }
+            
+                
+            else
+            {
+                TimeManager.Pause();
+                isPaused = true;
+                imageBoutonPause.overrideSprite = iconPauseIsSelected;
+                imageBoutonResume.overrideSprite = iconResume;
+            }
+            
         }
     }
 

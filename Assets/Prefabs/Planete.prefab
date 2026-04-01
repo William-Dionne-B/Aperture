@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 7202151605407854536}
   - component: {fileID: 5962638322922466213}
   - component: {fileID: 7138443762225450242}
-  - component: {fileID: 8521881273450291504}
-  - component: {fileID: 8051827377420379070}
   - component: {fileID: 7169520259636093909}
+  - component: {fileID: 8521881273450291504}
   - component: {fileID: 5265390733578404198}
+  - component: {fileID: 8051827377420379070}
   m_Layer: 0
   m_Name: Planete
   m_TagString: Untagged
@@ -141,40 +141,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8521881273450291504
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2563120141751923440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  initialVelocity: {x: 0, y: 0, z: 15}
-  applyInitialVelocity: 1
-  Mass: 1
-  rb: {fileID: 0}
-  line: {fileID: 0}
---- !u!114 &8051827377420379070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2563120141751923440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
-  heightOffsetPercentage: 0.2
-  minScale: 0.5
-  maxScale: 20
-  scaleMultiplier: 0.1
 --- !u!120 &7169520259636093909
 LineRenderer:
   serializedVersion: 2
@@ -282,6 +248,23 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &8521881273450291504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2563120141751923440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialVelocity: {x: 0, y: 0, z: 15}
+  applyInitialVelocity: 1
+  Mass: 1
+  rb: {fileID: 0}
+  line: {fileID: 0}
 --- !u!114 &5265390733578404198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,12 +277,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 0
-  speedMagnitude: 0
-  radius: 0
-  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
-  distanceToEtoile: 0
   objectName: "Plan\xE8te X"
+  speedMagnitude: 0
+  mass: 3
+  radius: 0.458
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+--- !u!114 &8051827377420379070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2563120141751923440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
+  heightOffsetPercentage: 0.2
+  minScale: 0.5
+  maxScale: 20
+  scaleMultiplier: 0.1
 --- !u!1 &3975878714945128468
 GameObject:
   m_ObjectHideFlags: 0
