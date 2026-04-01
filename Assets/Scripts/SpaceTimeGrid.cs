@@ -7,17 +7,35 @@ using UnityEngine.Rendering;
 public class SpaceTimeGrid : MonoBehaviour
 {
     public int resolution = 200;
-    public float size = 50f;
+    public float size = 500f;
     public float maxWarpDepth = 2000f;
     public float gridCellWorldSize = 500f;
+    public float gridVerticalOffset = -0.5f;
+    public bool followCamera = true;
+    public Transform cameraTarget;
+    public Color lineColor = new Color(0.45f, 0.45f, 0.45f, 0.28f);
+    [Range(0.0001f, 0.01f)] public float lineWidth = 0.0006f;
+    public float warpStrength = 55f;
+    public float warpMultiplier = 4f;
+    public float fadeStartDistance = 350f;
+    public float fadeEndDistance = 1600f;
 
     static readonly int GridScaleId = Shader.PropertyToID("_GridScale");
+    static readonly int LineColorId = Shader.PropertyToID("_LineColor");
+    static readonly int LineWidthId = Shader.PropertyToID("_LineWidth");
+    static readonly int StrengthId = Shader.PropertyToID("_Strength");
+    static readonly int WarpMultiplierId = Shader.PropertyToID("_WarpMultiplier");
+    static readonly int FadeStartDistanceId = Shader.PropertyToID("_FadeStartDistance");
+    static readonly int FadeEndDistanceId = Shader.PropertyToID("_FadeEndDistance");
 
     void Start()
     {
         resolution = Mathf.Max(1, resolution);
         size = Mathf.Max(0.01f, size);
         gridCellWorldSize = Mathf.Max(0.01f, gridCellWorldSize);
+        fadeEndDistance = Mathf.Max(fadeStartDistance + 0.01f, fadeEndDistance);
+        ApplyVerticalOffset();
+        ApplyCameraFollow();
 
         Mesh mesh = new Mesh();
         mesh.name = "SpaceTimeGridMesh";
@@ -80,8 +98,49 @@ public class SpaceTimeGrid : MonoBehaviour
 
     void OnValidate()
     {
+        resolution = Mathf.Max(1, resolution);
+        size = Mathf.Max(0.01f, size);
         gridCellWorldSize = Mathf.Max(0.01f, gridCellWorldSize);
+        fadeEndDistance = Mathf.Max(fadeStartDistance + 0.01f, fadeEndDistance);
+        ApplyVerticalOffset();
         ApplyGridMaterialSettings();
+    }
+
+    void LateUpdate()
+    {
+        ApplyCameraFollow();
+    }
+
+    void ApplyVerticalOffset()
+    {
+        Vector3 position = transform.position;
+        position.y = gridVerticalOffset;
+        transform.position = position;
+    }
+
+    void ApplyCameraFollow()
+    {
+        if (!followCamera)
+        {
+            return;
+        }
+
+        Transform target = cameraTarget;
+        if (target == null && Camera.main != null)
+        {
+            target = Camera.main.transform;
+        }
+
+        if (target == null)
+        {
+            return;
+        }
+
+        Vector3 position = transform.position;
+        position.x = target.position.x;
+        position.z = target.position.z;
+        position.y = gridVerticalOffset;
+        transform.position = position;
     }
 
     void ApplyGridMaterialSettings()
@@ -100,5 +159,12 @@ public class SpaceTimeGrid : MonoBehaviour
 
         float gridScale = 1f / gridCellWorldSize;
         material.SetFloat(GridScaleId, gridScale);
+        material.SetColor(LineColorId, lineColor);
+        material.SetFloat(LineWidthId, lineWidth);
+        material.SetFloat(StrengthId, warpStrength);
+        material.SetFloat(WarpMultiplierId, warpMultiplier);
+        material.SetFloat(FadeStartDistanceId, fadeStartDistance);
+        material.SetFloat(FadeEndDistanceId, fadeEndDistance);
+        material.renderQueue = 2450;
     }
 }

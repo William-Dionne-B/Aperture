@@ -2,16 +2,18 @@ Shader "Unlit/SpaceTimeWarp"
 {
     Properties
     {
-        _Strength ("Gravity Strength", Float) = 100
+        _Strength ("Gravity Strength", Float) = 55
         _Falloff ("Gravity Falloff", Float) = 1.5
-        _WarpMultiplier ("Warp Multiplier", Float) = 6
+        _WarpMultiplier ("Warp Multiplier", Float) = 4
         _MinDistance ("Min Distance", Float) = 0.5
         _WellSoftening ("Well Softening", Float) = 30
 
         _GridScale ("Grid Scale", Float) = 0.02
-        _LineWidth ("Line Width", Float) = 0.001
+        _LineWidth ("Line Width", Float) = 0.0006
 
-        _LineColor ("Line Color", Color) = (0.3,0.7,1,1)
+        _LineColor ("Line Color", Color) = (0.45,0.45,0.45,0.28)
+        _FadeStartDistance ("Fade Start Distance", Float) = 350
+        _FadeEndDistance ("Fade End Distance", Float) = 1600
     }
 
     SubShader
@@ -22,7 +24,7 @@ Shader "Unlit/SpaceTimeWarp"
         Pass
         {
             Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite Off
+            ZWrite On
             Cull Off
 
             CGPROGRAM
@@ -41,6 +43,8 @@ Shader "Unlit/SpaceTimeWarp"
 
             float _GridScale;
             float _LineWidth;
+            float _FadeStartDistance;
+            float _FadeEndDistance;
 
             float4 _LineColor;
 
@@ -103,7 +107,12 @@ Shader "Unlit/SpaceTimeWarp"
                 float antialias = max(fwidth(lineDistance), 0.0001);
                 float lineMask = 1.0 - smoothstep(_LineWidth, _LineWidth + antialias, lineDistance);
 
-                return float4(_LineColor.rgb, _LineColor.a * lineMask);
+                float cameraDistance = distance(_WorldSpaceCameraPos.xyz, i.worldPos);
+                float fadeStart = max(_FadeStartDistance, 0.0001);
+                float fadeEnd = max(_FadeEndDistance, fadeStart + 0.0001);
+                float fade = 1.0 - smoothstep(fadeStart, fadeEnd, cameraDistance);
+
+                return float4(_LineColor.rgb, _LineColor.a * lineMask * fade);
             }
 
             ENDCG
