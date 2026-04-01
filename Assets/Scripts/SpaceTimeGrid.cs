@@ -165,6 +165,6 @@ public class SpaceTimeGrid : MonoBehaviour
         material.SetFloat(WarpMultiplierId, warpMultiplier);
         material.SetFloat(FadeStartDistanceId, fadeStartDistance);
         material.SetFloat(FadeEndDistanceId, fadeEndDistance);
-        material.renderQueue = 2450;
+        material.renderQueue = (int)RenderQueue.Transparent;
     }
 }

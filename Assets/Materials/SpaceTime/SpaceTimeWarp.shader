@@ -24,7 +24,7 @@ Shader "Unlit/SpaceTimeWarp"
         Pass
         {
             Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite On
+            ZWrite Off
             Cull Off
 
             CGPROGRAM
@@ -112,7 +112,9 @@ Shader "Unlit/SpaceTimeWarp"
                 float fadeEnd = max(_FadeEndDistance, fadeStart + 0.0001);
                 float fade = 1.0 - smoothstep(fadeStart, fadeEnd, cameraDistance);
 
-                return float4(_LineColor.rgb, _LineColor.a * lineMask * fade);
+                float alpha = _LineColor.a * lineMask * fade;
+                clip(alpha - 0.001);
+                return float4(_LineColor.rgb, alpha);
             }
 
             ENDCG
