@@ -22,6 +22,8 @@ public class ObjectManager : MonoBehaviour
     public GameObject obj_name; // Champ de texte pour le nom TODO : faire marcher le changement de nom
 
     public GameObject dist_etoile; // Champ de texte pour la distance à l'étoile (lecture seule)
+    
+    public GameObject surface_gravity;
 
     // Références liées aux listeners pour pouvoir détacher proprement
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
@@ -89,7 +91,12 @@ public class ObjectManager : MonoBehaviour
                 SetText(speed, props.speedMagnitude.ToString("G"));
                 SetText(radius, props.radius.ToString("G"));
                 SetText(obj_name, props.objectName);
+                
+                float grav = props.gravityMagnitude;
+                float gravEnG = grav / 9.81f; // 1 g = 9.81 3/s^2 sur Terre
 
+                SetText(surface_gravity, $"{grav:0.##} m/s² ({gravEnG:0.##} g)");
+                
                 // Calcul robuste/affichage de la distance à l'étoile :
                 // - si l'EtoileParent est fourni, calcule la distance à la position courante et met à jour la propriété.
                 // - sinon affiche la valeur existante ou "N/A".

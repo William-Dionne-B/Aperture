@@ -14,6 +14,14 @@ public class ObjectProperties : MonoBehaviour
     public float radius;
     [SerializeField]
     public float distanceToEtoile;
+    
+    [Header("Simulation Scale")]
+    [Tooltip("1 unité = 46 400 km (soit 46 400 000 mètres)")]
+    public float unityToMetersScale = 46400000f;
+    
+    [Tooltip("1 unité de masse")]
+    public float unityToKgScale = 1e15f;
+    
     [SerializeField]
     public float gravityMagnitude;
     [SerializeField]
@@ -79,6 +87,21 @@ public class ObjectProperties : MonoBehaviour
         if (thisGravityBody != null)
             thisGravityBody.Mass = mass;
 
+        if (radius > 0 && GravityManager.Instance != null)
+        {
+            float vraiRayonEnMetres = radius * unityToMetersScale;
+            float vraieMasseEnKg = mass * unityToKgScale;
+            
+            float constanteGravitationnelle = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+            
+            gravityMagnitude = (constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres);
+        }
+        
+        else
+        {
+            gravityMagnitude = 0f;
+        }
+        
         // Calcul de la distance à l'étoile parente
         if (EtoileParent != null && thisTransform != null)
         {

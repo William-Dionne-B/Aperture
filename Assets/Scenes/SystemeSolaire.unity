@@ -4793,6 +4793,8 @@ MonoBehaviour:
   mass: 285.878
   radius: 4.31
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -7297,7 +7299,7 @@ GameObject:
   - component: {fileID: 708864638}
   - component: {fileID: 708864637}
   m_Layer: 5
-  m_Name: InputSoleil
+  m_Name: InputGravity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7651,6 +7653,7 @@ MonoBehaviour:
   radius: {fileID: 1973707806}
   obj_name: {fileID: 525979632}
   dist_etoile: {fileID: 468830850}
+  surface_gravity: {fileID: 708864635}
 --- !u!114 &734588772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9761,6 +9764,8 @@ MonoBehaviour:
   mass: 0.16601
   radius: 0.1755
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -10075,7 +10080,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &959862942
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10651,6 +10656,8 @@ MonoBehaviour:
   mass: 955.11
   radius: 5.025
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -15730,6 +15737,8 @@ MonoBehaviour:
   mass: 0.322716
   radius: 0.244
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -21257,6 +21266,8 @@ MonoBehaviour:
   mass: 43.668
   radius: 1.79
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -21861,6 +21872,8 @@ MonoBehaviour:
   mass: 51.813
   radius: 1.85
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -22725,6 +22738,8 @@ MonoBehaviour:
   mass: 2.44784
   radius: 0.435
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
@@ -23784,9 +23799,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Terre
   speedMagnitude: 0
-  mass: 3.003
-  radius: 0.46
+  mass: 5.972
+  radius: 0.137
   distanceToEtoile: 0
+  unityToMetersScale: 46400000
+  unityToKgScale: 1e+15
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
