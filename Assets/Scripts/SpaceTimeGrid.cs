@@ -15,7 +15,7 @@ public class SpaceTimeGrid : MonoBehaviour
     public Transform cameraTarget;
     public Color lineColor = new Color(0.45f, 0.45f, 0.45f, 0.28f);
     [Range(0.0001f, 0.01f)] public float lineWidth = 0.0006f;
-    public float warpStrength = 55f;
+    public float warpStrength = 0.01f;
     public float warpMultiplier = 4f;
     public float fadeStartDistance = 350f;
     public float fadeEndDistance = 1600f;
