@@ -3,14 +3,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 public class ObjectManager : MonoBehaviour
 {
     private GameObject selection;
+    private GameObject lastSelection;
+    private Vector3 cameraLocalPositionWhenAttached;
+    private Quaternion cameraLocalRotationWhenAttached;
+    private bool cameraIsAttachedToSelection = false;
 
     public GameObject MainCamera;
     public GameObject InfoUI;
     public GameObject SelectionViewFrame;
+    public GameObject ListObjet;
+    public GameObject CameraFocusButton;
 
     public GameObject speed;
     public GameObject mass;
@@ -21,6 +28,8 @@ public class ObjectManager : MonoBehaviour
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
 
+    private float initialYOffset = 95f;
+
     private RawImage selectionRawImage;
 
     public float cameraPadding = 1.5f;
@@ -29,6 +38,12 @@ public class ObjectManager : MonoBehaviour
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
     TMP_InputField radiusTmp; InputField radiusUi; UnityAction<string> radiusListener;
     TMP_InputField nameTmp; InputField nameUi; UnityAction<string> nameListener;
+
+    private ScrollRect listScrollRect;
+    private Transform listContent;
+    private GameObject buttonPrefab;
+    private Dictionary<GameObject, GameObject> objectToButtonMap = new Dictionary<GameObject, GameObject>();
+    private List<ObjectProperties> lastFrameObjects = new List<ObjectProperties>();
 
     void Start()
     {
@@ -62,7 +77,156 @@ public class ObjectManager : MonoBehaviour
             }
         }
 
+        InitializeListUI();
+        InitializeCameraFocusButton();
         updateUIVisibility();
+    }
+
+    void InitializeCameraFocusButton()
+    {
+        if (CameraFocusButton == null) return;
+
+        Button button = CameraFocusButton.GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(FocusMainCameraOnSelection);
+        }
+    }
+
+    void FocusMainCameraOnSelection()
+    {
+        if (selection == null || MainCamera == null) return;
+
+        DetachCameraFromSelection();
+
+        var renderer = selection.GetComponentInChildren<Renderer>();
+        if (renderer == null) return;
+
+        Bounds bounds = renderer.bounds;
+        Vector3 center = bounds.center;
+        float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+        float distance = size * cameraPadding;
+
+        Vector3 direction = new Vector3(0f, 0f, -1f);
+
+        MainCamera.transform.position = center + direction * distance;
+        MainCamera.transform.LookAt(center);
+
+        AttachCameraToSelection();
+    }
+
+    void AttachCameraToSelection()
+    {
+        if (selection == null || MainCamera == null) return;
+
+        MainCamera.transform.SetParent(selection.transform);
+        cameraLocalPositionWhenAttached = MainCamera.transform.localPosition;
+        cameraLocalRotationWhenAttached = MainCamera.transform.localRotation;
+        cameraIsAttachedToSelection = true;
+    }
+
+    void DetachCameraFromSelection()
+    {
+        if (MainCamera == null) return;
+
+        if (MainCamera.transform.parent != null)
+        {
+            MainCamera.transform.SetParent(null);
+        }
+        cameraIsAttachedToSelection = false;
+    }
+
+    void CheckForMovementInput()
+    {
+        if (!cameraIsAttachedToSelection) return;
+
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        {
+            DetachCameraFromSelection();
+        }
+    }
+
+    void InitializeListUI()
+    {
+        if (ListObjet == null) return;
+
+        listScrollRect = ListObjet.GetComponent<ScrollRect>();
+        if (listScrollRect == null)
+        {
+            listScrollRect = ListObjet.AddComponent<ScrollRect>();
+        }
+
+        // Récupère ou crée le contenu du ScrollView
+        listContent = listScrollRect.content;
+        if (listContent == null)
+        {
+            GameObject contentObj = new GameObject("Content");
+            contentObj.transform.SetParent(ListObjet.transform, false);
+            listContent = contentObj.transform;
+            listScrollRect.content = listContent.GetComponent<RectTransform>();
+
+            RectTransform contentRect = contentObj.GetComponent<RectTransform>();
+            if (contentRect == null) contentRect = contentObj.AddComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0, 1);
+            contentRect.anchorMax = new Vector2(1, 1);
+            contentRect.pivot = new Vector2(0.5f, 1);
+            contentRect.offsetMin = Vector2.zero;
+            contentRect.offsetMax = Vector2.zero;
+            contentRect.sizeDelta = new Vector2(0, 0);
+
+            VerticalLayoutGroup layoutGroup = contentObj.AddComponent<VerticalLayoutGroup>();
+            layoutGroup.childForceExpandHeight = false;
+            layoutGroup.childForceExpandWidth = true;
+            layoutGroup.spacing = 5;
+            layoutGroup.padding = new RectOffset(5, 5, 5, 5);
+
+            ContentSizeFitter fitter = contentObj.AddComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        }
+
+        // Crée le préfab de bouton
+        CreateButtonPrefab();
+    }
+
+    void CreateButtonPrefab()
+    {
+        buttonPrefab = new GameObject("ObjectButton");
+        buttonPrefab.SetActive(false);
+
+        RectTransform buttonRect = buttonPrefab.AddComponent<RectTransform>();
+        buttonRect.sizeDelta = new Vector2(200, 50);
+
+        Image buttonImage = buttonPrefab.AddComponent<Image>();
+        buttonImage.color = new Color(0.2f, 0.2f, 0.2f);
+
+        Button buttonComponent = buttonPrefab.AddComponent<Button>();
+        buttonComponent.targetGraphic = buttonImage;
+
+        ColorBlock colors = buttonComponent.colors;
+        colors.normalColor = new Color(0.2f, 0.2f, 0.2f);
+        colors.highlightedColor = new Color(0.3f, 0.3f, 0.3f);
+        colors.pressedColor = new Color(0.1f, 0.1f, 0.1f);
+        colors.selectedColor = new Color(0.4f, 0.4f, 0.4f);
+        buttonComponent.colors = colors;
+
+        LayoutElement layoutElement = buttonPrefab.AddComponent<LayoutElement>();
+        layoutElement.preferredHeight = 50;
+        layoutElement.preferredWidth = 200;
+
+        GameObject textObj = new GameObject("Text");
+        textObj.transform.SetParent(buttonPrefab.transform, false);
+
+        RectTransform textRect = textObj.AddComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+
+        TextMeshProUGUI textComponent = textObj.AddComponent<TextMeshProUGUI>();
+        textComponent.text = "Object";
+        textComponent.alignment = TextAlignmentOptions.Center;
+        textComponent.fontSize = 16;
     }
 
     void Update()
@@ -76,16 +240,143 @@ public class ObjectManager : MonoBehaviour
 
         if (selection != selected)
         {
+            DetachCameraFromSelection();
             selection = selected;
+            lastSelection = selection;
             BindFieldListeners();
         }
 
         UpdateSelectionCamera();
 
+        // Vérifie les entrées de mouvement
+        CheckForMovementInput();
+
+        // Met à jour la liste des objets chaque frame
+        UpdateObjectList();
+
         if (IsAnyFieldEditing())
             return;
 
         updateUIVisibility();
+    }
+
+    void UpdateObjectList()
+    {
+        if (listContent == null) return;
+
+        // Récupère tous les objets avec ObjectProperties dans la scène
+        ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
+
+        // Vérifie si la liste a changé
+        bool listChanged = allObjectsInScene.Length != lastFrameObjects.Count;
+        if (!listChanged)
+        {
+            for (int i = 0; i < allObjectsInScene.Length; i++)
+            {
+                if (allObjectsInScene[i] != lastFrameObjects[i])
+                {
+                    listChanged = true;
+                    break;
+                }
+            }
+        }
+
+        // Si la liste a changé, reconstruit les boutons
+        if (listChanged)
+        {
+            // Efface les anciens boutons
+            foreach (Transform child in listContent)
+            {
+                Destroy(child.gameObject);
+            }
+            objectToButtonMap.Clear();
+
+            // Crée les nouveaux boutons
+            float yOffset = initialYOffset;
+            foreach (ObjectProperties objProps in allObjectsInScene)
+            {
+                if (objProps == null) continue;
+
+                GameObject buttonInstance = Instantiate(buttonPrefab, listContent);
+                buttonInstance.SetActive(true);
+
+                RectTransform buttonRect = buttonInstance.GetComponent<RectTransform>();
+                buttonRect.anchoredPosition = new Vector2(0, yOffset);
+                yOffset -= 55; // 50 de hauteur + 5 de spacing
+
+                TextMeshProUGUI textComponent = buttonInstance.GetComponentInChildren<TextMeshProUGUI>();
+                if (textComponent != null)
+                {
+                    textComponent.text = objProps.objectName;
+                }
+
+                Button buttonComponent = buttonInstance.GetComponent<Button>();
+                if (buttonComponent != null)
+                {
+                    GameObject objToSelect = objProps.gameObject;
+                    if (objProps.transform.parent != null)
+                    {
+                        objToSelect = objProps.transform.parent.gameObject;
+                    }
+
+                    buttonComponent.onClick.AddListener(() => SelectObject(objToSelect));
+                }
+
+                objectToButtonMap[objProps.gameObject] = buttonInstance;
+            }
+
+            // Met à jour la liste de référence
+            lastFrameObjects.Clear();
+            foreach (ObjectProperties objProps in allObjectsInScene)
+            {
+                lastFrameObjects.Add(objProps);
+            }
+        }
+
+        // Met à jour les textes des boutons existants et l'apparence de sélection
+        foreach (var kvp in objectToButtonMap)
+        {
+            ObjectProperties objProps = kvp.Key.GetComponent<ObjectProperties>();
+            if (objProps == null && kvp.Key.transform.parent != null)
+            {
+                objProps = kvp.Key.transform.parent.GetComponent<ObjectProperties>();
+            }
+
+            GameObject buttonGO = kvp.Value;
+            TextMeshProUGUI textComponent = buttonGO.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (textComponent != null && objProps != null)
+            {
+                textComponent.text = objProps.objectName;
+            }
+
+            // Highlight le bouton si l'objet est sélectionné
+            Button buttonComponent = buttonGO.GetComponent<Button>();
+            Image buttonImage = buttonGO.GetComponent<Image>();
+            if (buttonComponent != null && buttonImage != null)
+            {
+                bool isSelected = (objProps != null && (objProps.gameObject == selection || 
+                    (objProps.transform.parent != null && objProps.transform.parent.gameObject == selection)));
+                
+                if (isSelected)
+                {
+                    buttonImage.color = new Color(0.4f, 0.4f, 0.4f);
+                }
+                else
+                {
+                    buttonImage.color = new Color(0.2f, 0.2f, 0.2f);
+                }
+            }
+        }
+    }
+
+    void SelectObject(GameObject obj)
+    {
+        var clickDetection = MainCamera?.GetComponent<ClickDetection>();
+        if (clickDetection != null)
+        {
+            clickDetection.selectedObject = obj;
+        }
     }
 
     void UpdateSelectionCamera()
@@ -384,5 +675,10 @@ public class ObjectManager : MonoBehaviour
     void OnDestroy()
     {
         UnbindAllFieldListeners();
+        DetachCameraFromSelection();
+        if (buttonPrefab != null)
+        {
+            Destroy(buttonPrefab);
+        }
     }
 }
