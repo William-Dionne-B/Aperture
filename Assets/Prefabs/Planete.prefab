@@ -279,12 +279,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: "Plan\xE8te X"
   speedMagnitude: 0
-  mass: 0
-  radius: 0
+  mass: 3
+  radius: 0.458
   distanceToEtoile: 0
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!114 &8051827377420379070
 MonoBehaviour:
   m_ObjectHideFlags: 0

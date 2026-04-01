@@ -280,11 +280,14 @@ MonoBehaviour:
   objectName: Sol
   speedMagnitude: 0
   mass: 1000000
-  radius: 15
+  radius: 50.1
   distanceToEtoile: 0
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 1544941027984095034}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!114 &-865306041739595272
 MonoBehaviour:
   m_ObjectHideFlags: 0

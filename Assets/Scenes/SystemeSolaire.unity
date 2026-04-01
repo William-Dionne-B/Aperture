@@ -817,7 +817,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rayon (km)
+  m_text: Rayon (m)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4793,11 +4793,12 @@ MonoBehaviour:
   mass: 285.878
   radius: 4.31
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &444187206
 LineRenderer:
   serializedVersion: 2
@@ -5625,7 +5626,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Gravit\xE9 (g)"
+  m_text: "Gravit\xE9 (m/s\xB2)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9764,11 +9765,12 @@ MonoBehaviour:
   mass: 0.16601
   radius: 0.1755
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &916402434
 LineRenderer:
   serializedVersion: 2
@@ -10656,11 +10658,12 @@ MonoBehaviour:
   mass: 955.11
   radius: 5.025
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &983345825
 LineRenderer:
   serializedVersion: 2
@@ -15737,11 +15740,12 @@ MonoBehaviour:
   mass: 0.322716
   radius: 0.244
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &1477929851
 LineRenderer:
   serializedVersion: 2
@@ -21266,11 +21270,12 @@ MonoBehaviour:
   mass: 43.668
   radius: 1.79
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &1991513596
 LineRenderer:
   serializedVersion: 2
@@ -21872,11 +21877,12 @@ MonoBehaviour:
   mass: 51.813
   radius: 1.85
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &2039324063
 LineRenderer:
   serializedVersion: 2
@@ -22738,11 +22744,12 @@ MonoBehaviour:
   mass: 2.44784
   radius: 0.435
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+24
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &2102451807
 LineRenderer:
   serializedVersion: 2
@@ -23799,14 +23806,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Terre
   speedMagnitude: 0
-  mass: 5.972
-  radius: 0.137
+  mass: 3.003
+  radius: 0.458
   distanceToEtoile: 0
-  unityToMetersScale: 46400000
-  unityToKgScale: 1e+15
   gravityMagnitude: 0
   temperatureMagnitude: 0
   EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!120 &8794845655808724983
 LineRenderer:
   serializedVersion: 2
