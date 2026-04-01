@@ -5,18 +5,32 @@ using UnityEngine;
 public class ObjectProperties : MonoBehaviour
 {
     [SerializeField]
-    public float mass;
+    public string objectName;
     [SerializeField]
     public float speedMagnitude;
     [SerializeField]
-    public float radius;
+    public float mass;
     [SerializeField]
-    public GameObject EtoileParent;
+    public float radius;
     [SerializeField]
     public float distanceToEtoile;
     [SerializeField]
-    public string objectName;
+    public float gravityMagnitude;
+    [SerializeField]
+    public float temperatureMagnitude;
+    [SerializeField]
+    public GameObject EtoileParent;
 
+    [Header("Simulation Scales (Système Solaire)")]
+    [Tooltip("1 unité de rayon = 13 900 km (soit 13 900 000 mètres)")]
+    public float radiusToMetersScale = 13900000f;
+    
+    [Tooltip("1 unité = 1 391 609 km (soit 1 391 609 000 mètres)")]
+    public float distanceToMetersScale = 1391609000f;
+    
+    [Tooltip("1 unité de masse = 1.988 * 10^15 kg (Millionième solaire)")]
+    public float unityToKgScale = 1.988e24f;
+    
     private GameObject thisObject; // L'objet parent du script
     private Transform thisTransform;
     private Rigidbody thisRigidbody;
@@ -75,6 +89,21 @@ public class ObjectProperties : MonoBehaviour
         if (thisGravityBody != null)
             thisGravityBody.Mass = mass;
 
+        if (radius > 0 && GravityManager.Instance != null)
+        {
+            float vraiRayonEnMetres = radius * radiusToMetersScale;
+            float vraieMasseEnKg = mass * unityToKgScale;
+            
+            float constanteGravitationnelle = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+            
+            gravityMagnitude = (constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres) / 1e9f;
+        }
+        
+        else
+        {
+            gravityMagnitude = 0f;
+        }
+        
         // Calcul de la distance à l'étoile parente
         if (EtoileParent != null && thisTransform != null)
         {
