@@ -16,6 +16,10 @@ public class ObjectProperties : MonoBehaviour
     public float distanceToEtoile;
     [SerializeField]
     public string objectName;
+    [SerializeField]
+    public float periode;
+    [SerializeField]
+    public float density;
 
     private GameObject thisObject; // L'objet parent du script
     private Transform thisTransform;
@@ -84,7 +88,27 @@ public class ObjectProperties : MonoBehaviour
 
             distanceToEtoile = s.magnitude;
         }
+
+        //calcule de la période de révolution autour de l'étoile parente
+        if (speedMagnitude > 0 && distanceToEtoile > 0)
+        {
+            periode = (float)Math.Round((2 * Mathf.PI * distanceToEtoile) / speedMagnitude, 2);
+        }
+        else
+        {
+            periode = 0f; // Période indéfinie si vitesse ou distance nulle
+        }
+
+        if (mass > 0 && radius > 0) 
+        {
+            density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
+        }
+        else
+        {
+            density = 0f; // Densité indéfinie si masse ou rayon nulle
+        }
     }
+    
 
     // Coroutine qui met à jour speedMagnitude 10 fois par seconde (toutes les 0.1s)
     private IEnumerator UpdateSpeedRoutine()

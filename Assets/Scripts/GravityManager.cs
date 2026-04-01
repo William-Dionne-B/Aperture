@@ -172,20 +172,24 @@ public class GravityManager : MonoBehaviour
 
     // Hybrid approach: if one body dominates the gravity, use orbital elements for a clean ellipse. Otherwise, do a short-term n-body prediction.
     void PredictOrbitHybrid(GravityBody body)
-{
-
-    if (IsTwoBodyDominated(body, out soleil))
     {
-        DrawOrbitFromElements(body, soleil);
-    }
-    else
-    {
-        float predictionTime = 10f;
-        int steps = 150;
+        if (IsTwoBodyDominated(body, out GravityBody mainAttractor))
+        {
+            // Calculate orbital period
+            float period = CalculateOrbitalPeriod(body, mainAttractor);
 
-        OrbitPredictor(body, predictionTime, steps);
+            // Calculate steps based on period
+            int steps = Mathf.CeilToInt(period / 1f);
+
+            // Dominated by one body → draw clean ellipse
+            DrawOrbitHybrid(body, mainAttractor, period, steps);
+        }
+        else
+        {
+            // No single dominant body → full short-term n-body integration
+            OrbitPredictor(body, 50f, 200);
+        }
     }
-}
 
     // Check if one body’s gravitational influence is much stronger than all others → treat as 2-body
     bool IsTwoBodyDominated(GravityBody body, out GravityBody mainAttractor)
@@ -218,43 +222,56 @@ public class GravityManager : MonoBehaviour
         return maxForce > secondMaxForce * 5f;//5f is tuneable
     }
 
-    // Draw a clean ellipse based on orbital elements, instead of a noisy n-body prediction
-    void DrawOrbitFromElements(GravityBody body, GravityBody centralBody)
+    // Compute orbital period using Kepler's 3rd law approximation
+    float CalculateOrbitalPeriod(GravityBody body, GravityBody centralBody)
     {
-        OrbitalElements el = CalculateOrbitalElements(body, centralBody);
+        float distance = Vector3.Distance(body.rb.position, centralBody.rb.position);
+        float mu = G * gravityMultiplier * (body.rb.mass + centralBody.rb.mass);
+        return 2f * Mathf.PI * Mathf.Sqrt(distance * distance * distance / mu);
+    }
 
-        if (el.eccentricity >= 1f)
-            return; // escape trajectory → don’t draw ellipse
+    // Draw a clean ellipse based on orbital elements, instead of a noisy n-body prediction
+    void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
+    {
+        float dt = period / steps;
+        Vector3 position = body.rb.position;
+        Vector3 velocity = body.rb.linearVelocity;
+        float gravConst = G * gravityMultiplier;
 
-        int segments = 100;
-        List<Vector3> points = new List<Vector3>();
+        List<Vector3> points = new List<Vector3> {position};
 
-        Vector3 center = centralBody.rb.position;
-
-        // Basis vectors
-        Vector3 r = (body.rb.position - center).normalized;
-        Vector3 v = body.rb.linearVelocity.normalized;
-        Vector3 normal = Vector3.Cross(r, v).normalized;
-        Vector3 tangent = Vector3.Cross(normal, r).normalized;
-
-        float a = el.semiMajorAxis;
-        float e = el.eccentricity;
-        float b = a * Mathf.Sqrt(1 - e * e);
-
-        for (int i = 0; i < segments; i++)
+        for (int i = 0; i < steps; i++)
         {
-            float theta = (i / (float)segments) * Mathf.PI * 2f;
+            // Compute acceleration from all bodies
+            Vector3 accel = Vector3.zero;
+            foreach (var other in bodies)
+            {
+                if (other == body) continue;
+                Vector3 dir = other.rb.position - position;
+                float dist = dir.magnitude + 0.001f;
+                accel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
+            }
 
-            float x = a * Mathf.Cos(theta);
-            float y = b * Mathf.Sin(theta);
+            // Integrate using simple Verlet step
+            position += velocity * dt + 0.5f * accel * dt * dt;
 
-            Vector3 point =
-                center +
-                r * (x - a * e) +
-                tangent * y;
+            // Compute new acceleration for velocity update
+            Vector3 newAccel = Vector3.zero;
+            foreach (var other in bodies)
+            {
+                if (other == body) continue;
+                Vector3 dir = other.rb.position - position;
+                float dist = dir.magnitude + 0.001f;
+                newAccel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
+            }
 
-            points.Add(point);
+            velocity += 0.5f * (accel + newAccel) * dt;
+
+            points.Add(position);
         }
+        // Ensure the last point matches the planet's current position
+        //points[points.Count - 1] = body.rb.position;
+
 
         body.line.positionCount = points.Count;
         body.line.SetPositions(points.ToArray());
@@ -321,6 +338,7 @@ public class GravityManager : MonoBehaviour
                     if (i == j) continue;
 
                     Vector3 direction = positions[j] - positions[i];
+
                     float distance = direction.magnitude + 0.001f;
 
                     newAccelerations[i] += constanteGravitationnelle * masses[j] /
@@ -338,6 +356,8 @@ public class GravityManager : MonoBehaviour
 
             orbitPoints.Add(positions[targetIndex]);
         }
+        // Ensure last point is the planet's real-time position
+        //orbitPoints[orbitPoints.Count - 1] = mainBody.rb.position;
 
         mainBody.line.useWorldSpace = true;
         mainBody.line.positionCount = orbitPoints.Count;

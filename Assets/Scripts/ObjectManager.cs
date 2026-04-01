@@ -17,6 +17,8 @@ public class ObjectManager : MonoBehaviour
     public GameObject radius;
     public GameObject obj_name;
     public GameObject dist_etoile;
+    public GameObject periode;
+    public GameObject density;
 
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
@@ -61,8 +63,6 @@ public class ObjectManager : MonoBehaviour
                 selectionRawImage.texture = SelectionRenderTexture;
             }
         }
-
-        updateUIVisibility();
     }
 
     void Update()
@@ -123,6 +123,8 @@ public class ObjectManager : MonoBehaviour
                 SetText(speed, props.speedMagnitude.ToString("G"));
                 SetText(radius, props.radius.ToString("G"));
                 SetText(obj_name, props.objectName);
+                SetText(periode, props.periode > 0f ? props.periode.ToString("G") : "N/A");
+                SetText(density, props.density.ToString("G"));
 
                 if (props.EtoileParent != null)
                 {
@@ -146,6 +148,8 @@ public class ObjectManager : MonoBehaviour
                 SetText(speed, "");
                 SetText(radius, "");
                 SetText(dist_etoile, "");
+                SetText(periode, "");
+                SetText(density, "");
             }
         }
         else
