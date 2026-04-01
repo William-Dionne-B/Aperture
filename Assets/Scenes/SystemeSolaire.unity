@@ -4799,6 +4799,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.34
+  greenhouseEffect: 0
 --- !u!120 &444187206
 LineRenderer:
   serializedVersion: 2
@@ -7655,6 +7658,7 @@ MonoBehaviour:
   obj_name: {fileID: 525979632}
   dist_etoile: {fileID: 468830850}
   surface_gravity: {fileID: 708864635}
+  temperature: {fileID: 1389631837}
 --- !u!114 &734588772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9771,6 +9775,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.11
+  greenhouseEffect: 0
 --- !u!120 &916402434
 LineRenderer:
   serializedVersion: 2
@@ -10664,6 +10671,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.34
+  greenhouseEffect: 0
 --- !u!120 &983345825
 LineRenderer:
   serializedVersion: 2
@@ -14876,7 +14886,7 @@ GameObject:
   - component: {fileID: 1389631840}
   - component: {fileID: 1389631839}
   m_Layer: 5
-  m_Name: InputSoleil
+  m_Name: "InputTemp\xE9rature"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15746,6 +15756,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.25
+  greenhouseEffect: 5
 --- !u!120 &1477929851
 LineRenderer:
   serializedVersion: 2
@@ -21276,6 +21289,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &1991513596
 LineRenderer:
   serializedVersion: 2
@@ -21883,6 +21899,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.29
+  greenhouseEffect: 0
 --- !u!120 &2039324063
 LineRenderer:
   serializedVersion: 2
@@ -22750,6 +22769,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.75
+  greenhouseEffect: 510
 --- !u!120 &2102451807
 LineRenderer:
   serializedVersion: 2
@@ -23815,6 +23837,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 33
 --- !u!120 &8794845655808724983
 LineRenderer:
   serializedVersion: 2

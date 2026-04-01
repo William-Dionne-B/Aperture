@@ -25,6 +25,8 @@ public class ObjectManager : MonoBehaviour
     
     public GameObject surface_gravity;
 
+    public GameObject temperature;
+
     // Références liées aux listeners pour pouvoir détacher proprement
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
@@ -130,6 +132,21 @@ public class ObjectManager : MonoBehaviour
                     else
                     {
                         SetText(dist_etoile, "N/A");
+                    }
+                }
+                
+                if (temperature != null)
+                {
+                    if (props.temperatureMagnitude > 0f)
+                    {
+                        float tempK = props.temperatureMagnitude;
+                        float tempC = tempK - 273.15f; // Conversion K -> °C
+                        
+                        SetText(temperature, $"{tempK:F1} ({tempC:F1} °C)");
+                    }
+                    else
+                    {
+                        SetText(temperature, "N/A");
                     }
                 }
             }

@@ -30,6 +30,16 @@ public class ObjectProperties : MonoBehaviour
     
     [Tooltip("1 unité de masse = 1.988 * 10^15 kg (Millionième solaire)")]
     public float unityToKgScale = 1.988e24f;
+
+    [Header("Thermodynamique")] [Tooltip("Luminosité de l'étoile en Watts (Soleil = 3.828e26")]
+    public float starLuminosity = 3.828e26f;
+
+    [Tooltip("Albédo : Capacité à refléter la lumière (Terre = 0.3")] [Range(0f, 1f)]
+    public float albedo = 0.3f;
+
+    [Tooltip("Effet de serre en Kelvin (Terre = environ +33 K")]
+    public float greenhouseEffect = 0f;
+        
     
     private GameObject thisObject; // L'objet parent du script
     private Transform thisTransform;
@@ -113,6 +123,20 @@ public class ObjectProperties : MonoBehaviour
 
             distanceToEtoile = s.magnitude;
         }
+
+        if (EtoileParent != null && distanceToEtoile > 0)
+        {
+            float vraieDistanceMetres = distanceToEtoile * distanceToMetersScale;
+
+            float sigma = 5.67e-8f;
+
+            float numerateur = starLuminosity * (1f - albedo);
+            float denominateur = 16f * Mathf.PI * sigma * (vraieDistanceMetres * vraieDistanceMetres);
+
+            float tempEquilibre = Mathf.Pow(numerateur / denominateur, 0.25f);
+
+            temperatureMagnitude = tempEquilibre + greenhouseEffect;
+        }    
     }
 
     // Coroutine qui met à jour speedMagnitude 10 fois par seconde (toutes les 0.1s)
