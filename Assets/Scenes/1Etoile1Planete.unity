@@ -1134,8 +1134,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 460d1c852bfb0674eae76bc3c5c9f34f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useAllGravityBodies: 1
   gravitySources: []
   masses: []
+  defaultMass: 1
 --- !u!114 &225940581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1148,8 +1150,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 166e27cfa2d5dcd45b499f34b045b03f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolution: 200
-  size: 50
+  resolution: 250
+  size: 2000
+  maxWarpDepth: 2000
+  gridCellWorldSize: 10
 --- !u!23 &225940582
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3805,6 +3809,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 638597506}
   m_CullTransparentMesh: 1
+--- !u!1001 &643969351
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3602527529239249499, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_Name
+      value: DragAndDropManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 169.18428
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 342.5101
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -320.4216
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957999701888366674, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f89b02ec0f9cc5142b9069e0f8348333, type: 3}
 --- !u!114 &651831238 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7338130588234770965, guid: 01319e4b053a2244487cba41de4c8018, type: 3}
@@ -11600,3 +11661,4 @@ SceneRoots:
   - {fileID: 6493191694215998482}
   - {fileID: 1314943883}
   - {fileID: 225940584}
+  - {fileID: 643969351}
