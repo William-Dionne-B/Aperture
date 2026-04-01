@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GravityManager : MonoBehaviour
@@ -54,6 +53,8 @@ public class GravityManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        CleanupInvalidBodies();
+
         int count = bodies.Count;
 
         for (int i = 0; i < count; i++)
@@ -63,14 +64,34 @@ public class GravityManager : MonoBehaviour
                 ApplyGravity(bodies[i], bodies[j]);
             }
 
-            OrbitPredictor(bodies[i]);
+            if (bodies[i] != null)
+            {
+                OrbitPredictor(bodies[i]);
+            }
             //OrbitPredictorIndividual();
         }
 
     }
 
+    void CleanupInvalidBodies()
+    {
+        for (int index = bodies.Count - 1; index >= 0; index--)
+        {
+            GravityBody body = bodies[index];
+            if (body == null || body.rb == null)
+            {
+                bodies.RemoveAt(index);
+            }
+        }
+    }
+
     void ApplyGravity(GravityBody a, GravityBody b)
     {
+        if (a == null || b == null || a.rb == null || b.rb == null)
+        {
+            return;
+        }
+
         Vector3 direction = b.rb.position - a.rb.position;
         float distanceSqr = direction.sqrMagnitude + softening;
 
@@ -111,6 +132,11 @@ public class GravityManager : MonoBehaviour
 
     void OrbitPredictor(GravityBody mainBody)
     {
+        if (mainBody == null || mainBody.rb == null || mainBody.line == null)
+        {
+            return;
+        }
+
         float constanteGravitationnelle = gravityMultiplier * G;
         int simulationSteps = 150;
         float timeStep = 0.1f;
@@ -123,6 +149,11 @@ public class GravityManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
+            if (bodies[i] == null || bodies[i].rb == null)
+            {
+                return;
+            }
+
             positions[i] = bodies[i].rb.position;
             vitesses[i] = bodies[i].rb.linearVelocity;
             masses[i] = bodies[i].rb.mass;
