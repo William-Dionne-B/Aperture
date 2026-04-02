@@ -20,27 +20,15 @@ public class PauseMenu : MonoBehaviour
     public Slider mouseSensitivitySlider;
     public Slider speedSlider;
     
+    [Header("Icones du Bouton Pause")]
+    public Image boutonSimulationImage;
+    public Sprite spritePause;
+    public Sprite spritePlay;
+    
     [Header("External Scripts")]
     public FreeFlyCamera cameraScript;
     
-    [Header("Icones du Bouton Pause")]
-    public Image imageBoutonFastBackward;
-    public Image imageBoutonPause;
-    public Image imageBoutonResume;
-    public Image imageBoutonFastForward;
-    public Sprite iconFastBackward;
-    public Sprite iconFastBackwardIsSelected;
-    public Sprite iconPause;
-    public Sprite iconPauseIsSelected;
-    public Sprite iconResume;
-    public Sprite iconResumeIsSelected;
-    public Sprite iconFastForward;
-    public Sprite iconFastForwardIsSelected;
-
-    // --- VARIABLES SÉPARÉES POUR RÉSOUDRE LE CONFLIT ---
-    
     public static bool isMenuOpen = false; 
-    
     public static bool isSimulationPaused = false; 
 
     // ==========================================
@@ -62,48 +50,57 @@ public class PauseMenu : MonoBehaviour
 
     void Update()
     {
+        // 1. Touche ÉCHAP (Menu)
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (keysMenuUI.activeSelf || audioMenuUI.activeSelf) OpenOptions();
-            else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
-            else if (isMenuOpen) Resume(); 
-            else Pause(); 
+            if (isMenuOpen) Resume(); else Pause();
         }
         
-        else if (Input.GetKeyDown(KeyCode.Space))
+        // 2. Touche ESPACE (Simulation) - Uniquement si menu fermé
+        else if (Input.GetKeyDown(KeyCode.Space) && !isMenuOpen)
         {
-            if (isMenuOpen)
-            {
-                Resume();
-            }
-            else
-            {
-                ToggleSimulationTime();
-            }
+            ToggleSimulation();
         }
     }
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Escape))
+    //     {
+    //         if (keysMenuUI.activeSelf || audioMenuUI.activeSelf) OpenOptions();
+    //         else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
+    //         else if (isMenuOpen) Resume(); 
+    //         else Pause(); 
+    //     }
+    //     
+    //     else if (Input.GetKeyDown(KeyCode.Space))
+    //     {
+    //         if (isMenuOpen)
+    //         {
+    //             Resume();
+    //         }
+    //         else
+    //         {
+    //             ToggleSimulationTime();
+    //         }
+    //     }
+    // }
 
     // ==========================================
     // CONTRÔLE DU TEMPS DE SIMULATION (ESPACE)
     // ==========================================
     
-    public void ToggleSimulationTime()
+    public void ToggleSimulation()
     {
+        isSimulationPaused = !isSimulationPaused; // Inverse l'état
+
         if (isSimulationPaused)
         {
-            TimeManager.Resume();
-            isSimulationPaused = false;
-            
-            if (imageBoutonPause != null) imageBoutonPause.overrideSprite = iconPause;
-            if (imageBoutonResume != null) imageBoutonResume.overrideSprite = iconResumeIsSelected;
+            TimeManager.Pause();
+            boutonSimulationImage.sprite = spritePlay; // On affiche Play car c'est en pause
         }
         else
         {
-            TimeManager.Pause();
-            isSimulationPaused = true;
-            
-            if (imageBoutonPause != null) imageBoutonPause.overrideSprite = iconPauseIsSelected;
-            if (imageBoutonResume != null) imageBoutonResume.overrideSprite = iconResume;
+            TimeManager.Resume();
+            boutonSimulationImage.sprite = spritePause; // On affiche Pause car ça tourne
         }
     }
 
@@ -117,20 +114,12 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Resume()
     {
-        DesactivateAllMenus();
+        pauseMenuUI.SetActive(false);
         timeMenuUI.SetActive(true);
         
-        if (isSimulationPaused)
-        {
-            Time.timeScale = 0f; 
-        }
-        else
-        {
-            Time.timeScale = 1f; 
-        }
+        Time.timeScale = isSimulationPaused ? 0f : 1f;
         
         isMenuOpen = false;
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -140,12 +129,11 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Pause()
     {
-        OpenPauseMenu();
+        pauseMenuUI.SetActive(true);
         timeMenuUI.SetActive(false);
         
-        Time.timeScale = 0f; // Fige le moteur Unity
+        Time.timeScale = 0f;
         isMenuOpen = true;
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
