@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GravityManager : MonoBehaviour
@@ -13,6 +15,8 @@ public class GravityManager : MonoBehaviour
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
     public static IReadOnlyList<GravityBody> Bodies => bodies;
+    private static readonly List<float> periodes = new List<float>();
+    private GravityBody soleil = null;
 
     void Awake()
     {
@@ -65,11 +69,7 @@ public class GravityManager : MonoBehaviour
                 ApplyGravity(bodies[i], bodies[j]);
             }
 
-            if (bodies[i] != null)
-            {
-                OrbitPredictor(bodies[i]);
-            }
-            //OrbitPredictorIndividual();
+            PredictOrbitHybrid(bodies[i]);
         }
 
     }
@@ -131,7 +131,175 @@ public class GravityManager : MonoBehaviour
             return weightedSum / totalMass;
         }
 
-    void OrbitPredictor(GravityBody mainBody)
+    //structure d'éléments orbitaux pour stocker les paramètres d'une orbite calculés à partir de la position et de la vitesse
+    public struct OrbitalElements
+    {
+        public float semiMajorAxis;
+        public float eccentricity;
+        public float periapsis;
+        public float apoapsis;
+        public float period;
+    }
+
+
+    //calcul des éléments orbitaux à partir de la position et de la vitesse d'un corps par rapport à un corps central
+    OrbitalElements CalculateOrbitalElements(GravityBody body, GravityBody centralBody)
+    {
+        float Gscaled = gravityMultiplier * G;
+
+        Vector3 r = body.rb.position - centralBody.rb.position;
+        Vector3 v = body.rb.linearVelocity - centralBody.rb.linearVelocity;
+
+        float mu = Gscaled * centralBody.rb.mass; // standard gravitational parameter
+
+        float rMag = r.magnitude;
+        float vMag = v.magnitude;
+
+        // Specific angular momentum
+        Vector3 h = Vector3.Cross(r, v);
+
+        // Eccentricity vector
+        Vector3 eVec = (Vector3.Cross(v, h) / mu) - (r / rMag);
+        float e = eVec.magnitude;
+
+        // Specific orbital energy
+        float energy = (vMag * vMag) / 2f - mu / rMag;
+
+        OrbitalElements elements = new OrbitalElements();
+
+        // Semi-major axis
+        elements.semiMajorAxis = -mu / (2f * energy);
+
+        // Periapsis / Apoapsis
+        elements.periapsis = elements.semiMajorAxis * (1f - e);
+        elements.apoapsis = elements.semiMajorAxis * (1f + e);
+
+        elements.eccentricity = e;
+
+        // Period (only if bound orbit)
+        if (e < 1f)
+        {
+            elements.period = 2f * Mathf.PI * Mathf.Sqrt(
+                Mathf.Pow(elements.semiMajorAxis, 3) / mu
+            );
+        }
+        else
+        {
+            elements.period = -1f; // escape trajectory
+        }
+
+        return elements;
+    }
+
+    // Hybrid approach: if one body dominates the gravity, use orbital elements for a clean ellipse. Otherwise, do a short-term n-body prediction.
+    void PredictOrbitHybrid(GravityBody body)
+    {
+        if (IsTwoBodyDominated(body, out GravityBody mainAttractor))
+        {
+            // Calculate orbital period
+            float period = CalculateOrbitalPeriod(body, mainAttractor);
+
+            // Calculate steps based on period
+            int steps = Mathf.CeilToInt(period / 1f);
+
+            // Dominated by one body → draw clean ellipse
+            DrawOrbitHybrid(body, mainAttractor, period, steps);
+        }
+        else
+        {
+            // No single dominant body → full short-term n-body integration
+            OrbitPredictor(body, 50f, 200);
+        }
+    }
+
+    // Check if one body’s gravitational influence is much stronger than all others → treat as 2-body
+    bool IsTwoBodyDominated(GravityBody body, out GravityBody mainAttractor)
+    {
+        mainAttractor = null;
+
+        float maxForce = 0f;
+        float secondMaxForce = 0f;
+
+        foreach (var other in bodies)
+        {
+            if (other == body) continue;
+
+            float distance = Vector3.Distance(body.rb.position, other.rb.position);
+            float force = other.rb.mass / (distance * distance);
+
+            if (force > maxForce)
+            {
+                secondMaxForce = maxForce;
+                maxForce = force;
+                mainAttractor = other;
+            }
+            else if (force > secondMaxForce)
+            {
+                secondMaxForce = force;
+            }
+        }
+
+        // If one body dominates enough → treat as 2-body
+        return maxForce > secondMaxForce * 5f;//5f is tuneable
+    }
+
+    // Compute orbital period using Kepler's 3rd law approximation
+    float CalculateOrbitalPeriod(GravityBody body, GravityBody centralBody)
+    {
+        float distance = Vector3.Distance(body.rb.position, centralBody.rb.position);
+        float mu = G * gravityMultiplier * (body.rb.mass + centralBody.rb.mass);
+        return 2f * Mathf.PI * Mathf.Sqrt(distance * distance * distance / mu);
+    }
+
+    // Draw a clean ellipse based on orbital elements, instead of a noisy n-body prediction
+    void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
+    {
+        float dt = period / steps;
+        Vector3 position = body.rb.position;
+        Vector3 velocity = body.rb.linearVelocity;
+        float gravConst = G * gravityMultiplier;
+
+        List<Vector3> points = new List<Vector3> {position};
+
+        for (int i = 0; i < steps; i++)
+        {
+            // Compute acceleration from all bodies
+            Vector3 accel = Vector3.zero;
+            foreach (var other in bodies)
+            {
+                if (other == body) continue;
+                Vector3 dir = other.rb.position - position;
+                float dist = dir.magnitude + 0.001f;
+                accel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
+            }
+
+            // Integrate using simple Verlet step
+            position += velocity * dt + 0.5f * accel * dt * dt;
+
+            // Compute new acceleration for velocity update
+            Vector3 newAccel = Vector3.zero;
+            foreach (var other in bodies)
+            {
+                if (other == body) continue;
+                Vector3 dir = other.rb.position - position;
+                float dist = dir.magnitude + 0.001f;
+                newAccel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
+            }
+
+            velocity += 0.5f * (accel + newAccel) * dt;
+
+            points.Add(position);
+        }
+        // Ensure the last point matches the planet's current position
+        //points[points.Count - 1] = body.rb.position;
+
+
+        body.line.positionCount = points.Count;
+        body.line.SetPositions(points.ToArray());
+    }
+
+    // Full n-body prediction for a short time to capture complex interactions when no single body dominates
+    void OrbitPredictor(GravityBody mainBody, float predictionTime, int steps)
     {
         if (mainBody == null || mainBody.rb == null || mainBody.line == null)
         {
@@ -139,10 +307,9 @@ public class GravityManager : MonoBehaviour
         }
 
         float constanteGravitationnelle = gravityMultiplier * G;
-        int simulationSteps = 150;
-        float timeStep = 0.1f;
 
         int count = bodies.Count;
+        float timeStep = predictionTime / steps;
 
         Vector3[] positions = new Vector3[count];
         Vector3[] vitesses = new Vector3[count];
@@ -163,6 +330,7 @@ public class GravityManager : MonoBehaviour
         Vector3[] accelerations = new Vector3[count];
         Vector3[] newAccelerations = new Vector3[count];
 
+        // Initial acceleration
         for (int i = 0; i < count; i++)
         {
             accelerations[i] = Vector3.zero;
@@ -183,15 +351,15 @@ public class GravityManager : MonoBehaviour
         int targetIndex = bodies.IndexOf(mainBody);
         List<Vector3> orbitPoints = new List<Vector3>();
 
-        for (int step = 0; step < simulationSteps; step++)
+        for (int step = 0; step < steps; step++)
         {
-            //position
+            // Position
             for (int i = 0; i < count; i++)
             {
                 positions[i] += vitesses[i] * timeStep + 0.5f * accelerations[i] * timeStep * timeStep;
             }
 
-            //accel
+            // Acceleration
             for (int i = 0; i < count; i++)
             {
                 newAccelerations[i] = Vector3.zero;
@@ -201,6 +369,7 @@ public class GravityManager : MonoBehaviour
                     if (i == j) continue;
 
                     Vector3 direction = positions[j] - positions[i];
+
                     float distance = direction.magnitude + 0.001f;
 
                     newAccelerations[i] += constanteGravitationnelle * masses[j] /
@@ -209,162 +378,20 @@ public class GravityManager : MonoBehaviour
                 }
             }
 
-            //vitesse
+            // Velocity
             for (int i = 0; i < count; i++)
             {
                 vitesses[i] += 0.5f * (accelerations[i] + newAccelerations[i]) * timeStep;
-
                 accelerations[i] = newAccelerations[i];
             }
 
-
             orbitPoints.Add(positions[targetIndex]);
         }
-
+        // Ensure last point is the planet's real-time position
+        //orbitPoints[orbitPoints.Count - 1] = mainBody.rb.position;
 
         mainBody.line.useWorldSpace = true;
         mainBody.line.positionCount = orbitPoints.Count;
         mainBody.line.SetPositions(orbitPoints.ToArray());
-    }
-
-    void OrbitPredictorIndividual()
-    {
-        float Gconst = gravityMultiplier * G;
-        float timeStep = 0.95f;
-        int maxSteps = 480;
-
-        int count = bodies.Count;
-
-        Vector3[] positions = new Vector3[count];
-        Vector3[] velocities = new Vector3[count];
-        float[] masses = new float[count];
-
-        for (int i = 0; i < count; i++)
-        {
-            positions[i] = bodies[i].rb.position;
-            velocities[i] = bodies[i].rb.linearVelocity;
-            masses[i] = bodies[i].rb.mass;
-        }
-
-        Vector3[] accelerations = ComputeAccelerations(positions, masses, Gconst);
-
-        Vector3 barycenter = ComputeBarycenter(positions, masses);
-
-        Vector3[] startDirections = new Vector3[count];
-        float[] accumulatedAngles = new float[count];
-        float[] previousAngles = new float[count];
-        bool[] completed = new bool[count];
-
-        List<Vector3>[] orbitPoints = new List<Vector3>[count];
-
-        for (int i = 0; i < count; i++)
-        {
-            startDirections[i] = (positions[i] - barycenter).normalized;
-            accumulatedAngles[i] = 0f;
-            previousAngles[i] = 0f;
-            completed[i] = false;
-            orbitPoints[i] = new List<Vector3>();
-        }
-
-        int remaining = count;
-
-        for (int step = 0; step < maxSteps && remaining > 0; step++)
-        {
-            // Position update (Velocity Verlet)
-            for (int i = 0; i < count; i++)
-                positions[i] += velocities[i] * timeStep + 0.5f * accelerations[i] * timeStep * timeStep;
-
-            Vector3[] newAccelerations = ComputeAccelerations(positions, masses, Gconst);
-
-            for (int i = 0; i < count; i++)
-            {
-                velocities[i] += 0.5f * (accelerations[i] + newAccelerations[i]) * timeStep;
-                accelerations[i] = newAccelerations[i];
-            }
-
-            barycenter = ComputeBarycenter(positions, masses);
-
-            for (int i = 0; i < count; i++)
-            {
-                if (completed[i]) continue;
-
-                orbitPoints[i].Add(positions[i]);
-
-                Vector3 currentDir = (positions[i] - barycenter).normalized;
-
-                Vector3 orbitNormal = Vector3.Cross(
-                    positions[i] - barycenter,
-                    velocities[i]
-                ).normalized;
-
-                float angle = Vector3.SignedAngle(startDirections[i], currentDir, orbitNormal);
-                float deltaAngle = Mathf.DeltaAngle(previousAngles[i], angle);
-
-                accumulatedAngles[i] += deltaAngle;
-                previousAngles[i] = angle;
-
-                if (Mathf.Abs(accumulatedAngles[i]) >= 360f)
-                {
-                    completed[i] = true;
-                    remaining--;
-                    continue;
-                }
-
-                float distance = Vector3.Distance(positions[i], barycenter);
-                if (distance > 10000f)
-                {
-                    completed[i] = true;
-                    remaining--;
-                }
-            }
-        }
-
-        // Draw all orbits
-        for (int i = 0; i < count; i++)
-        {
-            bodies[i].line.useWorldSpace = true;
-            bodies[i].line.positionCount = orbitPoints[i].Count;
-            bodies[i].line.SetPositions(orbitPoints[i].ToArray());
-        }
-    }
-
-    Vector3 ComputeBarycenter(Vector3[] positions, float[] masses)
-    {
-        Vector3 center = Vector3.zero;
-        float totalMass = 0f;
-
-        for (int i = 0; i < positions.Length; i++)
-        {
-            center += positions[i] * masses[i];
-            totalMass += masses[i];
-        }
-
-        return center / totalMass;
-    }
-
-    Vector3[] ComputeAccelerations(Vector3[] positions, float[] masses, float G)
-    {
-        int count = positions.Length;
-        Vector3[] accelerations = new Vector3[count];
-
-        for (int i = 0; i < count; i++)
-        {
-            for (int j = i + 1; j < count; j++)
-            {
-                Vector3 direction = positions[j] - positions[i];
-                float distance = direction.magnitude + 0.001f;
-
-                Vector3 forceDir = direction.normalized;
-                float force = G * masses[i] * masses[j] / (distance * distance);
-
-                Vector3 accelI = force / masses[i] * forceDir;
-                Vector3 accelJ = force / masses[j] * -forceDir;
-
-                accelerations[i] += accelI;
-                accelerations[j] += accelJ;
-            }
-        }
-
-        return accelerations;
     }
 }

@@ -24,6 +24,8 @@ public class ObjectManager : MonoBehaviour
     public GameObject radius;
     public GameObject obj_name;
     public GameObject dist_etoile;
+    public GameObject periode;
+    public GameObject density;
 
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
@@ -155,7 +157,7 @@ public class ObjectManager : MonoBehaviour
             listScrollRect = ListObjet.AddComponent<ScrollRect>();
         }
 
-        // Récupère ou crée le contenu du ScrollView
+        // Rï¿½cupï¿½re ou crï¿½e le contenu du ScrollView
         listContent = listScrollRect.content;
         if (listContent == null)
         {
@@ -184,7 +186,7 @@ public class ObjectManager : MonoBehaviour
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
 
-        // Crée le préfab de bouton
+        // Crï¿½e le prï¿½fab de bouton
         CreateButtonPrefab();
     }
 
@@ -247,10 +249,10 @@ public class ObjectManager : MonoBehaviour
 
         UpdateSelectionCamera();
 
-        // Vérifie les entrées de mouvement
+        // Vï¿½rifie les entrï¿½es de mouvement
         CheckForMovementInput();
 
-        // Met à jour la liste des objets chaque frame
+        // Met ï¿½ jour la liste des objets chaque frame
         UpdateObjectList();
 
         if (IsAnyFieldEditing())
@@ -263,10 +265,10 @@ public class ObjectManager : MonoBehaviour
     {
         if (listContent == null) return;
 
-        // Récupère tous les objets avec ObjectProperties dans la scène
+        // Rï¿½cupï¿½re tous les objets avec ObjectProperties dans la scï¿½ne
         ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
 
-        // Vérifie si la liste a changé
+        // Vï¿½rifie si la liste a changï¿½
         bool listChanged = allObjectsInScene.Length != lastFrameObjects.Count;
         if (!listChanged)
         {
@@ -280,7 +282,7 @@ public class ObjectManager : MonoBehaviour
             }
         }
 
-        // Si la liste a changé, reconstruit les boutons
+        // Si la liste a changï¿½, reconstruit les boutons
         if (listChanged)
         {
             // Efface les anciens boutons
@@ -290,7 +292,7 @@ public class ObjectManager : MonoBehaviour
             }
             objectToButtonMap.Clear();
 
-            // Crée les nouveaux boutons
+            // Crï¿½e les nouveaux boutons
             float yOffset = initialYOffset;
             foreach (ObjectProperties objProps in allObjectsInScene)
             {
@@ -324,7 +326,7 @@ public class ObjectManager : MonoBehaviour
                 objectToButtonMap[objProps.gameObject] = buttonInstance;
             }
 
-            // Met à jour la liste de référence
+            // Met ï¿½ jour la liste de rï¿½fï¿½rence
             lastFrameObjects.Clear();
             foreach (ObjectProperties objProps in allObjectsInScene)
             {
@@ -332,7 +334,7 @@ public class ObjectManager : MonoBehaviour
             }
         }
 
-        // Met à jour les textes des boutons existants et l'apparence de sélection
+        // Met ï¿½ jour les textes des boutons existants et l'apparence de sï¿½lection
         foreach (var kvp in objectToButtonMap)
         {
             ObjectProperties objProps = kvp.Key.GetComponent<ObjectProperties>();
@@ -349,7 +351,7 @@ public class ObjectManager : MonoBehaviour
                 textComponent.text = objProps.objectName;
             }
 
-            // Highlight le bouton si l'objet est sélectionné
+            // Highlight le bouton si l'objet est sï¿½lectionnï¿½
             Button buttonComponent = buttonGO.GetComponent<Button>();
             Image buttonImage = buttonGO.GetComponent<Image>();
             if (buttonComponent != null && buttonImage != null)
@@ -413,6 +415,8 @@ public class ObjectManager : MonoBehaviour
                 SetText(speed, props.speedMagnitude.ToString("G"));
                 SetText(radius, props.radius.ToString("G"));
                 SetText(obj_name, props.objectName);
+                SetText(periode, props.periode > 0f ? props.periode.ToString("G") : "N/A");
+                SetText(density, props.density.ToString("G"));
 
                 if (props.EtoileParent != null)
                 {
@@ -436,6 +440,8 @@ public class ObjectManager : MonoBehaviour
                 SetText(speed, "");
                 SetText(radius, "");
                 SetText(dist_etoile, "");
+                SetText(periode, "");
+                SetText(density, "");
             }
         }
         else
