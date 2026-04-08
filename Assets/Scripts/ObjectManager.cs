@@ -64,8 +64,7 @@ public class ObjectManager : MonoBehaviour
         SelectionCamera.usePhysicalProperties = true;
         SelectionCamera.nearClipPlane = 0.01f;
         SelectionCamera.farClipPlane = 10000f;
-        SelectionCamera.clearFlags = CameraClearFlags.SolidColor;
-        SelectionCamera.backgroundColor = Color.black;
+        SelectionCamera.clearFlags = CameraClearFlags.Skybox;
         SelectionCamera.fieldOfView = 60f;
 
         if (SelectionViewFrame != null)

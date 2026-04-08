@@ -192,7 +192,7 @@ Material:
     - _OutlineWidth: 0
     - _Parallax: 0.005
     - _PerspectiveFilter: 0.875
-    - _Power: 1.89
+    - _Power: 3.62
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
@@ -218,7 +218,7 @@ Material:
     - _StencilOp: 0
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
-    - _Step: 0.34
+    - _Step: 0.13
     - _SubsurfaceIndirect: 0.25
     - _SubsurfaceKwToggle: 0
     - _Surface: 0
