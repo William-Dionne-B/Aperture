@@ -276,12 +276,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 5000000
+  objectName: Trou Noir
   speedMagnitude: 0
+  mass: 10000000
   radius: 5
-  EtoileParent: {fileID: 821638216226138241}
   distanceToEtoile: 0
-  objectName: Soleil
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 821638216226138241}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!114 &6505932524256143332
 MonoBehaviour:
   m_ObjectHideFlags: 0

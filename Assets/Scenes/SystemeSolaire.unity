@@ -4894,12 +4894,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 285.878
-  speedMagnitude: 0
-  radius: 4.31
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Saturne
+  speedMagnitude: 0
+  mass: 285.878
+  radius: 4.31
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &444187206
 LineRenderer:
   serializedVersion: 2
@@ -10144,12 +10154,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 0.16601
-  speedMagnitude: 0
-  radius: 0.1755
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Mercure
+  speedMagnitude: 0
+  mass: 0.16601
+  radius: 0.1755
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &916402434
 LineRenderer:
   serializedVersion: 2
@@ -10968,12 +10988,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 955.11
-  speedMagnitude: 0
-  radius: 5.025
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Jupiter
+  speedMagnitude: 0
+  mass: 955.11
+  radius: 5.025
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &983345825
 LineRenderer:
   serializedVersion: 2
@@ -13943,13 +13973,17 @@ MonoBehaviour:
   SelectionViewFrame: {fileID: 908988564}
   ListObjet: {fileID: 1250010922}
   CameraFocusButton: {fileID: 1603682988}
+  SelectionCamera: {fileID: 0}
+  SelectionRenderTexture: {fileID: 0}
   speed: {fileID: 497712306}
   mass: {fileID: 806141526}
   radius: {fileID: 439573722}
   obj_name: {fileID: 1603940644}
   dist_etoile: {fileID: 0}
-  SelectionCamera: {fileID: 0}
-  SelectionRenderTexture: {fileID: 0}
+  periode: {fileID: 0}
+  density: {fileID: 0}
+  surface_gravity: {fileID: 0}
+  temperature: {fileID: 0}
   cameraPadding: 1.2
 --- !u!114 &1231005235
 MonoBehaviour:
@@ -16635,12 +16669,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 0.322716
-  speedMagnitude: 0
-  radius: 0.244
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Mars
+  speedMagnitude: 0
+  mass: 0.322716
+  radius: 0.244
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &1477929851
 LineRenderer:
   serializedVersion: 2
@@ -19792,19 +19836,10 @@ MonoBehaviour:
   fieldOfViewSlider: {fileID: 600877759}
   mouseSensitivitySlider: {fileID: 1907978937}
   speedSlider: {fileID: 1800566367}
+  boutonSimulationImage: {fileID: 0}
+  spritePause: {fileID: 0}
+  spritePlay: {fileID: 0}
   cameraScript: {fileID: 0}
-  imageBoutonFastBackward: {fileID: 0}
-  imageBoutonPause: {fileID: 0}
-  imageBoutonResume: {fileID: 0}
-  imageBoutonFastForward: {fileID: 0}
-  iconFastBackward: {fileID: 0}
-  iconFastBackwardIsSelected: {fileID: 0}
-  iconPause: {fileID: 0}
-  iconPauseIsSelected: {fileID: 0}
-  iconResume: {fileID: 0}
-  iconResumeIsSelected: {fileID: 0}
-  iconFastForward: {fileID: 0}
-  iconFastForwardIsSelected: {fileID: 0}
 --- !u!4 &1724912031
 Transform:
   m_ObjectHideFlags: 0
@@ -22966,12 +23001,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 43.668
-  speedMagnitude: 0
-  radius: 1.79
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Uranus
+  speedMagnitude: 0
+  mass: 43.668
+  radius: 1.79
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &1991513596
 LineRenderer:
   serializedVersion: 2
@@ -23699,12 +23744,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 51.813
-  speedMagnitude: 0
-  radius: 1.85
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Neptune
+  speedMagnitude: 0
+  mass: 51.813
+  radius: 1.85
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &2039324063
 LineRenderer:
   serializedVersion: 2
@@ -24397,12 +24452,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 2.44784
-  speedMagnitude: 0
-  radius: 0.435
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Venus
+  speedMagnitude: 0
+  mass: 2.44784
+  radius: 0.435
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &2102451807
 LineRenderer:
   serializedVersion: 2
@@ -25318,13 +25383,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2490495472793993361}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.9504608, z: -0, w: -0.31084466}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 107.5, y: 0, z: 0}
   m_LocalScale: {x: 0.92, y: 0.92, z: 0.92}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 216.22, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8794845655808724981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25354,12 +25419,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 3.003
-  speedMagnitude: 0
-  radius: 0.46
-  EtoileParent: {fileID: 2118472577}
-  distanceToEtoile: 0
   objectName: Terre
+  speedMagnitude: 0
+  mass: 3.003
+  radius: 0.46
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 2118472577}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
 --- !u!120 &8794845655808724983
 LineRenderer:
   serializedVersion: 2
