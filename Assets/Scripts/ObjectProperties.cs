@@ -5,18 +5,45 @@ using UnityEngine;
 public class ObjectProperties : MonoBehaviour
 {
     [SerializeField]
-    public float mass;
+    public string objectName;
     [SerializeField]
     public float speedMagnitude;
     [SerializeField]
-    public float radius;
+    public float mass;
     [SerializeField]
-    public GameObject EtoileParent;
+    public float radius;
     [SerializeField]
     public float distanceToEtoile;
     [SerializeField]
-    public string objectName;
+    public float gravityMagnitude;
+    [SerializeField]
+    public float temperatureMagnitude;
+    [SerializeField]
+    public float periode;
+    [SerializeField]
+    public float density;
+    public GameObject EtoileParent;
 
+    [Header("Simulation Scales (Système Solaire)")]
+    [Tooltip("1 unité de rayon = 13 900 km (soit 13 900 000 mètres)")]
+    public float radiusToMetersScale = 13900000f;
+    
+    [Tooltip("1 unité = 1 391 609 km (soit 1 391 609 000 mètres)")]
+    public float distanceToMetersScale = 1391609000f;
+    
+    [Tooltip("1 unité de masse = 1.988 * 10^15 kg (Millionième solaire)")]
+    public float unityToKgScale = 1.988e24f;
+
+    [Header("Thermodynamique")] [Tooltip("Luminosité de l'étoile en Watts (Soleil = 3.828e26")]
+    public float starLuminosity = 3.828e26f;
+
+    [Tooltip("Albédo : Capacité à refléter la lumière (Terre = 0.3")] [Range(0f, 1f)]
+    public float albedo = 0.3f;
+
+    [Tooltip("Effet de serre en Kelvin (Terre = environ +33 K")]
+    public float greenhouseEffect = 0f;
+        
+    
     private GameObject thisObject; // L'objet parent du script
     private Transform thisTransform;
     private Rigidbody thisRigidbody;
@@ -75,6 +102,21 @@ public class ObjectProperties : MonoBehaviour
         if (thisGravityBody != null)
             thisGravityBody.Mass = mass;
 
+        if (radius > 0 && GravityManager.Instance != null)
+        {
+            float vraiRayonEnMetres = radius * radiusToMetersScale;
+            float vraieMasseEnKg = mass * unityToKgScale;
+            
+            float constanteGravitationnelle = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+            
+            gravityMagnitude = (constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres) / 1e9f;
+        }
+        
+        else
+        {
+            gravityMagnitude = 0f;
+        }
+        
         // Calcul de la distance à l'étoile parente
         if (EtoileParent != null && thisTransform != null)
         {
@@ -84,7 +126,41 @@ public class ObjectProperties : MonoBehaviour
 
             distanceToEtoile = s.magnitude;
         }
+
+        //calcule de la période de révolution autour de l'étoile parente
+        if (speedMagnitude > 0 && distanceToEtoile > 0)
+        {
+            periode = (float)Math.Round((2 * Mathf.PI * distanceToEtoile) / speedMagnitude, 2);
+        }
+        else
+        {
+            periode = 0f; // Période indéfinie si vitesse ou distance nulle
+        }
+
+        if (mass > 0 && radius > 0) 
+        {
+            density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
+        }
+        else
+        {
+            density = 0f; // Densité indéfinie si masse ou rayon nulle
+        }
+
+        if (EtoileParent != null && distanceToEtoile > 0)
+        {
+            float vraieDistanceMetres = distanceToEtoile * distanceToMetersScale;
+
+            float sigma = 5.67e-8f;
+
+            float numerateur = starLuminosity * (1f - albedo);
+            float denominateur = 16f * Mathf.PI * sigma * (vraieDistanceMetres * vraieDistanceMetres);
+
+            float tempEquilibre = Mathf.Pow(numerateur / denominateur, 0.25f);
+
+            temperatureMagnitude = tempEquilibre + greenhouseEffect;
+        }    
     }
+    
 
     // Coroutine qui met à jour speedMagnitude 10 fois par seconde (toutes les 0.1s)
     private IEnumerator UpdateSpeedRoutine()

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Contrôle le menu de pause principal, la navigation entre les sous-menus
-/// (Options, Guide, Touches) et la gestion des paramètres utilisateur.
+/// et la séparation entre la pause de l'interface et la pause de la simulation.
 /// </summary>
 public class PauseMenu : MonoBehaviour
 {
@@ -20,33 +20,22 @@ public class PauseMenu : MonoBehaviour
     public Slider mouseSensitivitySlider;
     public Slider speedSlider;
     
+    [Header("Icones du Bouton Pause")]
+    public Image boutonSimulationImage;
+    public Sprite spritePause;
+    public Sprite spritePlay;
+    
     [Header("External Scripts")]
     public FreeFlyCamera cameraScript;
     
-    [Header("Icones du Bouton Pause")]
-    public Image imageBoutonFastBackward;
-    public Image imageBoutonPause;
-    public Image imageBoutonResume;
-    public Image imageBoutonFastForward;
-    public Sprite iconFastBackward;
-    public Sprite iconFastBackwardIsSelected;
-    public Sprite iconPause;
-    public Sprite iconPauseIsSelected;
-    public Sprite iconResume;
-    public Sprite iconResumeIsSelected;
-    public Sprite iconFastForward;
-    public Sprite iconFastForwardIsSelected;
-
-    // --- Variables Globales ---
-    public static bool isPaused = false;
+    public static bool isMenuOpen = false; 
+    public static bool isSimulationPaused = false; 
 
     // ==========================================
     // MÉTHODES UNITY
     // ==========================================
-
     void Start()
     {
-        // Initialisation visuelle des sliders au démarrage
         if (mouseSensitivitySlider != null && cameraScript != null)
             mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity", 3.5f);
         
@@ -61,55 +50,90 @@ public class PauseMenu : MonoBehaviour
 
     void Update()
     {
-        // Gestion de la touche Échap pour la navigation en arrière
+        // 1. Touche ÉCHAP (Menu)
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (keysMenuUI.activeSelf) OpenOptions();
-            else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
-            else if (isPaused) Resume();
-            else Pause();
+            if (isMenuOpen) Resume(); else Pause();
+        }
+        
+        // 2. Touche ESPACE (Simulation) - Uniquement si menu fermé
+        else if (Input.GetKeyDown(KeyCode.Space) && !isMenuOpen)
+        {
+            ToggleSimulation();
+        }
+    }
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Escape))
+    //     {
+    //         if (keysMenuUI.activeSelf || audioMenuUI.activeSelf) OpenOptions();
+    //         else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
+    //         else if (isMenuOpen) Resume(); 
+    //         else Pause(); 
+    //     }
+    //     
+    //     else if (Input.GetKeyDown(KeyCode.Space))
+    //     {
+    //         if (isMenuOpen)
+    //         {
+    //             Resume();
+    //         }
+    //         else
+    //         {
+    //             ToggleSimulationTime();
+    //         }
+    //     }
+    // }
+
+    // ==========================================
+    // CONTRÔLE DU TEMPS DE SIMULATION (ESPACE)
+    // ==========================================
+    
+    public void ToggleSimulation()
+    {
+        isSimulationPaused = !isSimulationPaused; // Inverse l'état
+
+        if (isSimulationPaused)
+        {
+            TimeManager.Pause();
+            boutonSimulationImage.sprite = spritePlay; // On affiche Play car c'est en pause
+        }
+        else
+        {
+            TimeManager.Resume();
+            boutonSimulationImage.sprite = spritePause; // On affiche Pause car ça tourne
         }
     }
 
+
     // ==========================================
-    // CONTRÔLE DE L'ÉTAT DU JEU
+    // CONTRÔLE DE L'ÉTAT DU MENU (ÉCHAP)
     // ==========================================
 
     /// <summary>
-    /// Reprend le jeu, réactive le contrôle du temps et cache les menus.
+    /// Ferme le menu Échap et relance le moteur Unity, SANS toucher à l'état de la simulation.
     /// </summary>
     public void Resume()
     {
-        DesactivateAllMenus();
+        pauseMenuUI.SetActive(false);
         timeMenuUI.SetActive(true);
-        Time.timeScale = 1f;
-        isPaused = false;
-
+        
+        Time.timeScale = isSimulationPaused ? 0f : 1f;
+        
+        isMenuOpen = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        if (imageBoutonFastBackward != null && imageBoutonPause != null && imageBoutonResume != null && imageBoutonFastForward && iconFastBackward != null && iconPause != null && iconResumeIsSelected != null && iconFastForward != null)
-        {
-            Debug.Log("AAA");
-            imageBoutonFastBackward.overrideSprite = iconFastBackward;
-            imageBoutonPause.overrideSprite = iconPause;
-            imageBoutonResume.overrideSprite = iconResumeIsSelected;
-            imageBoutonFastForward.overrideSprite = iconFastForward;
-            Debug.Log("BBB");
-        }
-        
     }
 
     /// <summary>
-    /// Met le jeu en pause, fige le temps et affiche le menu principal.
+    /// Ouvre le menu Échap et fige tout le moteur Unity.
     /// </summary>
     public void Pause()
     {
-        OpenPauseMenu();
+        pauseMenuUI.SetActive(true);
         timeMenuUI.SetActive(false);
+        
         Time.timeScale = 0f;
-        isPaused = true;
-
+        isMenuOpen = true;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -119,7 +143,6 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void QuitGame()
     {
-        // TODO: Ajouter la logique de sauvegarde de l'univers ici
         Debug.Log("Ending Simulator !");
         MainMenuManager.loadScene("MenuAccueil");
     }
@@ -152,9 +175,6 @@ public class PauseMenu : MonoBehaviour
         audioMenuUI.SetActive(true);
     }
     
-    /// <summary>
-    /// Ouvre le menu des options et synchronise la valeur des sliders avec la caméra.
-    /// </summary>
     public void OpenOptions()
     {
         DesactivateAllMenus();
@@ -168,25 +188,19 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Fonction utilitaire pour cacher tous les panneaux d'interface.
-    /// </summary>
     private void DesactivateAllMenus()
     {
-        pauseMenuUI.SetActive(false);
-        optionMenuUI.SetActive(false);
-        guideMenuUI.SetActive(false);
-        keysMenuUI.SetActive(false);
-        audioMenuUI.SetActive(false);
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
+        if (optionMenuUI != null) optionMenuUI.SetActive(false);
+        if (guideMenuUI != null) guideMenuUI.SetActive(false);
+        if (keysMenuUI != null) keysMenuUI.SetActive(false);
+        if (audioMenuUI != null) audioMenuUI.SetActive(false);
     }
 
     // ==========================================
     // GESTION DES PARAMÈTRES (OPTIONS)
     // ==========================================
 
-    /// <summary>
-    /// Réinitialise les sliders à leurs valeurs par défaut.
-    /// </summary>
     public void Reset()
     {
         if (fieldOfViewSlider != null) fieldOfViewSlider.value = 60f;
@@ -196,10 +210,6 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Paramètres réinitialisés aux valeurs par défaut !");
     }
 
-    
-    /// <summary>
-    /// Sauvegarde les valeurs actuelles des sliders dans les PlayerPrefs et met à jour la caméra.
-    /// </summary>
     public void SaveOptions()
     {
         if (cameraScript != null)

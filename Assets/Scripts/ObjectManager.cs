@@ -7,33 +7,38 @@ using System.Collections.Generic;
 
 public class ObjectManager : MonoBehaviour
 {
-    private GameObject selection;
+    private GameObject selection; 
     private GameObject lastSelection;
     private Vector3 cameraLocalPositionWhenAttached;
     private Quaternion cameraLocalRotationWhenAttached;
     private bool cameraIsAttachedToSelection = false;
 
-    public GameObject MainCamera;
-    public GameObject InfoUI;
+    public GameObject MainCamera; 
+    public GameObject InfoUI; 
+    
     public GameObject SelectionViewFrame;
     public GameObject ListObjet;
     public GameObject CameraFocusButton;
 
-    public GameObject speed;
-    public GameObject mass;
-    public GameObject radius;
-    public GameObject obj_name;
-    public GameObject dist_etoile;
-
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
-
+    
+    [Header("Champs UI Textes")]
+    public GameObject speed; 
+    public GameObject mass; 
+    public GameObject radius; 
+    public GameObject obj_name; 
+    public GameObject dist_etoile; 
+    public GameObject periode;
+    public GameObject density;
+    public GameObject surface_gravity;
+    public GameObject temperature;
+    
     private float initialYOffset = 95f;
-
     private RawImage selectionRawImage;
-
     public float cameraPadding = 1.5f;
-
+    
+    // RÃ©fÃ©rences liÃ©es aux listeners
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
     TMP_InputField radiusTmp; InputField radiusUi; UnityAction<string> radiusListener;
@@ -46,40 +51,29 @@ public class ObjectManager : MonoBehaviour
     private List<ObjectProperties> lastFrameObjects = new List<ObjectProperties>();
 
     // --- Preview layer logic ---
-    private const int SelectionLayer = 31; // couche temporaire utilisée pour la prévisualisation
+    private const int SelectionLayer = 31; // couche temporaire utilisï¿½e pour la prï¿½visualisation
     private int SelectionLayerMask => (1 << SelectionLayer);
     private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
 
     void Start()
     {
-        if (SelectionRenderTexture == null)
-        {
-            SelectionRenderTexture = new RenderTexture(1024, 1024, 24);
-        }
-
-        if (SelectionCamera != null)
-        {
-            Destroy(SelectionCamera.gameObject);
-        }
+        if (SelectionRenderTexture == null) SelectionRenderTexture = new RenderTexture(1024, 1024, 24);
+        if (SelectionCamera != null) Destroy(SelectionCamera.gameObject);
 
         GameObject camObj = new GameObject("SelectionCamera");
         SelectionCamera = camObj.AddComponent<Camera>();
-
         SelectionCamera.targetTexture = SelectionRenderTexture;
         SelectionCamera.usePhysicalProperties = true;
         SelectionCamera.nearClipPlane = 0.01f;
         SelectionCamera.farClipPlane = 10000f;
         SelectionCamera.clearFlags = CameraClearFlags.Skybox;  // skybox visible
         SelectionCamera.fieldOfView = 60f;
-        SelectionCamera.cullingMask = SelectionLayerMask;     // ne rendre que la couche de sélection
+        SelectionCamera.cullingMask = SelectionLayerMask;     // ne rendre que la couche de sï¿½lection
 
         if (SelectionViewFrame != null)
         {
             selectionRawImage = SelectionViewFrame.GetComponent<RawImage>();
-            if (selectionRawImage != null)
-            {
-                selectionRawImage.texture = SelectionRenderTexture;
-            }
+            if (selectionRawImage != null) selectionRawImage.texture = SelectionRenderTexture;
         }
 
         InitializeListUI();
@@ -90,18 +84,13 @@ public class ObjectManager : MonoBehaviour
     void InitializeCameraFocusButton()
     {
         if (CameraFocusButton == null) return;
-
         Button button = CameraFocusButton.GetComponent<Button>();
-        if (button != null)
-        {
-            button.onClick.AddListener(FocusMainCameraOnSelection);
-        }
+        if (button != null) button.onClick.AddListener(FocusMainCameraOnSelection);
     }
 
     void FocusMainCameraOnSelection()
     {
         if (selection == null || MainCamera == null) return;
-
         DetachCameraFromSelection();
 
         var renderer = selection.GetComponentInChildren<Renderer>();
@@ -112,9 +101,7 @@ public class ObjectManager : MonoBehaviour
         float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
         float distance = size * cameraPadding;
 
-        Vector3 direction = new Vector3(0f, 0f, -1f);
-
-        MainCamera.transform.position = center + direction * distance;
+        MainCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
         MainCamera.transform.LookAt(center);
 
         AttachCameraToSelection();
@@ -123,7 +110,6 @@ public class ObjectManager : MonoBehaviour
     void AttachCameraToSelection()
     {
         if (selection == null || MainCamera == null) return;
-
         MainCamera.transform.SetParent(selection.transform);
         cameraLocalPositionWhenAttached = MainCamera.transform.localPosition;
         cameraLocalRotationWhenAttached = MainCamera.transform.localRotation;
@@ -133,18 +119,13 @@ public class ObjectManager : MonoBehaviour
     void DetachCameraFromSelection()
     {
         if (MainCamera == null) return;
-
-        if (MainCamera.transform.parent != null)
-        {
-            MainCamera.transform.SetParent(null);
-        }
+        if (MainCamera.transform.parent != null) MainCamera.transform.SetParent(null);
         cameraIsAttachedToSelection = false;
     }
 
     void CheckForMovementInput()
     {
         if (!cameraIsAttachedToSelection) return;
-
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
         {
             DetachCameraFromSelection();
@@ -156,12 +137,8 @@ public class ObjectManager : MonoBehaviour
         if (ListObjet == null) return;
 
         listScrollRect = ListObjet.GetComponent<ScrollRect>();
-        if (listScrollRect == null)
-        {
-            listScrollRect = ListObjet.AddComponent<ScrollRect>();
-        }
+        if (listScrollRect == null) listScrollRect = ListObjet.AddComponent<ScrollRect>();
 
-        // Récupère ou crée le contenu du ScrollView
         listContent = listScrollRect.content;
         if (listContent == null)
         {
@@ -175,8 +152,6 @@ public class ObjectManager : MonoBehaviour
             contentRect.anchorMin = new Vector2(0, 1);
             contentRect.anchorMax = new Vector2(1, 1);
             contentRect.pivot = new Vector2(0.5f, 1);
-            contentRect.offsetMin = Vector2.zero;
-            contentRect.offsetMax = Vector2.zero;
             contentRect.sizeDelta = new Vector2(0, 0);
 
             VerticalLayoutGroup layoutGroup = contentObj.AddComponent<VerticalLayoutGroup>();
@@ -190,7 +165,6 @@ public class ObjectManager : MonoBehaviour
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
 
-        // Crée le préfab de bouton
         CreateButtonPrefab();
     }
 
@@ -212,12 +186,10 @@ public class ObjectManager : MonoBehaviour
         colors.normalColor = new Color(0.2f, 0.2f, 0.2f);
         colors.highlightedColor = new Color(0.3f, 0.3f, 0.3f);
         colors.pressedColor = new Color(0.1f, 0.1f, 0.1f);
-        colors.selectedColor = new Color(0.4f, 0.4f, 0.4f);
         buttonComponent.colors = colors;
 
         LayoutElement layoutElement = buttonPrefab.AddComponent<LayoutElement>();
         layoutElement.preferredHeight = 50;
-        layoutElement.preferredWidth = 200;
 
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(buttonPrefab.transform, false);
@@ -225,8 +197,6 @@ public class ObjectManager : MonoBehaviour
         RectTransform textRect = textObj.AddComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = Vector2.zero;
-        textRect.offsetMax = Vector2.zero;
 
         TextMeshProUGUI textComponent = textObj.AddComponent<TextMeshProUGUI>();
         textComponent.text = "Object";
@@ -243,7 +213,7 @@ public class ObjectManager : MonoBehaviour
 
         var selected = click.selectedObject;
 
-        // conserve l'ancienne sélection pour restaurer ses couches
+        // conserve l'ancienne sï¿½lection pour restaurer ses couches
         GameObject oldSelection = selection;
 
         if (selection != selected)
@@ -253,22 +223,16 @@ public class ObjectManager : MonoBehaviour
             lastSelection = selection;
             BindFieldListeners();
 
-            // restaure l'ancienne sélection puis applique la couche de preview à la nouvelle sélection
+            // restaure l'ancienne sï¿½lection puis applique la couche de preview ï¿½ la nouvelle sï¿½lection
             RestoreSelectionLayers();
             ApplySelectionLayer(selection);
         }
 
         UpdateSelectionCamera();
-
-        // Vérifie les entrées de mouvement
         CheckForMovementInput();
-
-        // Met à jour la liste des objets chaque frame
         UpdateObjectList();
 
-        if (IsAnyFieldEditing())
-            return;
-
+        if (IsAnyFieldEditing()) return;
         updateUIVisibility();
     }
 
@@ -276,11 +240,9 @@ public class ObjectManager : MonoBehaviour
     {
         if (listContent == null) return;
 
-        // Récupère tous les objets avec ObjectProperties dans la scène
         ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
-
-        // Vérifie si la liste a changé
         bool listChanged = allObjectsInScene.Length != lastFrameObjects.Count;
+        
         if (!listChanged)
         {
             for (int i = 0; i < allObjectsInScene.Length; i++)
@@ -293,17 +255,11 @@ public class ObjectManager : MonoBehaviour
             }
         }
 
-        // Si la liste a changé, reconstruit les boutons
         if (listChanged)
         {
-            // Efface les anciens boutons
-            foreach (Transform child in listContent)
-            {
-                Destroy(child.gameObject);
-            }
+            foreach (Transform child in listContent) Destroy(child.gameObject);
             objectToButtonMap.Clear();
 
-            // Crée les nouveaux boutons
             float yOffset = initialYOffset;
             foreach (ObjectProperties objProps in allObjectsInScene)
             {
@@ -314,70 +270,43 @@ public class ObjectManager : MonoBehaviour
 
                 RectTransform buttonRect = buttonInstance.GetComponent<RectTransform>();
                 buttonRect.anchoredPosition = new Vector2(0, yOffset);
-                yOffset -= 55; // 50 de hauteur + 5 de spacing
+                yOffset -= 55; 
 
                 TextMeshProUGUI textComponent = buttonInstance.GetComponentInChildren<TextMeshProUGUI>();
-                if (textComponent != null)
-                {
-                    textComponent.text = objProps.objectName;
-                }
+                if (textComponent != null) textComponent.text = objProps.objectName;
 
                 Button buttonComponent = buttonInstance.GetComponent<Button>();
                 if (buttonComponent != null)
                 {
                     GameObject objToSelect = objProps.gameObject;
-                    if (objProps.transform.parent != null)
-                    {
-                        objToSelect = objProps.transform.parent.gameObject;
-                    }
-
+                    if (objProps.transform.parent != null) objToSelect = objProps.transform.parent.gameObject;
                     buttonComponent.onClick.AddListener(() => SelectObject(objToSelect));
                 }
 
                 objectToButtonMap[objProps.gameObject] = buttonInstance;
             }
 
-            // Met à jour la liste de référence
             lastFrameObjects.Clear();
-            foreach (ObjectProperties objProps in allObjectsInScene)
-            {
-                lastFrameObjects.Add(objProps);
-            }
+            foreach (ObjectProperties objProps in allObjectsInScene) lastFrameObjects.Add(objProps);
         }
 
-        // Met à jour les textes des boutons existants et l'apparence de sélection
         foreach (var kvp in objectToButtonMap)
         {
             ObjectProperties objProps = kvp.Key.GetComponent<ObjectProperties>();
-            if (objProps == null && kvp.Key.transform.parent != null)
-            {
-                objProps = kvp.Key.transform.parent.GetComponent<ObjectProperties>();
-            }
+            if (objProps == null && kvp.Key.transform.parent != null) objProps = kvp.Key.transform.parent.GetComponent<ObjectProperties>();
 
             GameObject buttonGO = kvp.Value;
             TextMeshProUGUI textComponent = buttonGO.GetComponentInChildren<TextMeshProUGUI>();
 
-            if (textComponent != null && objProps != null)
-            {
-                textComponent.text = objProps.objectName;
-            }
+            if (textComponent != null && objProps != null) textComponent.text = objProps.objectName;
 
-            // Highlight le bouton si l'objet est sélectionné
-            Button buttonComponent = buttonGO.GetComponent<Button>();
             Image buttonImage = buttonGO.GetComponent<Image>();
-            if (buttonComponent != null && buttonImage != null)
+            if (buttonImage != null)
             {
                 bool isSelected = (objProps != null && (objProps.gameObject == selection || 
                     (objProps.transform.parent != null && objProps.transform.parent.gameObject == selection)));
                 
-                if (isSelected)
-                {
-                    buttonImage.color = new Color(0.4f, 0.4f, 0.4f);
-                }
-                else
-                {
-                    buttonImage.color = new Color(0.2f, 0.2f, 0.2f);
-                }
+                buttonImage.color = isSelected ? new Color(0.4f, 0.4f, 0.4f) : new Color(0.2f, 0.2f, 0.2f);
             }
         }
     }
@@ -385,29 +314,21 @@ public class ObjectManager : MonoBehaviour
     void SelectObject(GameObject obj)
     {
         var clickDetection = MainCamera?.GetComponent<ClickDetection>();
-        if (clickDetection != null)
-        {
-            clickDetection.selectedObject = obj;
-        }
+        if (clickDetection != null) clickDetection.selectedObject = obj;
     }
 
     void UpdateSelectionCamera()
     {
         if (SelectionCamera == null || selection == null) return;
-
         var renderer = selection.GetComponentInChildren<Renderer>();
         if (renderer == null) return;
 
         Bounds bounds = renderer.bounds;
-
         Vector3 center = bounds.center;
         float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
-
         float distance = size * cameraPadding;
 
-        Vector3 direction = new Vector3(0f, 0f, -1f);
-
-        SelectionCamera.transform.position = center + direction * distance;
+        SelectionCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
         SelectionCamera.transform.LookAt(center);
     }
 
@@ -418,156 +339,105 @@ public class ObjectManager : MonoBehaviour
         if (selection != null)
         {
             InfoUI.SetActive(true);
-
             var props = selection.GetComponent<ObjectProperties>();
             if (props != null)
             {
-                SetText(mass, props.mass.ToString("G"));
-                SetText(speed, props.speedMagnitude.ToString("G"));
-                SetText(radius, props.radius.ToString("G"));
+                float vraieMasse = props.mass * props.unityToKgScale;
+                float vraiRayon = props.radius * props.radiusToMetersScale;
+                
+                SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
+                SetText(radius, FormaterScientifiqueTMP(vraiRayon) + " m");
+                SetText(speed, props.speedMagnitude.ToString("F2") + " m/s");
                 SetText(obj_name, props.objectName);
+                SetText(periode, props.periode > 0f ? props.periode.ToString("G") : "N/A");
+                SetText(density, props.density.ToString("G"));
+
+                float grav = props.gravityMagnitude;
+                float gravEnG = grav / 9.81f; 
+                SetText(surface_gravity, $"{grav:0.##} m/sÂ² ({gravEnG:0.##} g)");
 
                 if (props.EtoileParent != null)
                 {
-                    Vector3 posEtoile = props.EtoileParent.transform.position;
-                    Vector3 posBody = selection.transform.position;
-                    float dist = Vector3.Distance(posEtoile, posBody);
-                    props.distanceToEtoile = dist;
-                    SetText(dist_etoile, dist.ToString("G"));
+                    float distUnity = Vector3.Distance(props.EtoileParent.transform.position, selection.transform.position);
+                    float vraieDistance = distUnity * props.distanceToMetersScale;
+                    float distanceAL = vraieDistance / 9.461e15f;
+                    SetText(dist_etoile, $"{FormaterScientifiqueTMP(vraieDistance)} m ({FormaterScientifiqueTMP(distanceAL)} al)");
                 }
-                else
+                else SetText(dist_etoile, "N/A");
+                
+                if (temperature != null)
                 {
-                    if (props.distanceToEtoile >= 0f)
-                        SetText(dist_etoile, props.distanceToEtoile.ToString("G"));
-                    else
-                        SetText(dist_etoile, "N/A");
+                    if (props.temperatureMagnitude > 0f)
+                    {
+                        float tempK = props.temperatureMagnitude;
+                        float tempC = tempK - 273.15f; 
+                        SetText(temperature, $"{tempK:F1} K ({tempC:F1} Â°C)");
+                    }
+                    else SetText(temperature, "N/A");
                 }
             }
             else
             {
-                SetText(mass, "");
-                SetText(speed, "");
-                SetText(radius, "");
-                SetText(dist_etoile, "");
+                SetText(mass, ""); SetText(speed, ""); SetText(radius, ""); SetText(dist_etoile, ""); SetText(periode, ""); SetText(density, "");
             }
         }
-        else
-        {
-            InfoUI.SetActive(false);
-        }
+        else InfoUI.SetActive(false);
     }
 
     void SetText(GameObject field, string value)
     {
         if (field == null) return;
-
         var tmpInput = field.GetComponent<TMP_InputField>();
         if (tmpInput != null) { tmpInput.text = value; return; }
-
         var uiInput = field.GetComponent<InputField>();
         if (uiInput != null) { uiInput.text = value; return; }
-
         var tmp = field.GetComponent<TMP_Text>();
         if (tmp != null) { tmp.text = value; return; }
-
         var uiText = field.GetComponent<Text>();
         if (uiText != null) { uiText.text = value; return; }
-
         tmp = field.GetComponentInChildren<TMP_Text>();
         if (tmp != null) { tmp.text = value; return; }
-
         uiText = field.GetComponentInChildren<Text>();
         if (uiText != null) { uiText.text = value; return; }
     }
 
     bool IsAnyFieldEditing()
     {
-        if (IsFieldEditing(mass)) return true;
-        if (IsFieldEditing(speed)) return true;
-        if (IsFieldEditing(radius)) return true;
-        if (IsFieldEditing(obj_name)) return true;
-        if (IsFieldEditing(dist_etoile)) return true;
-        return false;
+        return IsFieldEditing(mass) || IsFieldEditing(speed) || IsFieldEditing(radius) || IsFieldEditing(obj_name) || IsFieldEditing(dist_etoile);
     }
 
     bool IsFieldEditing(GameObject field)
     {
         if (field == null) return false;
-
         var tmpInput = field.GetComponent<TMP_InputField>();
         if (tmpInput != null) return tmpInput.isFocused;
-
         var uiInput = field.GetComponent<InputField>();
         if (uiInput != null) return uiInput.isFocused;
-
         tmpInput = field.GetComponentInChildren<TMP_InputField>();
         if (tmpInput != null) return tmpInput.isFocused;
-
         uiInput = field.GetComponentInChildren<InputField>();
         if (uiInput != null) return uiInput.isFocused;
-
         return false;
     }
 
     void BindFieldListeners()
     {
         UnbindAllFieldListeners();
+        massTmp = GetTMPInput(mass); massUi = GetLegacyInput(mass);
+        if (massTmp != null) { massListener = (s) => OnMassEndEdit(s); massTmp.onEndEdit.AddListener(massListener); }
+        else if (massUi != null) { massListener = (s) => OnMassEndEdit(s); massUi.onEndEdit.AddListener(massListener); }
 
-        massTmp = GetTMPInput(mass);
-        massUi = GetLegacyInput(mass);
+        speedTmp = GetTMPInput(speed); speedUi = GetLegacyInput(speed);
+        if (speedTmp != null) { speedListener = (s) => OnSpeedEndEdit(s); speedTmp.onEndEdit.AddListener(speedListener); }
+        else if (speedUi != null) { speedListener = (s) => OnSpeedEndEdit(s); speedUi.onEndEdit.AddListener(speedListener); }
 
-        if (massTmp != null)
-        {
-            massListener = (s) => OnMassEndEdit(s);
-            massTmp.onEndEdit.AddListener(massListener);
-        }
-        else if (massUi != null)
-        {
-            massListener = (s) => OnMassEndEdit(s);
-            massUi.onEndEdit.AddListener(massListener);
-        }
+        radiusTmp = GetTMPInput(radius); radiusUi = GetLegacyInput(radius);
+        if (radiusTmp != null) { radiusListener = (s) => OnRadiusEndEdit(s); radiusTmp.onEndEdit.AddListener(radiusListener); }
+        else if (radiusUi != null) { radiusListener = (s) => OnRadiusEndEdit(s); radiusUi.onEndEdit.AddListener(radiusListener); }
 
-        speedTmp = GetTMPInput(speed);
-        speedUi = GetLegacyInput(speed);
-
-        if (speedTmp != null)
-        {
-            speedListener = (s) => OnSpeedEndEdit(s);
-            speedTmp.onEndEdit.AddListener(speedListener);
-        }
-        else if (speedUi != null)
-        {
-            speedListener = (s) => OnSpeedEndEdit(s);
-            speedUi.onEndEdit.AddListener(speedListener);
-        }
-
-        radiusTmp = GetTMPInput(radius);
-        radiusUi = GetLegacyInput(radius);
-
-        if (radiusTmp != null)
-        {
-            radiusListener = (s) => OnRadiusEndEdit(s);
-            radiusTmp.onEndEdit.AddListener(radiusListener);
-        }
-        else if (radiusUi != null)
-        {
-            radiusListener = (s) => OnRadiusEndEdit(s);
-            radiusUi.onEndEdit.AddListener(radiusListener);
-        }
-
-        nameTmp = GetTMPInput(obj_name);
-        nameUi = GetLegacyInput(obj_name);
-
-        if (nameTmp != null)
-        {
-            nameListener = (s) => OnNameEndEdit(s);
-            nameTmp.onEndEdit.AddListener(nameListener);
-        }
-        else if (nameUi != null)
-        {
-            nameListener = (s) => OnNameEndEdit(s);
-            nameUi.onEndEdit.AddListener(nameListener);
-        }
+        nameTmp = GetTMPInput(obj_name); nameUi = GetLegacyInput(obj_name);
+        if (nameTmp != null) { nameListener = (s) => OnNameEndEdit(s); nameTmp.onEndEdit.AddListener(nameListener); }
+        else if (nameUi != null) { nameListener = (s) => OnNameEndEdit(s); nameUi.onEndEdit.AddListener(nameListener); }
     }
 
     void UnbindAllFieldListeners()
@@ -605,16 +475,21 @@ public class ObjectManager : MonoBehaviour
         return field.GetComponentInChildren<InputField>();
     }
 
+    // --- CALLBACKS D'Ã‰DITION ---
     void OnMassEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
         if (props == null) return;
 
-        if (TryParseFloatFlexible(input, out float v))
-            props.mass = v;
+        if (LireEntreeUtilisateur(input, out float vraieMasseTapee))
+        {
+            props.mass = vraieMasseTapee / props.unityToKgScale;
+        }
         else
-            SetText(mass, props.mass.ToString("G"));
-
+        {
+            float vraieMasse = props.mass * props.unityToKgScale;
+            SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
+        }
         updateUIVisibility();
     }
 
@@ -623,11 +498,9 @@ public class ObjectManager : MonoBehaviour
         var props = selection?.GetComponent<ObjectProperties>();
         if (props == null) return;
 
-        if (TryParseFloatFlexible(input, out float v))
-            props.speedMagnitude = v;
-        else
-            SetText(speed, props.speedMagnitude.ToString("G"));
-
+        if (LireEntreeUtilisateur(input, out float v)) props.speedMagnitude = v;
+        else SetText(speed, props.speedMagnitude.ToString("F2") + " m/s");
+        
         updateUIVisibility();
     }
 
@@ -636,11 +509,15 @@ public class ObjectManager : MonoBehaviour
         var props = selection?.GetComponent<ObjectProperties>();
         if (props == null) return;
 
-        if (TryParseFloatFlexible(input, out float v))
-            props.radius = v;
+        if (LireEntreeUtilisateur(input, out float vraiRayonEnMetres))
+        {
+            props.radius = vraiRayonEnMetres / props.radiusToMetersScale;
+        }
         else
-            SetText(radius, props.radius.ToString("G"));
-
+        {
+            float vraiRayon = props.radius * props.radiusToMetersScale;
+            SetText(radius, FormaterScientifiqueTMP(vraiRayon) + " m");
+        }
         updateUIVisibility();
     }
 
@@ -654,41 +531,54 @@ public class ObjectManager : MonoBehaviour
             props.objectName = input;
             selection.name = input;
         }
-        else
-        {
-            SetText(obj_name, props.objectName);
-        }
+        else SetText(obj_name, props.objectName);
 
         updateUIVisibility();
     }
 
-    bool TryParseFloatFlexible(string s, out float result)
+    // --- LE TRADUCTEUR D'INTERFACE MAGIQUE ---
+    bool LireEntreeUtilisateur(string input, out float resultatFinal)
     {
-        if (string.IsNullOrWhiteSpace(s))
+        resultatFinal = 0f;
+        if (string.IsNullOrWhiteSpace(input)) return false;
+
+        float multiplicateur = 1f;
+
+        if (input.Contains("M km")) multiplicateur = 1e9f; 
+        else if (input.Contains("km")) multiplicateur = 1e3f; 
+
+        string textPropre = input.Replace(" kg", "").Replace(" M km", "").Replace(" km", "").Replace(" m", "").Replace(" m/s", "");
+        textPropre = textPropre.Replace(" Ã— 10<sup>", "E").Replace(" x 10<sup>", "E").Replace("</sup>", "");
+        textPropre = textPropre.Replace(" ", "").Replace(",", ".");
+
+        if (float.TryParse(textPropre, NumberStyles.Float, CultureInfo.InvariantCulture, out float valeurBrute))
         {
-            result = 0f;
-            return false;
+            resultatFinal = valeurBrute * multiplicateur;
+            return true;
         }
-
-        if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out result))
-            return true;
-
-        if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
-            return true;
-
-        var replaced = s.Replace(',', '.');
-        if (float.TryParse(replaced, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
-            return true;
-
-        result = 0f;
         return false;
+    }
+    
+    string FormaterScientifiqueTMP(float valeur)
+    {
+        if (valeur == 0f) return "0";
+        string formatStandard = valeur.ToString("E2");
+        string[] parties = formatStandard.Split('E');
+
+        if (parties.Length == 2)
+        {
+            string baseNum = parties[0]; 
+            int exposant = int.Parse(parties[1]); 
+            return $"{baseNum.Replace('.', ',')} Ã— 10<sup>{exposant}</sup>";
+        }
+        return formatStandard;
     }
 
     void OnDestroy()
     {
         UnbindAllFieldListeners();
         DetachCameraFromSelection();
-        RestoreSelectionLayers();
+        RestoreSelectionLayers();  
         if (buttonPrefab != null)
         {
             Destroy(buttonPrefab);
