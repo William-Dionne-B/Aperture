@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 985709952069091107}
   - component: {fileID: 8523169192094749120}
   - component: {fileID: 1557204167598093639}
-  - component: {fileID: 1262627819960287473}
   - component: {fileID: 5893172788963099703}
+  - component: {fileID: 1262627819960287473}
   - component: {fileID: 2183513946539248318}
   - component: {fileID: 7738383565594045505}
   m_Layer: 0
@@ -141,23 +141,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1262627819960287473
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  initialVelocity: {x: 0, y: 0, z: 0}
-  applyInitialVelocity: 1
-  Mass: 1
-  rb: {fileID: 0}
-  line: {fileID: 0}
 --- !u!120 &5893172788963099703
 LineRenderer:
   serializedVersion: 2
@@ -265,6 +248,23 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1262627819960287473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544941027984095034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialVelocity: {x: 0, y: 0, z: 0}
+  applyInitialVelocity: 1
+  Mass: 1
+  rb: {fileID: 0}
+  line: {fileID: 0}
 --- !u!114 &2183513946539248318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,12 +277,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1000000
-  speedMagnitude: 0
-  radius: 15
-  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
-  distanceToEtoile: 0
   objectName: Bleu
+  speedMagnitude: 0
+  mass: 1000000
+  radius: 15
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
 --- !u!114 &7738383565594045505
 MonoBehaviour:
   m_ObjectHideFlags: 0

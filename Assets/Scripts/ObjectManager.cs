@@ -7,35 +7,49 @@ using System.Collections.Generic;
 
 public class ObjectManager : MonoBehaviour
 {
-    private GameObject selection;
+
+    private GameObject selection; // Objet sélectionné
+    
     private GameObject lastSelection;
     private Vector3 cameraLocalPositionWhenAttached;
     private Quaternion cameraLocalRotationWhenAttached;
     private bool cameraIsAttachedToSelection = false;
 
-    public GameObject MainCamera;
-    public GameObject InfoUI;
+    public GameObject MainCamera; // Camera principale
+
+    public GameObject InfoUI; // UI d'information
+    
     public GameObject SelectionViewFrame;
     public GameObject ListObjet;
     public GameObject CameraFocusButton;
 
-    public GameObject speed;
-    public GameObject mass;
-    public GameObject radius;
-    public GameObject obj_name;
-    public GameObject dist_etoile;
-    public GameObject periode;
-    public GameObject density;
-
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
+    
+    public GameObject speed; // Champ de texte pour la vitesse
+
+    public GameObject mass; // Champ de texte pour la masse
+
+    public GameObject radius; // Champ de texte pour le rayon
+
+    public GameObject obj_name; // Champ de texte pour le nom TODO : faire marcher le changement de nom
 
     private float initialYOffset = 95f;
 
     private RawImage selectionRawImage;
 
     public float cameraPadding = 1.5f;
+    
+    public GameObject dist_etoile; // Champ de texte pour la distance à l'étoile (lecture seule)
 
+    public GameObject periode;
+    public GameObject density;
+    
+    public GameObject surface_gravity;
+
+    public GameObject temperature;
+    
+    // Références liées aux listeners pour pouvoir détacher proprement
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
     TMP_InputField radiusTmp; InputField radiusUi; UnityAction<string> radiusListener;
@@ -411,29 +425,68 @@ public class ObjectManager : MonoBehaviour
             var props = selection.GetComponent<ObjectProperties>();
             if (props != null)
             {
-                SetText(mass, props.mass.ToString("G"));
-                SetText(speed, props.speedMagnitude.ToString("G"));
-                SetText(radius, props.radius.ToString("G"));
+                float vraieMasse = props.mass * props.unityToKgScale;
+                float vraiRayon = props.radius * props.radiusToMetersScale;
+                
+                // Met à jour les champs UI avec les valeurs des propriétés (utilise les champs tels que définis dans ObjectProperties)
+                SetText(mass, FormaterScientifiqueTMP(vraieMasse));
+                SetText(radius, FormaterScientifiqueTMP(vraiRayon));
+                SetText(speed, props.speedMagnitude.ToString("F2"));
                 SetText(obj_name, props.objectName);
                 SetText(periode, props.periode > 0f ? props.periode.ToString("G") : "N/A");
                 SetText(density, props.density.ToString("G"));
 
+                // Gravité de surface (inchangé, ton code gère déjà bien ça)
+                float grav = props.gravityMagnitude;
+                float gravEnG = grav / 9.81f; 
+                if (surface_gravity != null) SetText(surface_gravity, $"{grav:0.##} ({gravEnG:0.##} g)");
+
+                // 2. CONVERSION DE LA DISTANCE À L'ÉTOILE
                 if (props.EtoileParent != null)
                 {
-                    Vector3 posEtoile = props.EtoileParent.transform.position;
-                    Vector3 posBody = selection.transform.position;
-                    float dist = Vector3.Distance(posEtoile, posBody);
-                    props.distanceToEtoile = dist;
-                    SetText(dist_etoile, dist.ToString("G"));
+                    try
+                    {
+                        float distUnity = Vector3.Distance(props.EtoileParent.transform.position, selection.transform.position);
+                        
+                        float vraieDistance = distUnity * props.distanceToMetersScale;
+                        SetText(dist_etoile, FormaterScientifiqueTMP(vraieDistance));
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"Impossible de calculer la distance à l'étoile : {ex.Message}");
+                        SetText(dist_etoile, "N/A");
+                    }
                 }
+                
                 else
                 {
                     if (props.distanceToEtoile >= 0f)
-                        SetText(dist_etoile, props.distanceToEtoile.ToString("G"));
+                    {
+                        float vraieDistance = props.distanceToEtoile * props.distanceToMetersScale;
+                        SetText(dist_etoile, vraieDistance.ToString("G"));
+                    }
                     else
+                    {
                         SetText(dist_etoile, "N/A");
+                    }
+                }
+                
+                if (temperature != null)
+                {
+                    if (props.temperatureMagnitude > 0f)
+                    {
+                        float tempK = props.temperatureMagnitude;
+                        float tempC = tempK - 273.15f; // Conversion K -> °C
+                        
+                        SetText(temperature, $"{tempK:F1} ({tempC:F1} °C)");
+                    }
+                    else
+                    {
+                        SetText(temperature, "N/A");
+                    }
                 }
             }
+            
             else
             {
                 SetText(mass, "");
@@ -442,6 +495,7 @@ public class ObjectManager : MonoBehaviour
                 SetText(dist_etoile, "");
                 SetText(periode, "");
                 SetText(density, "");
+                Debug.LogWarning("ObjectProperties manquant sur l'objet sélectionné.");
             }
         }
         else
@@ -605,9 +659,19 @@ public class ObjectManager : MonoBehaviour
 
         if (TryParseFloatFlexible(input, out float v))
             props.mass = v;
+        if (LireEntreeUtilisateur(input, out float vraieMasseTapee))
+        {
+            // On divise par ton échelle pour redonner la petite valeur à Unity (ex: 3.003)
+            props.mass = vraieMasseTapee / props.unityToKgScale;
+        }
         else
             SetText(mass, props.mass.ToString("G"));
 
+        {
+            // Si le joueur a tapé n'importe quoi, on restaure l'affichage normal
+            float vraieMasse = props.mass * props.unityToKgScale;
+            SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
+        }
         updateUIVisibility();
     }
 
@@ -617,10 +681,15 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
 
         if (TryParseFloatFlexible(input, out float v))
+        if (LireEntreeUtilisateur(input, out float v))
+        {
             props.speedMagnitude = v;
         else
             SetText(speed, props.speedMagnitude.ToString("G"));
 
+        {
+            SetText(speed, props.speedMagnitude.ToString("F2") + " m/s");
+        }
         updateUIVisibility();
     }
 
@@ -631,9 +700,17 @@ public class ObjectManager : MonoBehaviour
 
         if (TryParseFloatFlexible(input, out float v))
             props.radius = v;
+        if (LireEntreeUtilisateur(input, out float vraiRayonEnMetres))
+        {
+            props.radius = vraiRayonEnMetres / props.radiusToMetersScale;
+        }
         else
             SetText(radius, props.radius.ToString("G"));
 
+        {
+            float vraiRayon = props.radius * props.radiusToMetersScale;
+            SetText(radius, FormaterDistance(vraiRayon)); // Ou FormaterScientifiqueTMP selon ce que tu avais choisi !
+        }
         updateUIVisibility();
     }
 
@@ -656,18 +733,48 @@ public class ObjectManager : MonoBehaviour
     }
 
     bool TryParseFloatFlexible(string s, out float result)
+    // Essaie plusieurs cultures pour être tolérant (ex : virgule ou point)
+    bool LireEntreeUtilisateur(string input, out float resultatFinal)
     {
-        if (string.IsNullOrWhiteSpace(s))
+        resultatFinal = 0f;
+        if (string.IsNullOrWhiteSpace(input)) return false;
+
+        float multiplicateur = 1f;
+
+        // 1. Détecter les unités de distance (si le joueur a laissé "km" ou "M km")
+        if (input.Contains("M km")) multiplicateur = 1e9f; // Millions de km -> Mètres
+        else if (input.Contains("km")) multiplicateur = 1e3f; // km -> Mètres
+
+        // 2. Enlever toutes les lettres et unités pour ne garder que les nombres
+        string textPropre = input.Replace(" kg", "")
+            .Replace(" M km", "")
+            .Replace(" km", "")
+            .Replace(" m", "")
+            .Replace(" m/s", "");
+
+        // 3. Convertir les balises TextMeshPro (× 10<sup>24</sup>) en format C# (E24)
+        textPropre = textPropre.Replace(" × 10<sup>", "E")
+            .Replace(" x 10<sup>", "E")
+            .Replace("</sup>", "");
+
+        // 4. Nettoyer les espaces et forcer le point décimal (pour ignorer les virgules)
+        textPropre = textPropre.Replace(" ", "").Replace(",", ".");
+
+        // 5. Convertir le texte final (ex: "5.97E24" ou "6371") en vrai chiffre
+        if (float.TryParse(textPropre, NumberStyles.Float, CultureInfo.InvariantCulture, out float valeurBrute))
         {
             result = 0f;
             return false;
         }
 
         if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out result))
+            // On applique le multiplicateur (ex: si c'était 7000 km, ça devient 7 000 000 mètres)
+            resultatFinal = valeurBrute * multiplicateur;
             return true;
 
         if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
             return true;
+        }
 
         var replaced = s.Replace(',', '.');
         if (float.TryParse(replaced, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
@@ -675,6 +782,51 @@ public class ObjectManager : MonoBehaviour
 
         result = 0f;
         return false;
+    }
+    
+    string FormaterDistance(float distanceEnMetres)
+    {
+        float distanceEnKm = distanceEnMetres / 1000f;
+
+        if (distanceEnKm >= 1000000f)
+        {
+            float distanceEnMillions = distanceEnKm / 1000000f;
+            return $"{distanceEnMillions:F2} M";
+        }
+        else if (distanceEnKm >= 1f)
+        {
+            return $"{distanceEnKm:F1}";
+        }
+        else
+        {
+            return $"{distanceEnMetres:F0} m";
+        }
+    }
+    
+    string FormaterScientifiqueTMP(float valeur)
+    {
+        // Si la valeur est 0, on affiche juste 0
+        if (valeur == 0f) return "0";
+
+        // 1. On récupère le format brut de C# (ex: "5.97E+24")
+        string formatStandard = valeur.ToString("E2");
+
+        // 2. On coupe le texte en deux parties au niveau du 'E'
+        string[] parties = formatStandard.Split('E');
+
+        if (parties.Length == 2)
+        {
+            string baseNum = parties[0]; // ex: "5.97"
+            
+            // int.Parse enlève automatiquement le "+" et les zéros inutiles (ex: "+24" devient 24)
+            int exposant = int.Parse(parties[1]); 
+
+            // 3. On reconstruit le texte avec le symbole "×" et la balise <sup> de TextMeshPro
+            return $"{baseNum.Replace('.', ',')} × 10<sup>{exposant}</sup>";
+        }
+
+        // Sécurité au cas où
+        return formatStandard;
     }
 
     void OnDestroy()

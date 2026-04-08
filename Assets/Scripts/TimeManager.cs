@@ -13,7 +13,7 @@ public class TimeManager : MonoBehaviour
     /// <summary>
     /// Remet la vitesse de la simulation à la normale (x1).
     /// </summary>
-    public void Resume()
+    public static void Resume()
     {
         if (GravityManager.Instance != null)
         {
@@ -24,7 +24,7 @@ public class TimeManager : MonoBehaviour
     /// <summary>
     /// Fige complètement la simulation physique (x0).
     /// </summary>
-    public void Pause()
+    public static void Pause()
     {
         if  (GravityManager.Instance != null)
         {
