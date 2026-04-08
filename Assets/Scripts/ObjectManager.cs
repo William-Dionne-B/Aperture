@@ -45,6 +45,11 @@ public class ObjectManager : MonoBehaviour
     private Dictionary<GameObject, GameObject> objectToButtonMap = new Dictionary<GameObject, GameObject>();
     private List<ObjectProperties> lastFrameObjects = new List<ObjectProperties>();
 
+    // --- Preview layer logic ---
+    private const int SelectionLayer = 31; // couche temporaire utilisée pour la prévisualisation
+    private int SelectionLayerMask => (1 << SelectionLayer);
+    private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
+
     void Start()
     {
         if (SelectionRenderTexture == null)
@@ -64,8 +69,9 @@ public class ObjectManager : MonoBehaviour
         SelectionCamera.usePhysicalProperties = true;
         SelectionCamera.nearClipPlane = 0.01f;
         SelectionCamera.farClipPlane = 10000f;
-        SelectionCamera.clearFlags = CameraClearFlags.Skybox;
+        SelectionCamera.clearFlags = CameraClearFlags.Skybox;  // skybox visible
         SelectionCamera.fieldOfView = 60f;
+        SelectionCamera.cullingMask = SelectionLayerMask;     // ne rendre que la couche de sélection
 
         if (SelectionViewFrame != null)
         {
@@ -237,12 +243,19 @@ public class ObjectManager : MonoBehaviour
 
         var selected = click.selectedObject;
 
+        // conserve l'ancienne sélection pour restaurer ses couches
+        GameObject oldSelection = selection;
+
         if (selection != selected)
         {
             DetachCameraFromSelection();
             selection = selected;
             lastSelection = selection;
             BindFieldListeners();
+
+            // restaure l'ancienne sélection puis applique la couche de preview à la nouvelle sélection
+            RestoreSelectionLayers();
+            ApplySelectionLayer(selection);
         }
 
         UpdateSelectionCamera();
@@ -675,9 +688,36 @@ public class ObjectManager : MonoBehaviour
     {
         UnbindAllFieldListeners();
         DetachCameraFromSelection();
+        RestoreSelectionLayers();
         if (buttonPrefab != null)
         {
             Destroy(buttonPrefab);
         }
+    }
+
+    // --- Layer helper methods ---
+    private void ApplySelectionLayer(GameObject root)
+    {
+        if (root == null) return;
+        savedLayers.Clear();
+
+        foreach (var t in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (!savedLayers.ContainsKey(t))
+                savedLayers[t] = t.gameObject.layer;
+            t.gameObject.layer = SelectionLayer;
+        }
+    }
+
+    private void RestoreSelectionLayers()
+    {
+        if (savedLayers == null || savedLayers.Count == 0) return;
+
+        foreach (var kv in savedLayers)
+        {
+            if (kv.Key != null)
+                kv.Key.gameObject.layer = kv.Value;
+        }
+        savedLayers.Clear();
     }
 }
