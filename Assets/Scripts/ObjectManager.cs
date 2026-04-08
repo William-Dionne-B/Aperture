@@ -347,7 +347,7 @@ public class ObjectManager : MonoBehaviour
                 
                 SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
                 SetText(radius, FormaterScientifiqueTMP(vraiRayon) + " m");
-                SetText(speed, props.speedMagnitude.ToString("F2") + " m/s");
+                SetText(speed, props.speedMagnitude.ToString("F2") + " km/s");
                 SetText(obj_name, props.objectName);
                 SetText(periode, props.periode > 0f ? props.periode.ToString("G") : "N/A");
                 SetText(density, props.density.ToString("G"));
@@ -499,7 +499,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
 
         if (LireEntreeUtilisateur(input, out float v)) props.speedMagnitude = v;
-        else SetText(speed, props.speedMagnitude.ToString("F2") + " m/s");
+        else SetText(speed, props.speedMagnitude.ToString("F2") + " km/s");
         
         updateUIVisibility();
     }
@@ -547,7 +547,7 @@ public class ObjectManager : MonoBehaviour
         if (input.Contains("M km")) multiplicateur = 1e9f; 
         else if (input.Contains("km")) multiplicateur = 1e3f; 
 
-        string textPropre = input.Replace(" kg", "").Replace(" M km", "").Replace(" km", "").Replace(" m", "").Replace(" m/s", "");
+        string textPropre = input.Replace(" kg", "").Replace(" M km", "").Replace(" km", "").Replace(" m", "").Replace(" m/s", "").Replace(" km/s", "");
         textPropre = textPropre.Replace(" × 10<sup>", "E").Replace(" x 10<sup>", "E").Replace("</sup>", "");
         textPropre = textPropre.Replace(" ", "").Replace(",", ".");
 
