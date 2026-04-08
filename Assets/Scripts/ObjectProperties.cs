@@ -89,14 +89,32 @@ public class ObjectProperties : MonoBehaviour
             distanceToEtoile = s.magnitude;
         }
 
-        //calcule de la période de révolution autour de l'étoile parente
-        if (speedMagnitude > 0 && distanceToEtoile > 0)
+        //TODO
+        // Calcul plus précis de la période orbitale (loi de Kepler)
+        if (EtoileParent != null && distanceToEtoile > 0)
         {
-            periode = (float)Math.Round((2 * Mathf.PI * distanceToEtoile) / speedMagnitude, 2);
-        }
-        else
-        {
-            periode = 0f; // Période indéfinie si vitesse ou distance nulle
+            GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
+
+            if (starGravity != null && starGravity.Mass > 0)
+            {
+                double vraieDistanceMetres = distanceToEtoile * distanceToMetersScale * 100f;
+
+                double G = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+                double masseEtoileKg = starGravity.Mass * unityToKgScale;
+
+                double mu = G * masseEtoileKg;
+
+                double periodeSecondes = 2.0 * Math.PI * Math.Sqrt(
+                    Math.Pow(vraieDistanceMetres, 3) / mu
+                );
+
+                // Convert back to float at the end
+                periode = (float)(periodeSecondes / 86400.0);
+            }
+            else
+            {
+                periode = 0f;
+            }
         }
 
         if (mass > 0 && radius > 0) 
