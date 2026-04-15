@@ -141,56 +141,6 @@ public class GravityManager : MonoBehaviour
         public float period;
     }
 
-
-    //calcul des éléments orbitaux à partir de la position et de la vitesse d'un corps par rapport à un corps central
-    OrbitalElements CalculateOrbitalElements(GravityBody body, GravityBody centralBody)
-    {
-        float Gscaled = gravityMultiplier * G;
-
-        Vector3 r = body.rb.position - centralBody.rb.position;
-        Vector3 v = body.rb.linearVelocity - centralBody.rb.linearVelocity;
-
-        float mu = Gscaled * centralBody.rb.mass; // standard gravitational parameter
-
-        float rMag = r.magnitude;
-        float vMag = v.magnitude;
-
-        // Specific angular momentum
-        Vector3 h = Vector3.Cross(r, v);
-
-        // Eccentricity vector
-        Vector3 eVec = (Vector3.Cross(v, h) / mu) - (r / rMag);
-        float e = eVec.magnitude;
-
-        // Specific orbital energy
-        float energy = (vMag * vMag) / 2f - mu / rMag;
-
-        OrbitalElements elements = new OrbitalElements();
-
-        // Semi-major axis
-        elements.semiMajorAxis = -mu / (2f * energy);
-
-        // Periapsis / Apoapsis
-        elements.periapsis = elements.semiMajorAxis * (1f - e);
-        elements.apoapsis = elements.semiMajorAxis * (1f + e);
-
-        elements.eccentricity = e;
-
-        // Period (only if bound orbit)
-        if (e < 1f)
-        {
-            elements.period = 2f * Mathf.PI * Mathf.Sqrt(
-                Mathf.Pow(elements.semiMajorAxis, 3) / mu
-            );
-        }
-        else
-        {
-            elements.period = -1f; // escape trajectory
-        }
-
-        return elements;
-    }
-
     // Hybrid approach: if one body dominates the gravity, use orbital elements for a clean ellipse. Otherwise, do a short-term n-body prediction.
     void PredictOrbitHybrid(GravityBody body)
     {
