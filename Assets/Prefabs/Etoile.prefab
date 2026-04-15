@@ -291,6 +291,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 1
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0

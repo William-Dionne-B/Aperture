@@ -3,18 +3,13 @@ using UnityEngine;
 public class PlanetSpawner : MonoBehaviour
 {
     [Header("Prefabs")]
-    public GameObject[] celestialPrefabs; // Array of different prefabs (planets, stars, black holes, etc.)
+    public GameObject[] celestialPrefabs;
     
-    [Header("Sun Settings")]
-    public float sunMass = 1000000;
-    public Transform sunTransform;
-
     private int planetCount = 0;
     private int selectedPrefabIndex = 0;
 
     void Start()
     {
-        // Subscribe to DragDropManager button events
         DragDropManager dragDropManager = FindFirstObjectByType<DragDropManager>();
         if (dragDropManager != null)
         {
@@ -22,29 +17,11 @@ public class PlanetSpawner : MonoBehaviour
         }
     }
 
-    void OnDestroy()
-    {
-        // Unsubscribe when destroyed
-        DragDropManager dragDropManager = FindFirstObjectByType<DragDropManager>();
-        if (dragDropManager != null)
-        {
-            dragDropManager.OnButtonPressed.RemoveListener(OnPrefabButtonPressed);
-        }
-    }
-
-    /// <summary>
-    /// Called when a prefab selection button is pressed
-    /// </summary>
     public void OnPrefabButtonPressed(int buttonID)
     {
         if (celestialPrefabs != null && buttonID >= 0 && buttonID < celestialPrefabs.Length)
         {
             selectedPrefabIndex = buttonID;
-            Debug.Log($"Selected prefab changed to: {celestialPrefabs[selectedPrefabIndex].name}");
-        }
-        else
-        {
-            Debug.LogWarning($"Invalid button ID: {buttonID}. Array has {celestialPrefabs?.Length ?? 0} prefabs.");
         }
     }
 
@@ -52,56 +29,77 @@ public class PlanetSpawner : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
+            // 1. Détection de la position de clic
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            Plane spawnPlane = new Plane(
-                Vector3.up,
-                Vector3.zero
-            );      
+            Plane spawnPlane = new Plane(Vector3.up, Vector3.zero);      
 
             if (spawnPlane.Raycast(ray, out float distance))
             {
                 Vector3 spawnPosition = ray.GetPoint(distance);
                 spawnPosition.y = 0;
 
-                // Get the currently selected prefab
-                GameObject prefabToSpawn = celestialPrefabs != null && celestialPrefabs.Length > 0 
-                    ? celestialPrefabs[selectedPrefabIndex] 
-                    : null;
-
-                if (prefabToSpawn == null)
+                // 2. Identification de l'étoile parente (La sélection actuelle)
+                GameObject starSelectionnee = null;
+                var click = Camera.main.GetComponent<ClickDetection>();
+                
+                if (click != null && click.selectedObject != null)
                 {
-                    Debug.LogWarning("No prefab selected or prefab array is empty!");
+                    var props = click.selectedObject.GetComponent<ObjectProperties>();
+                    // On ne peut orbiter que si l'objet sélectionné est une étoile
+                    if (props != null && props.isStar)
+                    {
+                        starSelectionnee = click.selectedObject;
+                    }
+                }
+
+                if (starSelectionnee == null)
+                {
+                    Debug.LogWarning("Veuillez sélectionner un Soleil avant de créer une planète !");
                     return;
                 }
 
-                GameObject planet = Instantiate(
-                    prefabToSpawn,
-                    spawnPosition,
-                    Quaternion.identity
-                );
-
+                // 3. Création de la planète
+                GameObject prefabToSpawn = celestialPrefabs[selectedPrefabIndex];
+                GameObject planet = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
                 planetCount++;
                 planet.name = "Planet_" + planetCount;
 
-                // Calculate and apply orbital velocity using the center of mass as reference
-                Vector3 centerOfMass = GravityManager.GetCenterOfMass();
-                Vector3 vitesseOrbitale = CalculateurVitesseOptimale.CalculerVitesseOrbitaleStatique(
-                    spawnPosition,
-                    sunMass,
-                    centerOfMass
-                );
-
-                // Apply velocity to the planet
-                GravityBody gravityBody = planet.GetComponent<GravityBody>();
-                if (gravityBody != null)
+                // 4. Attribution du Soleil Parent
+                ObjectProperties planetProps = planet.GetComponent<ObjectProperties>();
+                if (planetProps != null)
                 {
-                    gravityBody.initialVelocity = vitesseOrbitale;
-                    gravityBody.applyInitialVelocity = true;
+                    planetProps.EtoileParent = starSelectionnee;
+                }
+
+                // 5. CALCUL DE LA VITESSE RELATIVE + VITESSE DU SOLEIL
+                Rigidbody sunRb = starSelectionnee.GetComponent<Rigidbody>();
+                if (sunRb != null)
+                {
+                    float G_jeu = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+                    float distUnity = Vector3.Distance(spawnPosition, starSelectionnee.transform.position);
                     
-                    if (gravityBody.rb != null)
+                    // Vitesse orbitale pure (v = sqrt(GM/r))
+                    float vOrbitaleMag = Mathf.Sqrt((G_jeu * sunRb.mass) / distUnity);
+
+                    // Direction perpendiculaire
+                    Vector3 dirVersSoleil = (starSelectionnee.transform.position - spawnPosition).normalized;
+                    Vector3 dirTangente = Vector3.Cross(dirVersSoleil, Vector3.up).normalized;
+                    
+                    Vector3 velociteOrbitalePure = dirTangente * vOrbitaleMag;
+
+                    // --- LA MAGIE EST ICI ---
+                    // On additionne la vitesse du soleil pour que la planète l'accompagne
+                    Vector3 velociteFinale = velociteOrbitalePure + sunRb.linearVelocity;
+
+                    // 6. Application physique
+                    Rigidbody planetRb = planet.GetComponent<Rigidbody>();
+                    GravityBody gravityBody = planet.GetComponent<GravityBody>();
+                    
+                    if (planetRb != null) planetRb.linearVelocity = velociteFinale;
+                    if (gravityBody != null)
                     {
-                        gravityBody.rb.linearVelocity = vitesseOrbitale;
+                        gravityBody.initialVelocity = velociteFinale;
+                        gravityBody.applyInitialVelocity = true;
                     }
                 }
             }
