@@ -342,7 +342,7 @@ public class ObjectManager : MonoBehaviour
             var props = selection.GetComponent<ObjectProperties>();
             if (props != null)
             {
-                float vraieMasse = props.mass * props.unityToKgScale;
+                float vraieMasse = props.Mass * props.unityToKgScale; 
                 float vraiRayon = props.radius * props.radiusToMetersScale;
                 
                 SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
@@ -483,11 +483,11 @@ public class ObjectManager : MonoBehaviour
 
         if (LireEntreeUtilisateur(input, out float vraieMasseTapee))
         {
-            props.mass = vraieMasseTapee / props.unityToKgScale;
+            props.Mass = vraieMasseTapee / props.unityToKgScale;
         }
         else
         {
-            float vraieMasse = props.mass * props.unityToKgScale;
+            float vraieMasse = props.Mass * props.unityToKgScale;
             SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
         }
         updateUIVisibility();

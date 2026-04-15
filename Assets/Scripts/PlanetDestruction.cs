@@ -150,7 +150,8 @@ public class PlanetDestruction : MonoBehaviour
 
         if (otherProperties != null && otherRigidbody != null)
         {
-            otherProperties.mass = combinedMass;
+            // --- CORRECTION ICI ---
+            otherProperties.Mass = combinedMass;
             otherProperties.radius = combinedRadius;
         }
 
@@ -169,7 +170,8 @@ public class PlanetDestruction : MonoBehaviour
 
         if (properties != null)
         {
-            properties.mass = combinedMass;
+            // --- CORRECTION ICI ---
+            properties.Mass = combinedMass;
             properties.radius = combinedRadius;
             targetObject.transform.localScale = new Vector3(combinedRadius * 2f, combinedRadius * 2f, combinedRadius * 2f);
         }
@@ -180,7 +182,9 @@ public class PlanetDestruction : MonoBehaviour
 
         if (body != null)
         {
-            body.mass = combinedMass;
+            // On peut garder body.mass = combinedMass ici par sécurité, 
+            // mais properties.Mass le fait déjà automatiquement !
+            body.mass = combinedMass; 
             body.position = mergedPosition;
             body.linearVelocity = mergedVelocity;
             body.angularVelocity = mergedAngularVelocity;
@@ -236,9 +240,10 @@ public class PlanetDestruction : MonoBehaviour
         }
 
         ObjectProperties properties = targetObject.GetComponent<ObjectProperties>();
-        if (properties != null && properties.mass > 0f)
+        // --- CORRECTION ICI ---
+        if (properties != null && properties.Mass > 0f)
         {
-            return properties.mass;
+            return properties.Mass;
         }
 
         Rigidbody body = targetObject.GetComponent<Rigidbody>();

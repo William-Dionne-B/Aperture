@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = System.Object;
 
 public class ObjectProperties : MonoBehaviour
@@ -15,8 +16,19 @@ public class ObjectProperties : MonoBehaviour
     
     [SerializeField]
     public float speedMagnitude;
-    [SerializeField]
-    public float mass;
+    [FormerlySerializedAs("mass")] [SerializeField]
+    private float _mass = 1f;
+
+    public float Mass
+    {
+        get { return _mass; }
+        set
+        {
+            _mass = value;
+            if (thisRigidbody != null) thisRigidbody.mass = _mass;
+            if (thisGravityBody != null) thisGravityBody.Mass = _mass;
+        }
+    }    
     [SerializeField]
     public float radius;
     [SerializeField]
@@ -85,11 +97,12 @@ public class ObjectProperties : MonoBehaviour
         thisRigidbody = thisObject.GetComponent<Rigidbody>();
         thisGravityBody = thisObject.GetComponent<GravityBody>();
 
-        // Vérifications de la validité des propriétés procurés au lancement
-        if (mass <= 0) mass = 1;
+        if (_mass <= 0) _mass = 1;
         if (distanceToEtoile < 0) distanceToEtoile = 0;
         if (speedMagnitude < 0) speedMagnitude = 0;
         if (radius <= 0) radius = 1;
+        
+        Mass = _mass;
         
         if (string.IsNullOrEmpty(objectName)) objectName = thisObject.name;
         else thisObject.name = objectName;
@@ -102,14 +115,12 @@ public class ObjectProperties : MonoBehaviour
     {
         if (thisTransform != null) thisTransform.localScale = new Vector3(2 * radius, 2 * radius, 2 * radius);
 
-        if (thisRigidbody != null) thisRigidbody.mass = mass;
-
-        if (thisGravityBody != null) thisGravityBody.Mass = mass;
+        if (thisGravityBody != null) thisGravityBody.Mass = _mass;
 
         if (radius > 0 && GravityManager.Instance != null)
         {
             float vraiRayonEnMetres = radius * radiusToMetersScale;
-            float vraieMasseEnKg = mass * unityToKgScale;
+            float vraieMasseEnKg = _mass * unityToKgScale;
             float constanteGravitationnelle = GravityManager.G * GravityManager.Instance.gravityMultiplier;
             
             gravityMagnitude = (constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres) / 1e9f;
@@ -128,7 +139,7 @@ public class ObjectProperties : MonoBehaviour
         if (speedMagnitude > 0 && distanceToEtoile > 0) periode = (float)Math.Round((2 * Mathf.PI * distanceToEtoile) / speedMagnitude, 2);
         else periode = 0f;
 
-        if (mass > 0 && radius > 0) density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
+        if (_mass > 0 && radius > 0) density = _mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
         else density = 0f;
 
         if (isStar)
