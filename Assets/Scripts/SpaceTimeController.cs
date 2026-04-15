@@ -14,6 +14,8 @@ public class SpaceTimeController : MonoBehaviour
     public float defaultMass = 1f;
 
     Material mat;
+    readonly Vector4[] cachedPositions = new Vector4[MaxMasses];
+    readonly float[] cachedValues = new float[MaxMasses];
 
     void Start()
     {
@@ -31,13 +33,12 @@ public class SpaceTimeController : MonoBehaviour
         float[] values = new float[MaxMasses];
         
         int count = useAllGravityBodies
-            ? FillFromGravityBodies(positions, values)
-            : FillFromManualSources(positions, values);
+            ? FillFromGravityBodies(cachedPositions, cachedValues)
+            : FillFromManualSources(cachedPositions, cachedValues);
 
-        // Envoi des données au Shader
         mat.SetInt("_MassCount", count);
-        mat.SetVectorArray("_MassPositions", positions);
-        mat.SetFloatArray("_MassValues", values);
+        mat.SetVectorArray("_MassPositions", cachedPositions);
+        mat.SetFloatArray("_MassValues", cachedValues);
     }
 
     int FillFromGravityBodies(Vector4[] positions, float[] values)
@@ -90,8 +91,6 @@ public class SpaceTimeController : MonoBehaviour
             return body.rb.mass;
         }
 
-        // On n'a plus besoin d'accéder à ObjectProperties ici car GravityBody 
-        // possède déjà la masse synchronisée !
         if (body.Mass > 0f)
         {
             return body.Mass;
@@ -124,9 +123,7 @@ public class SpaceTimeController : MonoBehaviour
         {
             return rb.mass;
         }
-
-        // --- LA CORRECTION EST ICI ---
-        // Utilisation de .Mass avec un M majuscule au lieu de ._mass
+        
         if (source.TryGetComponent<ObjectProperties>(out ObjectProperties objectProperties) && objectProperties.Mass > 0f)
         {
             return objectProperties.Mass;

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &821638216226138241
+--- !u!1 &509663796537468643
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,53 +8,53 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6490839497697232776}
-  - component: {fileID: 3015551940620803673}
-  - component: {fileID: 3773606082717759097}
-  - component: {fileID: 4628209283823939098}
-  - component: {fileID: 4915352759624738635}
-  - component: {fileID: 6492705631344968056}
-  - component: {fileID: 4719997649766820574}
-  - component: {fileID: 6365874497260117586}
-  - component: {fileID: 6505932524256143332}
-  - component: {fileID: 8906954845355455736}
+  - component: {fileID: 8956725146775408371}
+  - component: {fileID: 7412747303262106979}
+  - component: {fileID: 5010602894069325404}
+  - component: {fileID: 8627658003966963079}
+  - component: {fileID: 5107846633873139917}
+  - component: {fileID: 6374843069750906595}
+  - component: {fileID: 5537029870950517379}
+  - component: {fileID: 3441891884452624227}
+  - component: {fileID: 3414848850028433938}
+  - component: {fileID: 3756086140219938745}
   m_Layer: 0
-  m_Name: TrouNoir
+  m_Name: Mars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6490839497697232776
+--- !u!4 &8956725146775408371
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 37.48, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalPosition: {x: 132.6, y: 0, z: 0}
+  m_LocalScale: {x: 0.48799998, y: 0.48799998, z: 0.48799998}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3015551940620803673
+--- !u!33 &7412747303262106979
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &3773606082717759097
+--- !u!23 &5010602894069325404
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f0b87a3c6dd44dc4ab1c9a1c0da4e583, type: 2}
+  - {fileID: 2100000, guid: bc9237c8647a9214da2798a16a5e052e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -93,13 +93,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &4628209283823939098
+--- !u!135 &8627658003966963079
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -114,15 +114,15 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &4915352759624738635
+--- !u!54 &5107846633873139917
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   serializedVersion: 4
-  m_Mass: 1e+9
+  m_Mass: 0.322716
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -141,31 +141,76 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6492705631344968056
+--- !u!114 &6374843069750906595
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialVelocity: {x: 0, y: 0, z: 0}
+  initialVelocity: {x: 0, y: 0, z: 23}
   applyInitialVelocity: 1
   Mass: 1
   rb: {fileID: 0}
   line: {fileID: 0}
---- !u!120 &4719997649766820574
+--- !u!114 &5537029870950517379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509663796537468643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
+  heightOffsetPercentage: 0.65
+  minScale: 0.5
+  maxScale: 20
+  scaleMultiplier: 0.1
+--- !u!114 &3441891884452624227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 509663796537468643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectName: Mars
+  speedMagnitude: 0
+  mass: 0.322716
+  radius: 0.244
+  distanceToEtoile: 0
+  gravityMagnitude: 0
+  temperatureMagnitude: 0
+  periode: 0
+  density: 0
+  EtoileParent: {fileID: 0}
+  radiusToMetersScale: 13900000
+  distanceToMetersScale: 1.391609e+9
+  unityToKgScale: 1.988e+24
+  starLuminosity: 3.828e+26
+  albedo: 0.3
+  greenhouseEffect: 0
+--- !u!120 &3414848850028433938
 LineRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -213,8 +258,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0
+        time: 0.10049057
+        value: 0.25
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -265,91 +310,18 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &6365874497260117586
+--- !u!114 &3756086140219938745
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectName: Trou Noir
-  isOrbitalBody: 0
-  speedMagnitude: 0
-  mass: 10000000
-  radius: 5
-  distanceToEtoile: 0
-  gravityMagnitude: 0
-  temperatureMagnitude: 0
-  periode: 0
-  density: 0
-  EtoileParent: {fileID: 821638216226138241}
-  radiusToMetersScale: 13900000
-  distanceToMetersScale: 1.391609e+9
-  unityToKgScale: 1.988e+24
-  isStar: 0
-  starSurfaceTemperature: 5778
-  starLuminosity: 3.828e+26
-  albedo: 0.3
-  greenhouseEffect: 0
---- !u!114 &6505932524256143332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
-  heightOffsetPercentage: 0.65
-  minScale: 0.5
-  maxScale: 50
-  scaleMultiplier: 0.1
---- !u!114 &8906954845355455736
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 821638216226138241}
+  m_GameObject: {fileID: 509663796537468643}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
-  mergePriority: 0
-  mergeDuration: 0.35
-  mergeCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
