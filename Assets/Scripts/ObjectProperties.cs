@@ -8,6 +8,11 @@ public class ObjectProperties : MonoBehaviour
 {
     [SerializeField]
     public string objectName;
+
+    [Header("Comportement Spawner")]
+    [Tooltip("Cochez si cet astre doit se mettre en orbite automatiquement comme une planète autour de son soleil")]
+    public bool isOrbitalBody = true;
+    
     [SerializeField]
     public float speedMagnitude;
     [SerializeField]

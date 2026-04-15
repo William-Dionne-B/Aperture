@@ -29,7 +29,6 @@ public class PlanetSpawner : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            // 1. Détection de la position de clic
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Plane spawnPlane = new Plane(Vector3.up, Vector3.zero);      
 
@@ -38,69 +37,89 @@ public class PlanetSpawner : MonoBehaviour
                 Vector3 spawnPosition = ray.GetPoint(distance);
                 spawnPosition.y = 0;
 
-                // 2. Identification de l'étoile parente (La sélection actuelle)
+                GameObject prefabToSpawn = celestialPrefabs != null && celestialPrefabs.Length > 0 
+                    ? celestialPrefabs[selectedPrefabIndex] 
+                    : null;
+
+                if (prefabToSpawn == null) return;
+
+                // 1. On lit les propriétés du Prefab AVANT de le créer
+                ObjectProperties prefabProps = prefabToSpawn.GetComponent<ObjectProperties>();
+                bool doitOrbiter = (prefabProps == null || prefabProps.isOrbitalBody);
+
+                // ==========================================
+                // 2. LE NOUVEAU RADAR : Recherche du Soleil le plus proche
+                // ==========================================
                 GameObject starSelectionnee = null;
-                var click = Camera.main.GetComponent<ClickDetection>();
                 
-                if (click != null && click.selectedObject != null)
+                if (doitOrbiter && ObjectProperties.AllStarsInSystem.Count > 0)
                 {
-                    var props = click.selectedObject.GetComponent<ObjectProperties>();
-                    // On ne peut orbiter que si l'objet sélectionné est une étoile
-                    if (props != null && props.isStar)
+                    float distanceMinimum = float.MaxValue;
+
+                    // On passe en revue TOUTES les étoiles enregistrées dans le jeu
+                    foreach (ObjectProperties star in ObjectProperties.AllStarsInSystem)
                     {
-                        starSelectionnee = click.selectedObject;
+                        if (star == null) continue;
+
+                        // On calcule la distance entre le clic de la souris et cette étoile
+                        float dist = Vector3.Distance(spawnPosition, star.transform.position);
+                        
+                        // Si c'est la plus proche trouvée jusqu'à présent, on la mémorise !
+                        if (dist < distanceMinimum)
+                        {
+                            distanceMinimum = dist;
+                            starSelectionnee = star.gameObject;
+                        }
                     }
                 }
+                // ==========================================
 
-                if (starSelectionnee == null)
-                {
-                    Debug.LogWarning("Veuillez sélectionner un Soleil avant de créer une planète !");
-                    return;
-                }
-
-                // 3. Création de la planète
-                GameObject prefabToSpawn = celestialPrefabs[selectedPrefabIndex];
-                GameObject planet = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+                // 3. Création de l'astre
+                GameObject astre = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
                 planetCount++;
-                planet.name = "Planet_" + planetCount;
+                astre.name = "Astre_" + planetCount;
 
-                // 4. Attribution du Soleil Parent
-                ObjectProperties planetProps = planet.GetComponent<ObjectProperties>();
-                if (planetProps != null)
+                // 4. Application de la vitesse orbitale si on a trouvé un soleil proche
+                if (doitOrbiter && starSelectionnee != null)
                 {
-                    planetProps.EtoileParent = starSelectionnee;
-                }
+                    ObjectProperties astreProps = astre.GetComponent<ObjectProperties>();
+                    if (astreProps != null) astreProps.EtoileParent = starSelectionnee;
 
-                // 5. CALCUL DE LA VITESSE RELATIVE + VITESSE DU SOLEIL
-                Rigidbody sunRb = starSelectionnee.GetComponent<Rigidbody>();
-                if (sunRb != null)
-                {
-                    float G_jeu = GravityManager.G * GravityManager.Instance.gravityMultiplier;
-                    float distUnity = Vector3.Distance(spawnPosition, starSelectionnee.transform.position);
-                    
-                    // Vitesse orbitale pure (v = sqrt(GM/r))
-                    float vOrbitaleMag = Mathf.Sqrt((G_jeu * sunRb.mass) / distUnity);
-
-                    // Direction perpendiculaire
-                    Vector3 dirVersSoleil = (starSelectionnee.transform.position - spawnPosition).normalized;
-                    Vector3 dirTangente = Vector3.Cross(dirVersSoleil, Vector3.up).normalized;
-                    
-                    Vector3 velociteOrbitalePure = dirTangente * vOrbitaleMag;
-
-                    // --- LA MAGIE EST ICI ---
-                    // On additionne la vitesse du soleil pour que la planète l'accompagne
-                    Vector3 velociteFinale = velociteOrbitalePure + sunRb.linearVelocity;
-
-                    // 6. Application physique
-                    Rigidbody planetRb = planet.GetComponent<Rigidbody>();
-                    GravityBody gravityBody = planet.GetComponent<GravityBody>();
-                    
-                    if (planetRb != null) planetRb.linearVelocity = velociteFinale;
-                    if (gravityBody != null)
+                    Rigidbody sunRb = starSelectionnee.GetComponent<Rigidbody>();
+                    if (sunRb != null)
                     {
-                        gravityBody.initialVelocity = velociteFinale;
-                        gravityBody.applyInitialVelocity = true;
+                        float G_jeu = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+                        
+                        // On utilise la distance avec l'étoile trouvée
+                        float distUnity = Vector3.Distance(spawnPosition, starSelectionnee.transform.position);
+                        
+                        // Calcul Vitesse
+                        float vOrbitaleMag = Mathf.Sqrt((G_jeu * sunRb.mass) / distUnity);
+                        Vector3 dirVersSoleil = (starSelectionnee.transform.position - spawnPosition).normalized;
+                        Vector3 dirTangente = Vector3.Cross(dirVersSoleil, Vector3.up).normalized;
+                        Vector3 velociteOrbitalePure = dirTangente * vOrbitaleMag;
+
+                        // Addition avec la vitesse de l'étoile parente
+                        Vector3 velociteFinale = velociteOrbitalePure + sunRb.linearVelocity;
+
+                        // Application Physique
+                        Rigidbody astreRb = astre.GetComponent<Rigidbody>();
+                        GravityBody gravityBody = astre.GetComponent<GravityBody>();
+                        
+                        if (astreRb != null) astreRb.linearVelocity = velociteFinale;
+                        if (gravityBody != null)
+                        {
+                            gravityBody.initialVelocity = velociteFinale;
+                            gravityBody.applyInitialVelocity = true;
+                        }
+                        
+                        Debug.Log($"{astre.name} orbite désormais autour de {starSelectionnee.name} !");
                     }
+                }
+                else
+                {
+                    // Si aucune étoile n'existe dans la scène, la planète devient orpheline
+                    Debug.Log($"{astre.name} créé en tant que corps libre (Aucune étoile à proximité).");
                 }
             }
         }

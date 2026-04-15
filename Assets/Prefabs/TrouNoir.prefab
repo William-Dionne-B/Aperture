@@ -277,6 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Trou Noir
+  isOrbitalBody: 0
   speedMagnitude: 0
   mass: 10000000
   radius: 5
@@ -289,6 +290,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
