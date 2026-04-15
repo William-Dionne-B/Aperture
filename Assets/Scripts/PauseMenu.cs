@@ -53,7 +53,23 @@ public class PauseMenu : MonoBehaviour
         // 1. Touche ÉCHAP (Menu)
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isMenuOpen) Resume(); else Pause();
+            // Navigation "Retour" : on recule d'un menu à la fois
+            if (keysMenuUI != null && keysMenuUI.activeSelf || audioMenuUI != null && audioMenuUI.activeSelf) 
+            {
+                OpenOptions();
+            }
+            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf) 
+            {
+                OpenPauseMenu();
+            }
+            else if (isMenuOpen) 
+            {
+                Resume(); 
+            }
+            else 
+            {
+                Pause(); 
+            }
         }
         
         // 2. Touche ESPACE (Simulation) - Uniquement si menu fermé
@@ -114,8 +130,10 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Resume()
     {
-        pauseMenuUI.SetActive(false);
-        timeMenuUI.SetActive(true);
+        // LA CORRECTION EST ICI : On désactive tous les sous-menus possibles
+        DesactivateAllMenus();
+        
+        if (timeMenuUI != null) timeMenuUI.SetActive(true);
         
         Time.timeScale = isSimulationPaused ? 0f : 1f;
         
