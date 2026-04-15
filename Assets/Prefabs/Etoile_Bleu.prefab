@@ -72,7 +72,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 051ddc18c408cac4ca465dd3df7a3f6c, type: 2}
+  - {fileID: 2100000, guid: 823ce9c9d29b08744b78eb5c606d4abc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -279,7 +279,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Bleu
-  isOrbitalBody: 0
   speedMagnitude: 0
   mass: 1000000
   radius: 15
@@ -292,8 +291,6 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
-  isStar: 1
-  starSurfaceTemperature: 22000
   starLuminosity: 3.52e+30
   albedo: 0.3
   greenhouseEffect: 0
