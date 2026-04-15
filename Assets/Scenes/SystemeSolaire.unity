@@ -4823,9 +4823,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &452420332
 GameObject:
   m_ObjectHideFlags: 0
@@ -10238,9 +10262,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &938018146
 GameObject:
   m_ObjectHideFlags: 0
@@ -11095,9 +11143,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &984317640
 GameObject:
   m_ObjectHideFlags: 0
@@ -12462,7 +12534,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1606619146}
   m_HandleRect: {fileID: 1606619145}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0.9999994
   m_Size: 0.6666666
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -20683,9 +20755,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -3990352540898623137, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: mergePriority
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: m_Name
       value: Etoile
+      objectReference: {fileID: 0}
+    - target: {fileID: 1557204167598093639, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: m_Mass
+      value: 1000000.06
       objectReference: {fileID: 0}
     - target: {fileID: 5892634834417267374, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: m_LocalPosition.x
@@ -22921,9 +23001,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1996507056
 GameObject:
   m_ObjectHideFlags: 0
@@ -23700,9 +23804,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &2040531136
 GameObject:
   m_ObjectHideFlags: 0
@@ -24450,9 +24578,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &2111862332
 GameObject:
   m_ObjectHideFlags: 0

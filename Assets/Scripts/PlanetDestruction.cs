@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlanetDestruction : MonoBehaviour
@@ -6,9 +7,12 @@ public class PlanetDestruction : MonoBehaviour
     public static event Action<PlanetDestruction, Collision> CollisionDetected;
 
     [Header("Merge Rules")]
-    public float minImpactSpeed = 0.1f;
     public bool requireGravityBodyOnOther = false;
     public bool logCollisionDetection = true;
+
+    [Header("Merge Visuals")]
+    public float mergeDuration = 0.35f;
+    public AnimationCurve mergeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     private bool isMerging;
     private Rigidbody sourceRigidbody;
@@ -29,11 +33,6 @@ public class PlanetDestruction : MonoBehaviour
         CollisionDetected?.Invoke(this, collision);
 
         if (isMerging || collision == null)
-        {
-            return;
-        }
-
-        if (collision.relativeVelocity.magnitude < Mathf.Max(0f, minImpactSpeed))
         {
             return;
         }
@@ -66,13 +65,7 @@ public class PlanetDestruction : MonoBehaviour
             otherDestruction.isMerging = true;
         }
 
-        MergeWith(otherObject);
-
-        isMerging = false;
-        if (otherDestruction != null)
-        {
-            otherDestruction.isMerging = false;
-        }
+        StartCoroutine(MergeWithRoutine(otherObject, otherDestruction));
     }
 
     GameObject GetCollisionObject(Collision collision)
@@ -93,6 +86,19 @@ public class PlanetDestruction : MonoBehaviour
 
     bool ShouldHandleMerge(GameObject otherObject)
     {
+        float thisMass = GetMass(gameObject);
+        float otherMass = GetMass(otherObject);
+
+        if (thisMass > otherMass)
+        {
+            return true;
+        }
+
+        if (thisMass < otherMass)
+        {
+            return false;
+        }
+
         float thisRadius = GetRadius(gameObject);
         float otherRadius = GetRadius(otherObject);
 
@@ -109,56 +115,158 @@ public class PlanetDestruction : MonoBehaviour
         return GetInstanceID() < otherObject.GetInstanceID();
     }
 
-    void MergeWith(GameObject otherObject)
+    IEnumerator MergeWithRoutine(GameObject otherObject, PlanetDestruction otherDestruction)
     {
-        ObjectProperties otherProperties = otherObject.GetComponent<ObjectProperties>();
-        Rigidbody otherRigidbody = otherObject.GetComponent<Rigidbody>();
+        if (otherObject == null)
+        {
+            isMerging = false;
+            if (otherDestruction != null)
+            {
+                otherDestruction.isMerging = false;
+            }
+            yield break;
+        }
 
-        float thisRadius = GetRadius(gameObject);
-        float otherRadius = GetRadius(otherObject);
-        float thisMass = GetMass(gameObject);
-        float otherMass = GetMass(otherObject);
+        bool thisWins = ShouldHandleMerge(otherObject);
+        GameObject winner = thisWins ? gameObject : otherObject;
+        GameObject loser = thisWins ? otherObject : gameObject;
 
-        float combinedMass = Mathf.Max(0f, thisMass + otherMass);
-        float combinedRadius = Mathf.Pow(Mathf.Pow(Mathf.Max(0f, thisRadius), 3f) + Mathf.Pow(Mathf.Max(0f, otherRadius), 3f), 1f / 3f);
+        PlanetDestruction winnerDestruction = thisWins ? this : otherDestruction;
+        PlanetDestruction loserDestruction = thisWins ? otherDestruction : this;
 
-        Vector3 thisPosition = sourceRigidbody != null ? sourceRigidbody.position : transform.position;
-        Vector3 otherPosition = otherRigidbody != null ? otherRigidbody.position : otherObject.transform.position;
+        Rigidbody winnerRigidbody = winner != null ? winner.GetComponent<Rigidbody>() : null;
+        Rigidbody loserRigidbody = loser != null ? loser.GetComponent<Rigidbody>() : null;
+
+        float winnerRadius = GetRadius(winner);
+        float loserRadius = GetRadius(loser);
+        float winnerMass = GetMass(winner);
+        float loserMass = GetMass(loser);
+
+        float combinedMass = Mathf.Max(0f, winnerMass + loserMass);
+        float combinedRadius = Mathf.Pow(Mathf.Pow(Mathf.Max(0f, winnerRadius), 3f) + Mathf.Pow(Mathf.Max(0f, loserRadius), 3f), 1f / 3f);
+
+        Vector3 winnerPosition = winnerRigidbody != null ? winnerRigidbody.position : winner.transform.position;
+        Vector3 loserPosition = loserRigidbody != null ? loserRigidbody.position : loser.transform.position;
         Vector3 mergedPosition = combinedMass > 0f
-            ? ((thisPosition * thisMass) + (otherPosition * otherMass)) / combinedMass
-            : transform.position;
+            ? ((winnerPosition * winnerMass) + (loserPosition * loserMass)) / combinedMass
+            : winner.transform.position;
 
-        Vector3 thisVelocity = sourceRigidbody != null ? sourceRigidbody.linearVelocity : Vector3.zero;
-        Vector3 otherVelocity = otherRigidbody != null ? otherRigidbody.linearVelocity : Vector3.zero;
+        Vector3 winnerVelocity = winnerRigidbody != null ? winnerRigidbody.linearVelocity : Vector3.zero;
+        Vector3 loserVelocity = loserRigidbody != null ? loserRigidbody.linearVelocity : Vector3.zero;
         Vector3 mergedVelocity = combinedMass > 0f
-            ? ((thisVelocity * thisMass) + (otherVelocity * otherMass)) / combinedMass
+            ? ((winnerVelocity * winnerMass) + (loserVelocity * loserMass)) / combinedMass
             : Vector3.zero;
 
-        Vector3 mergedAngularVelocity = sourceRigidbody != null ? sourceRigidbody.angularVelocity : Vector3.zero;
-        bool thisWins = ShouldHandleMerge(otherObject);
+        Vector3 winnerAngularVelocity = winnerRigidbody != null ? winnerRigidbody.angularVelocity : Vector3.zero;
+        Vector3 loserAngularVelocity = loserRigidbody != null ? loserRigidbody.angularVelocity : Vector3.zero;
+        Vector3 mergedAngularVelocity = combinedMass > 0f
+            ? ((winnerAngularVelocity * winnerMass) + (loserAngularVelocity * loserMass)) / combinedMass
+            : winnerAngularVelocity;
 
-        if (thisWins)
+        Vector3 winnerStartScale = winner.transform.localScale;
+        Vector3 loserStartScale = loser.transform.localScale;
+        Vector3 combinedScale = Vector3.one * (combinedRadius * 2f);
+
+        if (winnerRigidbody != null)
         {
-            ApplyMergedState(gameObject, combinedMass, combinedRadius, mergedPosition, mergedVelocity, mergedAngularVelocity);
-            Destroy(otherObject);
-        }
-        else
-        {
-            ApplyMergedState(otherObject, combinedMass, combinedRadius, mergedPosition, mergedVelocity, mergedAngularVelocity);
-            Destroy(gameObject);
+            winnerRigidbody.isKinematic = true;
+            winnerRigidbody.detectCollisions = false;
+            winnerRigidbody.linearVelocity = Vector3.zero;
+            winnerRigidbody.angularVelocity = Vector3.zero;
         }
 
-        if (otherProperties != null && otherRigidbody != null)
+        if (loserRigidbody != null)
         {
-            otherProperties.mass = combinedMass;
-            otherProperties.radius = combinedRadius;
+            loserRigidbody.isKinematic = true;
+            loserRigidbody.detectCollisions = false;
+            loserRigidbody.linearVelocity = Vector3.zero;
+            loserRigidbody.angularVelocity = Vector3.zero;
+        }
+
+        SetCollidersEnabled(loser, false);
+
+        float duration = Mathf.Max(0.01f, mergeDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (winner == null || loser == null)
+            {
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
+            float normalized = Mathf.Clamp01(elapsed / duration);
+            float blend = mergeCurve != null ? mergeCurve.Evaluate(normalized) : normalized;
+
+            Vector3 winnerStepPosition = Vector3.Lerp(winnerPosition, mergedPosition, blend);
+            Vector3 loserStepPosition = Vector3.Lerp(loserPosition, mergedPosition, blend * blend);
+
+            SetObjectPosition(winner, winnerRigidbody, winnerStepPosition);
+            SetObjectPosition(loser, loserRigidbody, loserStepPosition);
+
+            winner.transform.localScale = Vector3.Lerp(winnerStartScale, combinedScale, blend);
+            loser.transform.localScale = Vector3.Lerp(loserStartScale, Vector3.zero, blend);
+
+            yield return null;
+        }
+
+        if (winner != null)
+        {
+            ApplyMergedState(winner, combinedMass, combinedRadius, mergedPosition, mergedVelocity, mergedAngularVelocity);
+        }
+
+        if (loser != null)
+        {
+            Destroy(loser);
         }
 
         if (logCollisionDetection)
         {
-            string winnerName = thisWins ? name : otherObject.name;
-            string loserName = thisWins ? otherObject.name : name;
-            Debug.Log($"Merged collision: {winnerName} absorbed {loserName}.", thisWins ? this : null);
+            string winnerName = winner != null ? winner.name : "Unknown";
+            string loserName = loser != null ? loser.name : "Unknown";
+            Debug.Log($"Merged collision: {winnerName} absorbed {loserName}.", winnerDestruction);
+        }
+
+        if (winnerDestruction != null)
+        {
+            winnerDestruction.isMerging = false;
+        }
+
+        if (loserDestruction != null)
+        {
+            loserDestruction.isMerging = false;
+        }
+    }
+
+    void SetObjectPosition(GameObject targetObject, Rigidbody body, Vector3 position)
+    {
+        if (body != null)
+        {
+            body.position = position;
+            return;
+        }
+
+        if (targetObject != null)
+        {
+            targetObject.transform.position = position;
+        }
+    }
+
+    void SetCollidersEnabled(GameObject targetObject, bool enabledState)
+    {
+        if (targetObject == null)
+        {
+            return;
+        }
+
+        Collider[] colliders = targetObject.GetComponentsInChildren<Collider>(true);
+        for (int index = 0; index < colliders.Length; index++)
+        {
+            if (colliders[index] != null)
+            {
+                colliders[index].enabled = enabledState;
+            }
         }
     }
 
