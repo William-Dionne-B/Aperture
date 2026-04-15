@@ -1,4 +1,3 @@
-using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,51 +6,69 @@ using System.Collections.Generic;
 
 public class ObjectManager : MonoBehaviour
 {
-    private GameObject selection; 
+    private GameObject selection;
     private GameObject lastSelection;
-    private Vector3 cameraLocalPositionWhenAttached;
-    private Quaternion cameraLocalRotationWhenAttached;
-    private bool cameraIsAttachedToSelection = false;
 
-    public GameObject MainCamera; 
-    public GameObject InfoUI; 
-    
+    // Verrouillage / anchors pour empêcher l'héritage de rotation
+    private bool cameraLockedToSelection = false;
+    private GameObject mainCameraAnchor;
+    private Vector3 mainCameraOffset; // offset utilisé pour positionner l'anchor = cameraWorldPos - selectionPos
+    private Quaternion mainCameraRotationWhenLocked;
+
+    private bool selectionCameraLockedToSelection = false;
+    private GameObject selectionCameraAnchor;
+    private Vector3 selectionCameraOffset;
+    private Quaternion selectionCameraRotationWhenLocked;
+
+    public GameObject MainCamera;
+    public GameObject InfoUI;
+
     public GameObject SelectionViewFrame;
-    public GameObject ListObjet;
+    public GameObject ListObjet; // Contient TMP_Dropdown ou Dropdown
     public GameObject CameraFocusButton;
 
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
-    
+
     [Header("Champs UI Textes")]
-    public GameObject speed; 
-    public GameObject mass; 
-    public GameObject radius; 
-    public GameObject obj_name; 
-    public GameObject dist_etoile; 
+    public GameObject speed;
+    public GameObject mass;
+    public GameObject radius;
+    public GameObject obj_name;
+    public GameObject dist_etoile;
     public GameObject periode;
     public GameObject density;
     public GameObject surface_gravity;
     public GameObject temperature;
-    
+
     private float initialYOffset = 95f;
     private RawImage selectionRawImage;
     public float cameraPadding = 1.5f;
-    
+
+    [Header("Verrou caméra - déplacement")]
+    public float lockedMoveSpeed = 5f;         // vitesse WASD pour la caméra principale quand verrouillée
+    public float previewLockedMoveSpeed = 2f; // (conservé si besoin mais WASD n'affecte plus la preview)
+
+    [Header("Buffer de sélection")]
+    public float selectionBufferDuration = 0.15f; // délai pendant lequel la sélection doit être stable
+    private GameObject pendingSelection;
+    private float pendingSelectionElapsed;
+    private bool pendingSelectionActive = false;
+
     // Références liées aux listeners
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
     TMP_InputField radiusTmp; InputField radiusUi; UnityAction<string> radiusListener;
     TMP_InputField nameTmp; InputField nameUi; UnityAction<string> nameListener;
 
-    private ScrollRect listScrollRect;
-    private Transform listContent;
-    private GameObject buttonPrefab;
-    private Dictionary<GameObject, GameObject> objectToButtonMap = new Dictionary<GameObject, GameObject>();
+    // Dropdown-based list UI
+    private TMP_Dropdown tmpDropdown;
+    private Dropdown legacyDropdown;
+    private List<GameObject> dropdownObjects = new List<GameObject>();
     private List<ObjectProperties> lastFrameObjects = new List<ObjectProperties>();
 
     // --- Preview layer logic ---
-    private const int SelectionLayer = 31; // couche temporaire utilis�e pour la pr�visualisation
+    private const int SelectionLayer = 31; // couche temporaire utilisée pour la prévisualisation
     private int SelectionLayerMask => (1 << SelectionLayer);
     private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
 
@@ -66,9 +83,9 @@ public class ObjectManager : MonoBehaviour
         SelectionCamera.usePhysicalProperties = true;
         SelectionCamera.nearClipPlane = 0.01f;
         SelectionCamera.farClipPlane = 10000f;
-        SelectionCamera.clearFlags = CameraClearFlags.Skybox;  // skybox visible
+        SelectionCamera.clearFlags = CameraClearFlags.Skybox;
         SelectionCamera.fieldOfView = 60f;
-        SelectionCamera.cullingMask = SelectionLayerMask;     // ne rendre que la couche de s�lection
+        SelectionCamera.cullingMask = SelectionLayerMask;
 
         if (SelectionViewFrame != null)
         {
@@ -91,7 +108,6 @@ public class ObjectManager : MonoBehaviour
     void FocusMainCameraOnSelection()
     {
         if (selection == null || MainCamera == null) return;
-        DetachCameraFromSelection();
 
         var renderer = selection.GetComponentInChildren<Renderer>();
         if (renderer == null) return;
@@ -107,101 +123,118 @@ public class ObjectManager : MonoBehaviour
         AttachCameraToSelection();
     }
 
+    // Création utilitaire d'un anchor
+    GameObject CreateAnchor(string name)
+    {
+        var go = new GameObject(name);
+        return go;
+    }
+
     void AttachCameraToSelection()
     {
         if (selection == null || MainCamera == null) return;
-        MainCamera.transform.SetParent(selection.transform);
-        cameraLocalPositionWhenAttached = MainCamera.transform.localPosition;
-        cameraLocalRotationWhenAttached = MainCamera.transform.localRotation;
-        cameraIsAttachedToSelection = true;
+
+        // MAIN CAMERA anchor only — la preview reste indépendante
+        if (mainCameraAnchor == null)
+        {
+            mainCameraAnchor = CreateAnchor("MainCameraAnchor");
+        }
+
+        Vector3 camWorldPos = MainCamera.transform.position;
+        Quaternion camWorldRot = MainCamera.transform.rotation;
+
+        mainCameraAnchor.transform.position = camWorldPos;
+        mainCameraAnchor.transform.rotation = camWorldRot;
+        mainCameraAnchor.transform.SetParent(selection.transform, true);
+
+        MainCamera.transform.SetParent(mainCameraAnchor.transform, true);
+
+        mainCameraOffset = MainCamera.transform.position - selection.transform.position;
+        mainCameraRotationWhenLocked = MainCamera.transform.rotation;
+        cameraLockedToSelection = true;
+
+        // s'assurer que la preview n'est pas parentée (doit rester indépendante)
+        if (selectionCameraAnchor != null)
+        {
+            if (SelectionCamera != null) SelectionCamera.transform.SetParent(null, true);
+            Destroy(selectionCameraAnchor);
+            selectionCameraAnchor = null;
+            selectionCameraLockedToSelection = false;
+        }
     }
 
     void DetachCameraFromSelection()
     {
-        if (MainCamera == null) return;
-        if (MainCamera.transform.parent != null) MainCamera.transform.SetParent(null);
-        cameraIsAttachedToSelection = false;
+        // Déparent et suppriment uniquement l'anchor de la caméra principale (préserver preview indépendante)
+        if (MainCamera != null) MainCamera.transform.SetParent(null, true);
+
+        if (mainCameraAnchor != null)
+        {
+            Destroy(mainCameraAnchor);
+            mainCameraAnchor = null;
+        }
+
+        // garantir que la preview n'est pas parentée involontairement
+        if (SelectionCamera != null && SelectionCamera.transform.parent != null)
+        {
+            SelectionCamera.transform.SetParent(null, true);
+        }
+        if (selectionCameraAnchor != null)
+        {
+            Destroy(selectionCameraAnchor);
+            selectionCameraAnchor = null;
+        }   
+        selectionCameraLockedToSelection = false;
+
+        cameraLockedToSelection = false;
     }
 
-    void CheckForMovementInput()
+    // appelé quand la sélection change pour réattacher l'anchor principal à la nouvelle sélection
+    // conserve la position world de la caméra (ne la déplace pas)
+    void ReparentAnchorsToNewSelection()
     {
-        if (!cameraIsAttachedToSelection) return;
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        if (selection == null) return;
+
+        if (mainCameraAnchor != null)
         {
-            DetachCameraFromSelection();
+            Vector3 camWorldPos = MainCamera.transform.position;
+            Quaternion camWorldRot = MainCamera.transform.rotation;
+
+            mainCameraAnchor.transform.SetParent(selection.transform, true);
+
+            mainCameraOffset = camWorldPos - selection.transform.position;
+            mainCameraRotationWhenLocked = camWorldRot;
+
+            mainCameraAnchor.transform.position = camWorldPos;
+            mainCameraAnchor.transform.rotation = camWorldRot;
         }
+
+        // on ne touche pas à la preview : elle doit rester indépendante
     }
 
     void InitializeListUI()
     {
         if (ListObjet == null) return;
 
-        listScrollRect = ListObjet.GetComponent<ScrollRect>();
-        if (listScrollRect == null) listScrollRect = ListObjet.AddComponent<ScrollRect>();
-
-        listContent = listScrollRect.content;
-        if (listContent == null)
+        tmpDropdown = ListObjet.GetComponent<TMP_Dropdown>() ?? ListObjet.GetComponentInChildren<TMP_Dropdown>();
+        if (tmpDropdown != null)
         {
-            GameObject contentObj = new GameObject("Content");
-            contentObj.transform.SetParent(ListObjet.transform, false);
-            listContent = contentObj.transform;
-            listScrollRect.content = listContent.GetComponent<RectTransform>();
-
-            RectTransform contentRect = contentObj.GetComponent<RectTransform>();
-            if (contentRect == null) contentRect = contentObj.AddComponent<RectTransform>();
-            contentRect.anchorMin = new Vector2(0, 1);
-            contentRect.anchorMax = new Vector2(1, 1);
-            contentRect.pivot = new Vector2(0.5f, 1);
-            contentRect.sizeDelta = new Vector2(0, 0);
-
-            VerticalLayoutGroup layoutGroup = contentObj.AddComponent<VerticalLayoutGroup>();
-            layoutGroup.childForceExpandHeight = false;
-            layoutGroup.childForceExpandWidth = true;
-            layoutGroup.spacing = 5;
-            layoutGroup.padding = new RectOffset(5, 5, 5, 5);
-
-            ContentSizeFitter fitter = contentObj.AddComponent<ContentSizeFitter>();
-            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            tmpDropdown.onValueChanged.RemoveAllListeners();
+            tmpDropdown.onValueChanged.AddListener(OnTMPDropdownValueChanged);
+            tmpDropdown.ClearOptions();
+            return;
         }
 
-        CreateButtonPrefab();
-    }
+        legacyDropdown = ListObjet.GetComponent<Dropdown>() ?? ListObjet.GetComponentInChildren<Dropdown>();
+        if (legacyDropdown != null)
+        {
+            legacyDropdown.onValueChanged.RemoveAllListeners();
+            legacyDropdown.onValueChanged.AddListener(OnLegacyDropdownValueChanged);
+            legacyDropdown.options.Clear();
+            return;
+        }
 
-    void CreateButtonPrefab()
-    {
-        buttonPrefab = new GameObject("ObjectButton");
-        buttonPrefab.SetActive(false);
-
-        RectTransform buttonRect = buttonPrefab.AddComponent<RectTransform>();
-        buttonRect.sizeDelta = new Vector2(200, 50);
-
-        Image buttonImage = buttonPrefab.AddComponent<Image>();
-        buttonImage.color = new Color(0.2f, 0.2f, 0.2f);
-
-        Button buttonComponent = buttonPrefab.AddComponent<Button>();
-        buttonComponent.targetGraphic = buttonImage;
-
-        ColorBlock colors = buttonComponent.colors;
-        colors.normalColor = new Color(0.2f, 0.2f, 0.2f);
-        colors.highlightedColor = new Color(0.3f, 0.3f, 0.3f);
-        colors.pressedColor = new Color(0.1f, 0.1f, 0.1f);
-        buttonComponent.colors = colors;
-
-        LayoutElement layoutElement = buttonPrefab.AddComponent<LayoutElement>();
-        layoutElement.preferredHeight = 50;
-
-        GameObject textObj = new GameObject("Text");
-        textObj.transform.SetParent(buttonPrefab.transform, false);
-
-        RectTransform textRect = textObj.AddComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-
-        TextMeshProUGUI textComponent = textObj.AddComponent<TextMeshProUGUI>();
-        textComponent.text = "Object";
-        textComponent.alignment = TextAlignmentOptions.Center;
-        textComponent.fontSize = 16;
+        Debug.LogWarning("[ObjectManager] `ListObjet` ne contient ni `TMP_Dropdown` ni `Dropdown`. Veuillez ajouter un dropdown dans l'inspecteur.");
     }
 
     void Update()
@@ -211,26 +244,109 @@ public class ObjectManager : MonoBehaviour
         var click = MainCamera.GetComponent<ClickDetection>();
         if (click == null) return;
 
-        var selected = click.selectedObject;
+        var clicked = click.selectedObject;
 
-        // conserve l'ancienne s�lection pour restaurer ses couches
-        GameObject oldSelection = selection;
-
-        if (selection != selected)
+        // --- BUFFER / DEBOUNCE: on stocke la sélection candidate et on applique seulement si stable ---
+        if (clicked != pendingSelection)
         {
-            DetachCameraFromSelection();
-            selection = selected;
-            lastSelection = selection;
-            BindFieldListeners();
+            pendingSelection = clicked;
+            pendingSelectionElapsed = 0f;
+            pendingSelectionActive = true;
+        }
+        else if (pendingSelectionActive)
+        {
+            pendingSelectionElapsed += Time.deltaTime;
+            if (pendingSelectionElapsed >= selectionBufferDuration)
+            {
+                // si la sélection candidate est différente de l'actuelle, on l'applique
+                if (selection != pendingSelection)
+                {
+                    // si verrou présent -> détache immédiatement (ne réapplique pas automatiquement)
+                    if (cameraLockedToSelection || selectionCameraLockedToSelection)
+                    {
+                        DetachCameraFromSelection();
+                    }
 
-            // restaure l'ancienne s�lection puis applique la couche de preview � la nouvelle s�lection
-            RestoreSelectionLayers();
-            ApplySelectionLayer(selection);
+                    selection = pendingSelection;
+                    lastSelection = selection;
+                    BindFieldListeners();
+
+                    RestoreSelectionLayers();
+                    ApplySelectionLayer(selection);
+
+                    // mettre à jour la preview APRÈS le détachement / changement de sélection
+                    UpdateSelectionCamera();
+
+                    // mettre à jour la dropdown pour refléter la sélection confirmée
+                    UpdateObjectList(); // s'assurer que dropdownObjects est à jour
+                    int idx = dropdownObjects.IndexOf(selection);
+                    if (tmpDropdown != null)
+                    {
+                        tmpDropdown.onValueChanged.RemoveListener(OnTMPDropdownValueChanged);
+                        if (idx >= 0) tmpDropdown.value = idx;
+                        else tmpDropdown.value = (tmpDropdown.options.Count > 0 ? 0 : tmpDropdown.value);
+                        tmpDropdown.onValueChanged.AddListener(OnTMPDropdownValueChanged);
+                    }
+                    else if (legacyDropdown != null)
+                    {
+                        legacyDropdown.onValueChanged.RemoveListener(OnLegacyDropdownValueChanged);
+                        if (idx >= 0) legacyDropdown.value = idx;
+                        else legacyDropdown.value = (legacyDropdown.options.Count > 0 ? 0 : legacyDropdown.value);
+                        legacyDropdown.onValueChanged.AddListener(OnLegacyDropdownValueChanged);
+                    }
+                }
+
+                pendingSelectionActive = false;
+            }
         }
 
-        UpdateSelectionCamera();
-        CheckForMovementInput();
+        // Toggle lock avec la touche L (si un objet est sélectionné)
+        if (Input.GetKeyDown(KeyCode.L) && selection != null)
+        {
+            if (cameraLockedToSelection || selectionCameraLockedToSelection)
+            {
+                DetachCameraFromSelection();
+            }
+            else
+            {
+                AttachCameraToSelection();
+            }
+        }
+
         UpdateObjectList();
+
+        // Déplacement WASD relatif à l'orientation de la caméra principale (en mode verrou)
+        if (cameraLockedToSelection && selection != null && MainCamera != null && mainCameraAnchor != null)
+        {
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
+
+            if (Mathf.Abs(h) > 0.0001f || Mathf.Abs(v) > 0.0001f)
+            {
+                // mouvement relatif à l'orientation de la caméra (strafe et forward dans le plan XZ)
+                Vector3 right = MainCamera.transform.right;
+                Vector3 forward = Vector3.ProjectOnPlane(MainCamera.transform.forward, Vector3.up).normalized;
+                Vector3 move = (right * h + forward * v) * lockedMoveSpeed * Time.deltaTime;
+
+                mainCameraOffset += move;
+            }
+
+            // positionner l'anchor en position monde = selection.position + offset (conserve la position monde de la caméra)
+            mainCameraAnchor.transform.position = selection.transform.position + mainCameraOffset;
+            // maintenir la rotation fixe enregistrée (empêche la sélection d'affecter la rotation)
+            mainCameraAnchor.transform.rotation = mainCameraRotationWhenLocked;
+        }
+
+        // IMPORTANT: ne plus appliquer WASD à la caméra de preview — la preview ne bouge pas via WASD
+        if (selectionCameraLockedToSelection && selection != null && SelectionCamera != null && selectionCameraAnchor != null)
+        {
+            // on conserve l'anchor position/rotation (pas de modification par WASD)
+            selectionCameraAnchor.transform.position = selection.transform.position + selectionCameraOffset;
+            selectionCameraAnchor.transform.rotation = selectionCameraRotationWhenLocked;
+        }
+
+        // Si la caméra de preview n'est pas en mode locked, comportement standard
+        UpdateSelectionCamera();
 
         if (IsAnyFieldEditing()) return;
         updateUIVisibility();
@@ -238,11 +354,9 @@ public class ObjectManager : MonoBehaviour
 
     void UpdateObjectList()
     {
-        if (listContent == null) return;
-
         ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
         bool listChanged = allObjectsInScene.Length != lastFrameObjects.Count;
-        
+
         if (!listChanged)
         {
             for (int i = 0; i < allObjectsInScene.Length; i++)
@@ -257,58 +371,67 @@ public class ObjectManager : MonoBehaviour
 
         if (listChanged)
         {
-            foreach (Transform child in listContent) Destroy(child.gameObject);
-            objectToButtonMap.Clear();
+            dropdownObjects.Clear();
 
-            float yOffset = initialYOffset;
+            List<string> optionNames = new List<string>();
             foreach (ObjectProperties objProps in allObjectsInScene)
             {
                 if (objProps == null) continue;
+                GameObject objToAdd = objProps.gameObject;
+                if (objProps.transform.parent != null) objToAdd = objProps.transform.parent.gameObject;
+                dropdownObjects.Add(objToAdd);
+                optionNames.Add(objProps.objectName);
+            }
 
-                GameObject buttonInstance = Instantiate(buttonPrefab, listContent);
-                buttonInstance.SetActive(true);
-
-                RectTransform buttonRect = buttonInstance.GetComponent<RectTransform>();
-                buttonRect.anchoredPosition = new Vector2(0, yOffset);
-                yOffset -= 55; 
-
-                TextMeshProUGUI textComponent = buttonInstance.GetComponentInChildren<TextMeshProUGUI>();
-                if (textComponent != null) textComponent.text = objProps.objectName;
-
-                Button buttonComponent = buttonInstance.GetComponent<Button>();
-                if (buttonComponent != null)
-                {
-                    GameObject objToSelect = objProps.gameObject;
-                    if (objProps.transform.parent != null) objToSelect = objProps.transform.parent.gameObject;
-                    buttonComponent.onClick.AddListener(() => SelectObject(objToSelect));
-                }
-
-                objectToButtonMap[objProps.gameObject] = buttonInstance;
+            if (tmpDropdown != null)
+            {
+                tmpDropdown.ClearOptions();
+                tmpDropdown.AddOptions(optionNames);
+            }
+            else if (legacyDropdown != null)
+            {
+                legacyDropdown.options.Clear();
+                foreach (var name in optionNames) legacyDropdown.options.Add(new Dropdown.OptionData(name));
             }
 
             lastFrameObjects.Clear();
             foreach (ObjectProperties objProps in allObjectsInScene) lastFrameObjects.Add(objProps);
-        }
 
-        foreach (var kvp in objectToButtonMap)
-        {
-            ObjectProperties objProps = kvp.Key.GetComponent<ObjectProperties>();
-            if (objProps == null && kvp.Key.transform.parent != null) objProps = kvp.Key.transform.parent.GetComponent<ObjectProperties>();
-
-            GameObject buttonGO = kvp.Value;
-            TextMeshProUGUI textComponent = buttonGO.GetComponentInChildren<TextMeshProUGUI>();
-
-            if (textComponent != null && objProps != null) textComponent.text = objProps.objectName;
-
-            Image buttonImage = buttonGO.GetComponent<Image>();
-            if (buttonImage != null)
+            if (selection != null)
             {
-                bool isSelected = (objProps != null && (objProps.gameObject == selection || 
-                    (objProps.transform.parent != null && objProps.transform.parent.gameObject == selection)));
-                
-                buttonImage.color = isSelected ? new Color(0.4f, 0.4f, 0.4f) : new Color(0.2f, 0.2f, 0.2f);
+                int idx = dropdownObjects.IndexOf(selection);
+                if (idx < 0)
+                {
+                    for (int i = 0; i < dropdownObjects.Count; i++)
+                    {
+                        if (dropdownObjects[i] == selection || (dropdownObjects[i].transform != null && dropdownObjects[i].transform == selection.transform.parent))
+                        {
+                            idx = i; break;
+                        }
+                    }
+                }
+
+                if (tmpDropdown != null && idx >= 0) tmpDropdown.value = idx;
+                else if (legacyDropdown != null && idx >= 0) legacyDropdown.value = idx;
+            }
+            else
+            {
+                if (tmpDropdown != null && tmpDropdown.options.Count > 0) tmpDropdown.value = 0;
+                if (legacyDropdown != null && legacyDropdown.options.Count > 0) legacyDropdown.value = 0;
             }
         }
+    }
+
+    void OnTMPDropdownValueChanged(int index)
+    {
+        if (index < 0 || index >= dropdownObjects.Count) return;
+        SelectObject(dropdownObjects[index]);
+    }
+
+    void OnLegacyDropdownValueChanged(int index)
+    {
+        if (index < 0 || index >= dropdownObjects.Count) return;
+        SelectObject(dropdownObjects[index]);
     }
 
     void SelectObject(GameObject obj)
@@ -328,8 +451,12 @@ public class ObjectManager : MonoBehaviour
         float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
         float distance = size * cameraPadding;
 
-        SelectionCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
-        SelectionCamera.transform.LookAt(center);
+        // Si verrouillée, la position est gérée dans Update() via l'anchor
+        if (!selectionCameraLockedToSelection)
+        {
+            SelectionCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
+            SelectionCamera.transform.LookAt(center);
+        }
     }
 
     void updateUIVisibility()
@@ -344,7 +471,7 @@ public class ObjectManager : MonoBehaviour
             {
                 float vraieMasse = props.mass * props.unityToKgScale;
                 float vraiRayon = props.radius * props.radiusToMetersScale;
-                
+
                 SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
                 SetText(radius, FormaterScientifiqueTMP(vraiRayon) + " m");
                 SetText(speed, props.speedMagnitude.ToString("F2") + " km/s");
@@ -353,7 +480,7 @@ public class ObjectManager : MonoBehaviour
                 SetText(density, props.density.ToString("G"));
 
                 float grav = props.gravityMagnitude;
-                float gravEnG = grav / 9.81f; 
+                float gravEnG = grav / 9.81f;
                 SetText(surface_gravity, $"{grav:0.##} m/s² ({gravEnG:0.##} g)");
 
                 if (props.EtoileParent != null)
@@ -364,13 +491,13 @@ public class ObjectManager : MonoBehaviour
                     SetText(dist_etoile, $"{FormaterScientifiqueTMP(vraieDistance)} m ({FormaterScientifiqueTMP(distanceAL)} al)");
                 }
                 else SetText(dist_etoile, "N/A");
-                
+
                 if (temperature != null)
                 {
                     if (props.temperatureMagnitude > 0f)
                     {
                         float tempK = props.temperatureMagnitude;
-                        float tempC = tempK - 273.15f; 
+                        float tempC = tempK - 273.15f;
                         SetText(temperature, $"{tempK:F1} K ({tempC:F1} °C)");
                     }
                     else SetText(temperature, "N/A");
@@ -500,7 +627,7 @@ public class ObjectManager : MonoBehaviour
 
         if (LireEntreeUtilisateur(input, out float v)) props.speedMagnitude = v;
         else SetText(speed, props.speedMagnitude.ToString("F2") + " km/s");
-        
+
         updateUIVisibility();
     }
 
@@ -536,7 +663,6 @@ public class ObjectManager : MonoBehaviour
         updateUIVisibility();
     }
 
-    // --- LE TRADUCTEUR D'INTERFACE MAGIQUE ---
     bool LireEntreeUtilisateur(string input, out float resultatFinal)
     {
         resultatFinal = 0f;
@@ -544,21 +670,21 @@ public class ObjectManager : MonoBehaviour
 
         float multiplicateur = 1f;
 
-        if (input.Contains("M km")) multiplicateur = 1e9f; 
-        else if (input.Contains("km")) multiplicateur = 1e3f; 
+        if (input.Contains("M km")) multiplicateur = 1e9f;
+        else if (input.Contains("km")) multiplicateur = 1e3f;
 
         string textPropre = input.Replace(" kg", "").Replace(" M km", "").Replace(" km", "").Replace(" m", "").Replace(" m/s", "").Replace(" km/s", "");
         textPropre = textPropre.Replace(" × 10<sup>", "E").Replace(" x 10<sup>", "E").Replace("</sup>", "");
         textPropre = textPropre.Replace(" ", "").Replace(",", ".");
 
-        if (float.TryParse(textPropre, NumberStyles.Float, CultureInfo.InvariantCulture, out float valeurBrute))
+        if (float.TryParse(textPropre, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float valeurBrute))
         {
             resultatFinal = valeurBrute * multiplicateur;
             return true;
         }
         return false;
     }
-    
+
     string FormaterScientifiqueTMP(float valeur)
     {
         if (valeur == 0f) return "0";
@@ -567,8 +693,8 @@ public class ObjectManager : MonoBehaviour
 
         if (parties.Length == 2)
         {
-            string baseNum = parties[0]; 
-            int exposant = int.Parse(parties[1]); 
+            string baseNum = parties[0];
+            int exposant = int.Parse(parties[1]);
             return $"{baseNum.Replace('.', ',')} × 10<sup>{exposant}</sup>";
         }
         return formatStandard;
@@ -578,17 +704,16 @@ public class ObjectManager : MonoBehaviour
     {
         UnbindAllFieldListeners();
         DetachCameraFromSelection();
-        RestoreSelectionLayers();  
-        if (buttonPrefab != null)
-        {
-            Destroy(buttonPrefab);
-        }
+        RestoreSelectionLayers();
+        if (tmpDropdown != null) tmpDropdown.onValueChanged.RemoveAllListeners();
+        if (legacyDropdown != null) legacyDropdown.onValueChanged.RemoveAllListeners();
     }
 
     // --- Layer helper methods ---
     private void ApplySelectionLayer(GameObject root)
     {
         if (root == null) return;
+
         savedLayers.Clear();
 
         foreach (var t in root.GetComponentsInChildren<Transform>(true))
