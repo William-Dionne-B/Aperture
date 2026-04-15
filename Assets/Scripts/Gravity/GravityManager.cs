@@ -198,7 +198,8 @@ public class GravityManager : MonoBehaviour
     {
         float distance = Vector3.Distance(body.rb.position, centralBody.rb.position);
         float mu = G * gravityMultiplier * (body.rb.mass + centralBody.rb.mass);
-        return 2f * Mathf.PI * Mathf.Sqrt(distance * distance * distance / mu);
+        float semiMajorAxis = 1 / ((2 / distance) - (Mathf.Pow(body.rb.linearVelocity.magnitude, 2)) / mu);
+        return 2f * Mathf.PI * Mathf.Sqrt(Mathf.Pow(semiMajorAxis, 3) / mu);
     }
 
     // Draw a clean ellipse based on orbital elements, instead of a noisy n-body prediction
