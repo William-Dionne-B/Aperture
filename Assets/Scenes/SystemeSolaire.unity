@@ -4689,8 +4689,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Saturne
+  isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 285.878
+  _mass: 285.878
   radius: 4.31
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -4701,6 +4702,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
@@ -10128,8 +10131,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Mercure
+  isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 0.16601
+  _mass: 0.16601
   radius: 0.1755
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -10140,6 +10144,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
@@ -10995,8 +11001,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Jupiter
+  isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 955.11
+  _mass: 955.11
   radius: 5.025
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -11007,6 +11014,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
@@ -19436,8 +19445,6 @@ MonoBehaviour:
   - {fileID: 2491994911087508931, guid: 383b4b2d446d5404abf9fd5ebd5328ec, type: 3}
   - {fileID: 1544941027984095034, guid: 103d291ade5c4c749ba91506c26f4d52, type: 3}
   - {fileID: 509663796537468643, guid: eb8c8fa1292c1564185bd9b41a4256cb, type: 3}
-  sunMass: 1000000
-  sunTransform: {fileID: 0}
 --- !u!114 &1701653282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20766,6 +20773,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8802154727256929741, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: EtoileParent
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: -3990352540898623137, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: mergePriority
       value: 0
@@ -22878,8 +22889,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Uranus
+  isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 43.668
+  _mass: 43.668
   radius: 1.79
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -22890,6 +22902,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
@@ -23681,8 +23695,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Neptune
+  isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 51.813
+  _mass: 51.813
   radius: 1.85
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -23693,6 +23708,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
@@ -24455,8 +24472,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Venus
+  isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 2.44784
+  _mass: 2.44784
   radius: 0.435
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -24467,6 +24485,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
-using Object = System.Object;
 
 public class ObjectProperties : MonoBehaviour
 {
@@ -16,7 +15,9 @@ public class ObjectProperties : MonoBehaviour
     
     [SerializeField]
     public float speedMagnitude;
-    [FormerlySerializedAs("mass")] [SerializeField]
+    
+    [FormerlySerializedAs("mass")] 
+    [SerializeField]
     private float _mass = 1f;
 
     public float Mass
@@ -29,6 +30,7 @@ public class ObjectProperties : MonoBehaviour
             if (thisGravityBody != null) thisGravityBody.Mass = _mass;
         }
     }    
+    
     [SerializeField]
     public float radius;
     [SerializeField]
@@ -67,7 +69,7 @@ public class ObjectProperties : MonoBehaviour
     [Tooltip("Effet de serre en Kelvin (Terre = environ +33 K")]
     public float greenhouseEffect = 0f;
     
-    private GameObject thisObject; // L'objet parent du script
+    private GameObject thisObject; 
     private Transform thisTransform;
     private Rigidbody thisRigidbody;
     private GravityBody thisGravityBody;
@@ -116,7 +118,13 @@ public class ObjectProperties : MonoBehaviour
         if (thisTransform != null) thisTransform.localScale = new Vector3(2 * radius, 2 * radius, 2 * radius);
 
         if (thisGravityBody != null) thisGravityBody.Mass = _mass;
+        
+        if (EtoileParent == null && AllStarsInSystem.Count > 0)
+        {
+            ChercherEtoileLaPlusProche();
+        }
 
+        // --- GRAVITÉ ---
         if (radius > 0 && GravityManager.Instance != null)
         {
             float vraiRayonEnMetres = radius * radiusToMetersScale;
@@ -127,21 +135,45 @@ public class ObjectProperties : MonoBehaviour
         }
         else gravityMagnitude = 0f;
         
+        // --- DISTANCE & PÉRIODE ---
         if (EtoileParent != null && thisTransform != null)
         {
             Vector3 posEtoile = EtoileParent.transform.position;
             Vector3 posBody = thisTransform.position;
-            Vector3 s = posEtoile - posBody;
-
-            distanceToEtoile = s.magnitude;
+            distanceToEtoile = Vector3.Distance(posEtoile, posBody);
         }
         
         if (speedMagnitude > 0 && distanceToEtoile > 0) periode = (float)Math.Round((2 * Mathf.PI * distanceToEtoile) / speedMagnitude, 2);
         else periode = 0f;
 
+        // --- DENSITÉ ---
         if (_mass > 0 && radius > 0) density = _mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
         else density = 0f;
 
+        // --- THERMODYNAMIQUE ---
+        ActualiserTemperature();
+    }
+
+    void ChercherEtoileLaPlusProche()
+    {
+        float distMin = float.MaxValue;
+        foreach (var star in AllStarsInSystem)
+        {
+            // CORRECTION : On s'assure à 100% que l'astre ne s'adopte pas lui-même !
+            if (star == null || star.gameObject == this.gameObject) continue;
+            
+            float d = Vector3.Distance(transform.position, star.transform.position);
+            if (d < distMin)
+            {
+                distMin = d;
+                EtoileParent = star.gameObject;
+            }
+        }
+    }
+
+    // Gestion propre de la température
+    void ActualiserTemperature()
+    {
         if (isStar)
         {
             temperatureMagnitude = starSurfaceTemperature;
@@ -177,9 +209,7 @@ public class ObjectProperties : MonoBehaviour
             }
         }
     }
-    
 
-    // Coroutine qui met à jour speedMagnitude 10 fois par seconde (toutes les 0.1s)
     private IEnumerator UpdateSpeedRoutine()
     {
         var wait = new WaitForSeconds(0.1f); // 10 Hz
