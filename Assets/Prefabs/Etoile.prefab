@@ -278,7 +278,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Soleil
+  objectName: Sol
+  isOrbitalBody: 0
   speedMagnitude: 0
   mass: 1000000
   radius: 50.1
@@ -291,6 +292,8 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 1
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0

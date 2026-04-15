@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Bleu
+  isOrbitalBody: 0
   speedMagnitude: 0
   mass: 1000000
   radius: 15
@@ -291,7 +292,9 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
-  starLuminosity: 3.828e+26
+  isStar: 1
+  starSurfaceTemperature: 22000
+  starLuminosity: 3.52e+30
   albedo: 0.3
   greenhouseEffect: 0
 --- !u!114 &7738383565594045505
