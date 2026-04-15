@@ -12,11 +12,23 @@ public class GravityManager : MonoBehaviour
     public float gravityMultiplier = 1e13f; // Tune this for fun & stability
     public float softening = 0.1f; // Prevents singularities / explosions
     public float Timestep = 3600f;
+    public bool enableOrbitPrediction = true;
+    public float orbitPredictionInterval = 0.25f;
+    public int maxOrbitPredictionSteps = 256;
+    public float maxOrbitPredictionDuration = 120f;
+    public float orbitSampleInterval = 0.5f;
+    public float maxOrbitPredictionDistance = 500f;
+    public int minOrbitPointsToRender = 12;
+    public float maxOrbitSegmentLength = 60f;
+    public float maxOrbitSegmentToAverageRatio = 4f;
+    public float maxOrbitSharpTurnDegrees = 120f;
+    public float maxOrbitSharpTurnRatio = 0.35f;
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
     public static IReadOnlyList<GravityBody> Bodies => bodies;
     private static readonly List<float> periodes = new List<float>();
     private GravityBody soleil = null;
+    private float orbitPredictionTimer = 0f;
 
     void Awake()
     {
@@ -61,6 +73,18 @@ public class GravityManager : MonoBehaviour
         CleanupInvalidBodies();
 
         int count = bodies.Count;
+        bool shouldPredictOrbit = false;
+
+        if (enableOrbitPrediction)
+        {
+            float interval = Mathf.Max(0.01f, orbitPredictionInterval);
+            orbitPredictionTimer += Time.fixedDeltaTime;
+            shouldPredictOrbit = orbitPredictionTimer >= interval;
+            if (shouldPredictOrbit)
+            {
+                orbitPredictionTimer = 0f;
+            }
+        }
 
         for (int i = 0; i < count; i++)
         {
@@ -69,7 +93,10 @@ public class GravityManager : MonoBehaviour
                 ApplyGravity(bodies[i], bodies[j]);
             }
 
-            PredictOrbitHybrid(bodies[i]);
+            if (shouldPredictOrbit)
+            {
+                PredictOrbitHybrid(bodies[i]);
+            }
         }
 
     }
@@ -194,21 +221,31 @@ public class GravityManager : MonoBehaviour
     // Hybrid approach: if one body dominates the gravity, use orbital elements for a clean ellipse. Otherwise, do a short-term n-body prediction.
     void PredictOrbitHybrid(GravityBody body)
     {
+        if (body == null || body.rb == null || body.line == null)
+        {
+            return;
+        }
+
         if (IsTwoBodyDominated(body, out GravityBody mainAttractor))
         {
             // Calculate orbital period
             float period = CalculateOrbitalPeriod(body, mainAttractor);
+            float duration = Mathf.Min(period, Mathf.Max(0.1f, maxOrbitPredictionDuration));
 
             // Calculate steps based on period
-            int steps = Mathf.CeilToInt(period / 1f);
+            float sample = Mathf.Max(0.01f, orbitSampleInterval);
+            int steps = Mathf.Clamp(Mathf.CeilToInt(duration / sample), 8, Mathf.Max(8, maxOrbitPredictionSteps));
 
             // Dominated by one body → draw clean ellipse
-            DrawOrbitHybrid(body, mainAttractor, period, steps);
+            DrawOrbitHybrid(body, mainAttractor, duration, steps);
         }
         else
         {
             // No single dominant body → full short-term n-body integration
-            OrbitPredictor(body, 50f, 200);
+            float duration = Mathf.Min(50f, Mathf.Max(0.1f, maxOrbitPredictionDuration));
+            float sample = Mathf.Max(0.01f, orbitSampleInterval);
+            int steps = Mathf.Clamp(Mathf.CeilToInt(duration / sample), 8, Mathf.Max(8, maxOrbitPredictionSteps));
+            OrbitPredictor(body, duration, steps);
         }
     }
 
@@ -255,9 +292,11 @@ public class GravityManager : MonoBehaviour
     void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
     {
         float dt = period / steps;
-        Vector3 position = body.rb.position;
+        Vector3 startPosition = body.rb.position;
+        Vector3 position = startPosition;
         Vector3 velocity = body.rb.linearVelocity;
         float gravConst = G * gravityMultiplier;
+        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance);
 
         List<Vector3> points = new List<Vector3> {position};
 
@@ -288,14 +327,18 @@ public class GravityManager : MonoBehaviour
 
             velocity += 0.5f * (accel + newAccel) * dt;
 
+            if ((position - startPosition).sqrMagnitude > maxDistance * maxDistance)
+            {
+                break;
+            }
+
             points.Add(position);
         }
         // Ensure the last point matches the planet's current position
         //points[points.Count - 1] = body.rb.position;
 
 
-        body.line.positionCount = points.Count;
-        body.line.SetPositions(points.ToArray());
+        ApplyOrbitLineIfStable(body.line, points, startPosition);
     }
 
     // Full n-body prediction for a short time to capture complex interactions when no single body dominates
@@ -349,7 +392,9 @@ public class GravityManager : MonoBehaviour
         }
 
         int targetIndex = bodies.IndexOf(mainBody);
-        List<Vector3> orbitPoints = new List<Vector3>();
+        List<Vector3> orbitPoints = new List<Vector3> { mainBody.rb.position };
+        Vector3 startPosition = mainBody.rb.position;
+        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance);
 
         for (int step = 0; step < steps; step++)
         {
@@ -385,13 +430,129 @@ public class GravityManager : MonoBehaviour
                 accelerations[i] = newAccelerations[i];
             }
 
-            orbitPoints.Add(positions[targetIndex]);
+            Vector3 predictedPosition = positions[targetIndex];
+            if ((predictedPosition - startPosition).sqrMagnitude > maxDistance * maxDistance)
+            {
+                break;
+            }
+
+            orbitPoints.Add(predictedPosition);
         }
         // Ensure last point is the planet's real-time position
         //orbitPoints[orbitPoints.Count - 1] = mainBody.rb.position;
 
-        mainBody.line.useWorldSpace = true;
-        mainBody.line.positionCount = orbitPoints.Count;
-        mainBody.line.SetPositions(orbitPoints.ToArray());
+        ApplyOrbitLineIfStable(mainBody.line, orbitPoints, startPosition);
+    }
+
+    void ApplyOrbitLineIfStable(LineRenderer line, List<Vector3> points, Vector3 origin)
+    {
+        if (line == null)
+        {
+            return;
+        }
+
+        if (!IsOrbitPredictionStable(points, origin))
+        {
+            line.positionCount = 0;
+            return;
+        }
+
+        line.useWorldSpace = true;
+        line.positionCount = points.Count;
+        line.SetPositions(points.ToArray());
+    }
+
+    bool IsOrbitPredictionStable(List<Vector3> points, Vector3 origin)
+    {
+        if (points == null)
+        {
+            return false;
+        }
+
+        int minimumPoints = Mathf.Max(2, minOrbitPointsToRender);
+        if (points.Count < minimumPoints)
+        {
+            return false;
+        }
+
+        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance);
+        float maxDistanceSqr = maxDistance * maxDistance;
+        float hardMaxSegment = Mathf.Max(0.01f, maxOrbitSegmentLength);
+        float segmentToAverageRatioLimit = Mathf.Max(1f, maxOrbitSegmentToAverageRatio);
+        float sharpTurnAngle = Mathf.Clamp(maxOrbitSharpTurnDegrees, 1f, 179f);
+        float sharpTurnRatioLimit = Mathf.Clamp01(maxOrbitSharpTurnRatio);
+
+        float totalSegmentLength = 0f;
+        float maxSegmentLengthObserved = 0f;
+        int segmentCount = 0;
+        int sharpTurnCount = 0;
+        int turnCount = 0;
+        bool hasPreviousDirection = false;
+        Vector3 previousDirection = Vector3.zero;
+
+        for (int i = 1; i < points.Count; i++)
+        {
+            if ((points[i] - origin).sqrMagnitude > maxDistanceSqr)
+            {
+                return false;
+            }
+
+            Vector3 segment = points[i] - points[i - 1];
+            float segmentLength = segment.magnitude;
+            if (segmentLength <= 0.0001f)
+            {
+                continue;
+            }
+
+            if (segmentLength > hardMaxSegment)
+            {
+                return false;
+            }
+
+            Vector3 direction = segment / segmentLength;
+            if (hasPreviousDirection)
+            {
+                float angle = Vector3.Angle(previousDirection, direction);
+                turnCount++;
+                if (angle > sharpTurnAngle)
+                {
+                    sharpTurnCount++;
+                }
+            }
+
+            previousDirection = direction;
+            hasPreviousDirection = true;
+
+            totalSegmentLength += segmentLength;
+            maxSegmentLengthObserved = Mathf.Max(maxSegmentLengthObserved, segmentLength);
+            segmentCount++;
+        }
+
+        if (segmentCount < minimumPoints - 1)
+        {
+            return false;
+        }
+
+        float averageSegmentLength = totalSegmentLength / segmentCount;
+        if (averageSegmentLength <= 0.0001f)
+        {
+            return false;
+        }
+
+        if (maxSegmentLengthObserved > averageSegmentLength * segmentToAverageRatioLimit)
+        {
+            return false;
+        }
+
+        if (turnCount > 0)
+        {
+            float sharpTurnRatio = (float)sharpTurnCount / turnCount;
+            if (sharpTurnRatio > sharpTurnRatioLimit)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -17408,6 +17408,17 @@ MonoBehaviour:
   gravityMultiplier: 1000000
   softening: 0.1
   Timestep: 3600
+  enableOrbitPrediction: 1
+  orbitPredictionInterval: 0.25
+  maxOrbitPredictionSteps: 256
+  maxOrbitPredictionDuration: 120
+  orbitSampleInterval: 0.5
+  maxOrbitPredictionDistance: 500
+  minOrbitPointsToRender: 12
+  maxOrbitSegmentLength: 60
+  maxOrbitSegmentToAverageRatio: 4
+  maxOrbitSharpTurnDegrees: 120
+  maxOrbitSharpTurnRatio: 0.35
 --- !u!4 &1594385739
 Transform:
   m_ObjectHideFlags: 0

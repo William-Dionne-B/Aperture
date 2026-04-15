@@ -10,6 +10,8 @@ public class SpaceTimeController : MonoBehaviour
     public float defaultMass = 1f;
 
     Material mat;
+    readonly Vector4[] cachedPositions = new Vector4[MaxMasses];
+    readonly float[] cachedValues = new float[MaxMasses];
 
     void Start()
     {
@@ -23,15 +25,13 @@ public class SpaceTimeController : MonoBehaviour
             return;
         }
 
-        Vector4[] positions = new Vector4[MaxMasses];
-        float[] values = new float[MaxMasses];
         int count = useAllGravityBodies
-            ? FillFromGravityBodies(positions, values)
-            : FillFromManualSources(positions, values);
+            ? FillFromGravityBodies(cachedPositions, cachedValues)
+            : FillFromManualSources(cachedPositions, cachedValues);
 
         mat.SetInt("_MassCount", count);
-        mat.SetVectorArray("_MassPositions", positions);
-        mat.SetFloatArray("_MassValues", values);
+        mat.SetVectorArray("_MassPositions", cachedPositions);
+        mat.SetFloatArray("_MassValues", cachedValues);
     }
 
     int FillFromGravityBodies(Vector4[] positions, float[] values)

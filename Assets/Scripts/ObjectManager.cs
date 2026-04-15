@@ -49,6 +49,8 @@ public class ObjectManager : MonoBehaviour
     private GameObject buttonPrefab;
     private Dictionary<GameObject, GameObject> objectToButtonMap = new Dictionary<GameObject, GameObject>();
     private List<ObjectProperties> lastFrameObjects = new List<ObjectProperties>();
+    private float objectListRefreshInterval = 0.5f;
+    private float objectListRefreshTimer = 0f;
 
     // --- Preview layer logic ---
     private const int SelectionLayer = 31; // couche temporaire utilis�e pour la pr�visualisation
@@ -240,54 +242,64 @@ public class ObjectManager : MonoBehaviour
     {
         if (listContent == null) return;
 
-        ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
-        bool listChanged = allObjectsInScene.Length != lastFrameObjects.Count;
-        
-        if (!listChanged)
+        objectListRefreshTimer += Time.unscaledDeltaTime;
+        bool shouldRefreshMembership = objectListRefreshTimer >= objectListRefreshInterval;
+        if (shouldRefreshMembership)
         {
-            for (int i = 0; i < allObjectsInScene.Length; i++)
-            {
-                if (allObjectsInScene[i] != lastFrameObjects[i])
-                {
-                    listChanged = true;
-                    break;
-                }
-            }
+            objectListRefreshTimer = 0f;
         }
 
-        if (listChanged)
+        if (shouldRefreshMembership)
         {
-            foreach (Transform child in listContent) Destroy(child.gameObject);
-            objectToButtonMap.Clear();
+            ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
+            bool listChanged = allObjectsInScene.Length != lastFrameObjects.Count;
 
-            float yOffset = initialYOffset;
-            foreach (ObjectProperties objProps in allObjectsInScene)
+            if (!listChanged)
             {
-                if (objProps == null) continue;
-
-                GameObject buttonInstance = Instantiate(buttonPrefab, listContent);
-                buttonInstance.SetActive(true);
-
-                RectTransform buttonRect = buttonInstance.GetComponent<RectTransform>();
-                buttonRect.anchoredPosition = new Vector2(0, yOffset);
-                yOffset -= 55; 
-
-                TextMeshProUGUI textComponent = buttonInstance.GetComponentInChildren<TextMeshProUGUI>();
-                if (textComponent != null) textComponent.text = objProps.objectName;
-
-                Button buttonComponent = buttonInstance.GetComponent<Button>();
-                if (buttonComponent != null)
+                for (int i = 0; i < allObjectsInScene.Length; i++)
                 {
-                    GameObject objToSelect = objProps.gameObject;
-                    if (objProps.transform.parent != null) objToSelect = objProps.transform.parent.gameObject;
-                    buttonComponent.onClick.AddListener(() => SelectObject(objToSelect));
+                    if (allObjectsInScene[i] != lastFrameObjects[i])
+                    {
+                        listChanged = true;
+                        break;
+                    }
                 }
-
-                objectToButtonMap[objProps.gameObject] = buttonInstance;
             }
 
-            lastFrameObjects.Clear();
-            foreach (ObjectProperties objProps in allObjectsInScene) lastFrameObjects.Add(objProps);
+            if (listChanged)
+            {
+                foreach (Transform child in listContent) Destroy(child.gameObject);
+                objectToButtonMap.Clear();
+
+                float yOffset = initialYOffset;
+                foreach (ObjectProperties objProps in allObjectsInScene)
+                {
+                    if (objProps == null) continue;
+
+                    GameObject buttonInstance = Instantiate(buttonPrefab, listContent);
+                    buttonInstance.SetActive(true);
+
+                    RectTransform buttonRect = buttonInstance.GetComponent<RectTransform>();
+                    buttonRect.anchoredPosition = new Vector2(0, yOffset);
+                    yOffset -= 55;
+
+                    TextMeshProUGUI textComponent = buttonInstance.GetComponentInChildren<TextMeshProUGUI>();
+                    if (textComponent != null) textComponent.text = objProps.objectName;
+
+                    Button buttonComponent = buttonInstance.GetComponent<Button>();
+                    if (buttonComponent != null)
+                    {
+                        GameObject objToSelect = objProps.gameObject;
+                        if (objProps.transform.parent != null) objToSelect = objProps.transform.parent.gameObject;
+                        buttonComponent.onClick.AddListener(() => SelectObject(objToSelect));
+                    }
+
+                    objectToButtonMap[objProps.gameObject] = buttonInstance;
+                }
+
+                lastFrameObjects.Clear();
+                foreach (ObjectProperties objProps in allObjectsInScene) lastFrameObjects.Add(objProps);
+            }
         }
 
         foreach (var kvp in objectToButtonMap)
