@@ -41,6 +41,14 @@ public class ObjectManager : MonoBehaviour
     public GameObject surface_gravity;
     public GameObject temperature;
 
+    [Header("Boutons ×10 / ÷10")]
+    public Button massMultiply10Button;
+    public Button massDivide10Button;
+    public Button speedMultiply10Button;
+    public Button speedDivide10Button;
+    public Button radiusMultiply10Button;
+    public Button radiusDivide10Button;
+
     private float initialYOffset = 95f;
     private RawImage selectionRawImage;
     public float cameraPadding = 1.5f;
@@ -95,6 +103,7 @@ public class ObjectManager : MonoBehaviour
 
         InitializeListUI();
         InitializeCameraFocusButton();
+        InitializeMultiplierButtons();
         updateUIVisibility();
     }
 
@@ -103,6 +112,49 @@ public class ObjectManager : MonoBehaviour
         if (CameraFocusButton == null) return;
         Button button = CameraFocusButton.GetComponent<Button>();
         if (button != null) button.onClick.AddListener(FocusMainCameraOnSelection);
+    }
+
+    void InitializeMultiplierButtons()
+    {
+        if (massMultiply10Button != null) massMultiply10Button.onClick.AddListener(OnMassMultiply10);
+        if (massDivide10Button != null) massDivide10Button.onClick.AddListener(OnMassDivide10);
+
+        if (speedMultiply10Button != null) speedMultiply10Button.onClick.AddListener(OnSpeedMultiply10);
+        if (speedDivide10Button != null) speedDivide10Button.onClick.AddListener(OnSpeedDivide10);
+
+        if (radiusMultiply10Button != null) radiusMultiply10Button.onClick.AddListener(OnRadiusMultiply10);
+        if (radiusDivide10Button != null) radiusDivide10Button.onClick.AddListener(OnRadiusDivide10);
+    }
+
+    void OnMassMultiply10()   => MultiplyMass(10f);
+    void OnMassDivide10()     => MultiplyMass(0.1f);
+    void OnSpeedMultiply10()  => MultiplySpeed(10f);
+    void OnSpeedDivide10()    => MultiplySpeed(0.1f);
+    void OnRadiusMultiply10() => MultiplyRadius(10f);
+    void OnRadiusDivide10()   => MultiplyRadius(0.1f);
+
+    void MultiplyMass(float factor)
+    {
+        var props = selection?.GetComponent<ObjectProperties>();
+        if (props == null) return;
+        props.mass *= factor;
+        updateUIVisibility();
+    }
+
+    void MultiplySpeed(float factor)
+    {
+        var props = selection?.GetComponent<ObjectProperties>();
+        if (props == null) return;
+        props.speedMagnitude *= factor;
+        updateUIVisibility();
+    }
+
+    void MultiplyRadius(float factor)
+    {
+        var props = selection?.GetComponent<ObjectProperties>();
+        if (props == null) return;
+        props.radius *= factor;
+        updateUIVisibility();
     }
 
     void FocusMainCameraOnSelection()
@@ -707,6 +759,14 @@ public class ObjectManager : MonoBehaviour
         RestoreSelectionLayers();
         if (tmpDropdown != null) tmpDropdown.onValueChanged.RemoveAllListeners();
         if (legacyDropdown != null) legacyDropdown.onValueChanged.RemoveAllListeners();
+
+        // remove multiplier listeners
+        if (massMultiply10Button != null) massMultiply10Button.onClick.RemoveListener(OnMassMultiply10);
+        if (massDivide10Button != null) massDivide10Button.onClick.RemoveListener(OnMassDivide10);
+        if (speedMultiply10Button != null) speedMultiply10Button.onClick.RemoveListener(OnSpeedMultiply10);
+        if (speedDivide10Button != null) speedDivide10Button.onClick.RemoveListener(OnSpeedDivide10);
+        if (radiusMultiply10Button != null) radiusMultiply10Button.onClick.RemoveListener(OnRadiusMultiply10);
+        if (radiusDivide10Button != null) radiusDivide10Button.onClick.RemoveListener(OnRadiusDivide10);
     }
 
     // --- Layer helper methods ---
