@@ -3,10 +3,20 @@ using UnityEngine.SceneManagement;
 
 public static class SpaceTimeGridBootstrap
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void EnsureGridExists()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void RegisterSceneLoadHook()
     {
-        Scene activeScene = SceneManager.GetActiveScene();
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        EnsureGridExists(scene);
+    }
+
+    private static void EnsureGridExists(Scene activeScene)
+    {
         if (!activeScene.IsValid() || activeScene.name != "SystemeSolaire")
         {
             return;
