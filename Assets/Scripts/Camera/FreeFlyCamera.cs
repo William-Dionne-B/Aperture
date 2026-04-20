@@ -19,6 +19,11 @@ public class FreeFlyCamera : MonoBehaviour
     public KeyCode unlockCursorKey = KeyCode.Tab;
     public KeyCode speedUp = KeyCode.UpArrow;
     public KeyCode speedDown = KeyCode.DownArrow;
+    public KeyCode speed1 = KeyCode.Alpha1;
+    public KeyCode speed2 = KeyCode.Alpha2;
+    public KeyCode speed3 = KeyCode.Alpha3;
+    public KeyCode speed4 = KeyCode.Alpha4;
+    public KeyCode speed5 = KeyCode.Alpha5;
 
     [Header("References")]
     public Camera playerCamera;
@@ -96,7 +101,7 @@ public class FreeFlyCamera : MonoBehaviour
         {
             ChangerFieldOfView(Mathf.Clamp(playerCamera.fieldOfView + (scroll * -50f), 30f, 110f));
         }
-
+        
         if (Input.GetKey(speedUp))
         {
             float newSpeed = moveSpeed + (100f * Time.unscaledDeltaTime);
@@ -107,6 +112,31 @@ public class FreeFlyCamera : MonoBehaviour
         {
             float newSpeed = moveSpeed - (100f * Time.unscaledDeltaTime);
             ChangerVitesse(Mathf.Clamp(newSpeed, 10f, 500f));
+        }
+        
+        if (Input.GetKey(speed1))
+        {
+            ChangerVitesse(Mathf.Clamp(5, 5f, 500f));
+        }
+        
+        if (Input.GetKey(speed2))
+        {
+            ChangerVitesse(Mathf.Clamp(10, 5f, 500f));
+        }
+        
+        if (Input.GetKey(speed3))
+        {
+            ChangerVitesse(Mathf.Clamp(55, 5f, 500f));
+        }
+        
+        if (Input.GetKey(speed4))
+        {
+            ChangerVitesse(Mathf.Clamp(105, 5f, 500f));
+        }
+        
+        if (Input.GetKey(speed5))
+        {
+            ChangerVitesse(Mathf.Clamp(250, 10f, 500f));
         }
     }
     
