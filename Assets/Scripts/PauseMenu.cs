@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -14,11 +16,13 @@ public class PauseMenu : MonoBehaviour
     public GameObject keysMenuUI;
     public GameObject audioMenuUI;
     public GameObject timeMenuUI;
+    public GameObject timeScrollMenuUI;
 
     [Header("Options UI Elements")] 
     public Slider fieldOfViewSlider;
     public Slider mouseSensitivitySlider;
-    public Slider speedSlider;
+    public Slider simulationSpeedSlider;
+    public TextMeshProUGUI speedValueText;
     
     [Header("Icones du Bouton Pause")]
     public Image boutonSimulationImage;
@@ -27,6 +31,7 @@ public class PauseMenu : MonoBehaviour
     
     [Header("External Scripts")]
     public FreeFlyCamera cameraScript;
+    public TimeManager timeManager;
     
     public static bool isMenuOpen = false; 
     public static bool isSimulationPaused = false; 
@@ -42,81 +47,101 @@ public class PauseMenu : MonoBehaviour
         if (fieldOfViewSlider != null && cameraScript != null)
             fieldOfViewSlider.value = PlayerPrefs.GetFloat("FieldOfView", 60f);
 
-        if (speedSlider != null && cameraScript != null)
-            speedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 100f);
+        if (simulationSpeedSlider != null && cameraScript != null)
+            simulationSpeedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 100f);
+        
+        if (simulationSpeedSlider != null)
+        {
+            simulationSpeedSlider.value = TimeManager.currentSpeedMultiplier;
+            simulationSpeedSlider.onValueChanged.AddListener(delegate { OnSpeedSliderChanged(); });
+        }
         
         DesactivateAllMenus();
     }
 
     void Update()
     {
-        // 1. Touche ÉCHAP (Menu)
+        UpdateSpeedText();
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Navigation "Retour" : on recule d'un menu à la fois
             if (keysMenuUI != null && keysMenuUI.activeSelf || audioMenuUI != null && audioMenuUI.activeSelf) 
-            {
                 OpenOptions();
-            }
             else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf) 
-            {
                 OpenPauseMenu();
-            }
             else if (isMenuOpen) 
-            {
                 Resume(); 
-            }
             else 
-            {
                 Pause(); 
-            }
         }
-        
-        // 2. Touche ESPACE (Simulation) - Uniquement si menu fermé
-        else if (Input.GetKeyDown(KeyCode.Space) && !isMenuOpen)
+        else if (!isMenuOpen)
         {
-            ToggleSimulation();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                ToggleSimulation();
+            }
+
+            HandleKeyboardSpeedControl();
         }
     }
-    // {
-    //     if (Input.GetKeyDown(KeyCode.Escape))
-    //     {
-    //         if (keysMenuUI.activeSelf || audioMenuUI.activeSelf) OpenOptions();
-    //         else if (optionMenuUI.activeSelf || guideMenuUI.activeSelf) OpenPauseMenu();
-    //         else if (isMenuOpen) Resume(); 
-    //         else Pause(); 
-    //     }
-    //     
-    //     else if (Input.GetKeyDown(KeyCode.Space))
-    //     {
-    //         if (isMenuOpen)
-    //         {
-    //             Resume();
-    //         }
-    //         else
-    //         {
-    //             ToggleSimulationTime();
-    //         }
-    //     }
-    // }
 
+    // --- LOGIQUE DE VITESSE ---
+
+    /// <summary>
+    /// Permet de modifier la valeur du slider avec les flèches directionnelles.
+    /// </summary>
+    private void HandleKeyboardSpeedControl()
+    {
+        if (simulationSpeedSlider == null) return;
+
+        float step = 1.0f;
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            simulationSpeedSlider.value += step;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            simulationSpeedSlider.value -= step;
+        }
+    }
+    
+    public void OnSpeedSliderChanged()
+    {
+        if (timeManager != null && simulationSpeedSlider != null)
+        {
+            timeManager.SetSpeedMultiplier(simulationSpeedSlider.value);
+        }
+    }
+
+    private void UpdateSpeedText()
+    {
+        if (speedValueText != null)
+        {
+            // Affiche la vitesse mémorisée dans le TimeManager
+            float displaySpeed = TimeManager.currentSpeedMultiplier;
+            speedValueText.text = "Vitesse: x" + displaySpeed.ToString("F1");
+        }
+    }
+    
     // ==========================================
     // CONTRÔLE DU TEMPS DE SIMULATION (ESPACE)
     // ==========================================
     
     public void ToggleSimulation()
     {
-        isSimulationPaused = !isSimulationPaused; // Inverse l'état
+        isSimulationPaused = !isSimulationPaused;
 
         if (isSimulationPaused)
         {
             TimeManager.Pause();
-            boutonSimulationImage.sprite = spritePlay; // On affiche Play car c'est en pause
+            if (boutonSimulationImage != null) boutonSimulationImage.sprite = spritePlay;
         }
         else
         {
             TimeManager.Resume();
-            boutonSimulationImage.sprite = spritePause; // On affiche Pause car ça tourne
+            if (boutonSimulationImage != null) boutonSimulationImage.sprite = spritePause;
         }
     }
 
@@ -131,18 +156,11 @@ public class PauseMenu : MonoBehaviour
     public void Resume()
     {
         DesactivateAllMenus();
-        
         if (timeMenuUI != null) timeMenuUI.SetActive(true);
+        if (timeScrollMenuUI != null) timeScrollMenuUI.SetActive(true);
         
-        // CORRECTION : On utilise le TimeManager pour restaurer la VRAIE vitesse
-        if (isSimulationPaused)
-        {
-            TimeManager.Pause();
-        }
-        else
-        {
-            TimeManager.Resume();
-        }
+        if (isSimulationPaused) TimeManager.Pause();
+        else TimeManager.Resume();
         
         isMenuOpen = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -154,12 +172,10 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Pause()
     {
-        pauseMenuUI.SetActive(true);
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
         if (timeMenuUI != null) timeMenuUI.SetActive(false);
         
-        // On force le gel absolu pendant qu'on est dans les options
         TimeManager.Pause(); 
-        
         isMenuOpen = true;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -202,7 +218,7 @@ public class PauseMenu : MonoBehaviour
         {
             if (fieldOfViewSlider != null) fieldOfViewSlider.value = cameraScript.playerCamera.fieldOfView;
             if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = cameraScript.mouseSensitivity;
-            if (speedSlider != null) speedSlider.value = cameraScript.moveSpeed;
+            if (simulationSpeedSlider != null) simulationSpeedSlider.value = cameraScript.moveSpeed;
         }
     }
 
@@ -223,7 +239,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (fieldOfViewSlider != null) fieldOfViewSlider.value = 60f;
         if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = 3.5f;
-        if (speedSlider != null) speedSlider.value = 100f;
+        if (simulationSpeedSlider != null) simulationSpeedSlider.value = 100f;
         
         Debug.Log("Paramètres réinitialisés aux valeurs par défaut !");
     }
@@ -244,10 +260,10 @@ public class PauseMenu : MonoBehaviour
                 cameraScript.playerCamera.fieldOfView = fieldOfViewSlider.value;
             }
 
-            if (speedSlider != null)
+            if (simulationSpeedSlider != null)
             {
-                PlayerPrefs.SetFloat("MoveSpeed", speedSlider.value);
-                cameraScript.moveSpeed = speedSlider.value;
+                PlayerPrefs.SetFloat("MoveSpeed", simulationSpeedSlider.value);
+                cameraScript.moveSpeed = simulationSpeedSlider.value;
             }
 
             PlayerPrefs.Save();
