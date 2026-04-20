@@ -126,16 +126,23 @@ public class PauseMenu : MonoBehaviour
     // ==========================================
 
     /// <summary>
-    /// Ferme le menu Échap et relance le moteur Unity, SANS toucher à l'état de la simulation.
+    /// Ferme le menu Échap et relance le moteur Unity, en respectant le multiplicateur de vitesse.
     /// </summary>
     public void Resume()
     {
-        // LA CORRECTION EST ICI : On désactive tous les sous-menus possibles
         DesactivateAllMenus();
         
         if (timeMenuUI != null) timeMenuUI.SetActive(true);
         
-        Time.timeScale = isSimulationPaused ? 0f : 1f;
+        // CORRECTION : On utilise le TimeManager pour restaurer la VRAIE vitesse
+        if (isSimulationPaused)
+        {
+            TimeManager.Pause();
+        }
+        else
+        {
+            TimeManager.Resume();
+        }
         
         isMenuOpen = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -143,26 +150,19 @@ public class PauseMenu : MonoBehaviour
     }
 
     /// <summary>
-    /// Ouvre le menu Échap et fige tout le moteur Unity.
+    /// Ouvre le menu Échap et fige tout le moteur Unity de force.
     /// </summary>
     public void Pause()
     {
         pauseMenuUI.SetActive(true);
-        timeMenuUI.SetActive(false);
+        if (timeMenuUI != null) timeMenuUI.SetActive(false);
         
-        Time.timeScale = 0f;
+        // On force le gel absolu pendant qu'on est dans les options
+        TimeManager.Pause(); 
+        
         isMenuOpen = true;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-    }
-
-    /// <summary>
-    /// Ferme complètement l'application.
-    /// </summary>
-    public void QuitGame()
-    {
-        Debug.Log("Ending Simulator !");
-        MainMenuManager.loadScene("MenuAccueil");
     }
 
     // ==========================================

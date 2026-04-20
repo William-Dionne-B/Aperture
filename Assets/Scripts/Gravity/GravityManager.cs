@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -23,6 +23,7 @@ public class GravityManager : MonoBehaviour
     public float maxOrbitSegmentToAverageRatio = 4f;
     public float maxOrbitSharpTurnDegrees = 120f;
     public float maxOrbitSharpTurnRatio = 0.35f;
+    private float predictionTimer = 0f;
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
     public static IReadOnlyList<GravityBody> Bodies => bodies;
@@ -37,11 +38,18 @@ public class GravityManager : MonoBehaviour
 
     void Update()
     {
-        foreach (var body in bodies)
+        predictionTimer += Time.unscaledDeltaTime; 
+        
+        if (predictionTimer >= 0.06f) 
         {
-            if (body != null && body.line != null)
+            predictionTimer = 0f;
+            
+            foreach (var body in bodies)
             {
-                PredictOrbitHybrid(body);
+                if (body != null && body.line != null)
+                {
+                    PredictOrbitHybrid(body);
+                }
             }
         }
     }
@@ -52,7 +60,8 @@ public class GravityManager : MonoBehaviour
         
         if (speed > 0f)
         {
-            Time.fixedDeltaTime = 0.02f / speed; 
+            float physicsResolution = Mathf.Clamp(speed / 3f, 1f, 4f);
+            Time.fixedDeltaTime = 0.02f * physicsResolution;
         }
         
         Debug.Log("Simulation speed set to " + speed + "x");

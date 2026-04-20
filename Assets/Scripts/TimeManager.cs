@@ -6,19 +6,42 @@ using UnityEngine;
 /// </summary>
 public class TimeManager : MonoBehaviour
 {
+    // On mémorise la vitesse choisie par le joueur (par défaut 1x)
+    public static float currentSpeedMultiplier = 1f;
+
     // ==========================================
-    // CONTRÔLE DU TEMPS ACTUEL (Option 1)
+    // CONTRÔLE DYNAMIQUE (Pour tes Sliders / Boutons UI)
+    // ==========================================
+
+    /// <summary>
+    /// À connecter sur un Slider UI ou des boutons (ex: 0.5f, 1f, 2f, 10f)
+    /// </summary>
+    public void SetSpeedMultiplier(float newSpeed)
+    {
+        currentSpeedMultiplier = newSpeed;
+
+        // On applique la nouvelle vitesse UNIQUEMENT si le jeu n'est pas en pause
+        if (!PauseMenu.isSimulationPaused && !PauseMenu.isMenuOpen)
+        {
+            ApplySpeed(currentSpeedMultiplier);
+        }
+    }
+
+    // Boutons UI rapides pour te faciliter la vie
+    public void SetSpeedNormal() { SetSpeedMultiplier(1f); }
+    public void SetSpeedFast() { SetSpeedMultiplier(5f); }
+    public void SetSpeedUltra() { SetSpeedMultiplier(10f); }
+
+    // ==========================================
+    // GESTION DES PAUSES (Appelé par PauseMenu)
     // ==========================================
     
     /// <summary>
-    /// Remet la vitesse de la simulation à la normale (x1).
+    /// Relance la simulation à la vitesse mémorisée.
     /// </summary>
     public static void Resume()
     {
-        if (GravityManager.Instance != null)
-        {
-            GravityManager.Instance.SetSimulationSpeed(1f);
-        }
+        ApplySpeed(currentSpeedMultiplier);
     }
 
     /// <summary>
@@ -26,50 +49,14 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     public static void Pause()
     {
-        if  (GravityManager.Instance != null)
-        {
-            GravityManager.Instance.SetSimulationSpeed(0f);
-        }
+        ApplySpeed(0f);
     }
 
-    /// <summary>
-    /// Accélère la simulation physique (x10).
-    /// </summary>
-    public void SetFastForward()
+    private static void ApplySpeed(float speed)
     {
         if (GravityManager.Instance != null)
         {
-            GravityManager.Instance.SetSimulationSpeed(10f);
+            GravityManager.Instance.SetSimulationSpeed(speed);
         }
-    }
-
-    // =========================================================
-    // FONCTIONNALITÉS EN ATTENTE POUR L'OPTION 2
-    // =========================================================
-    
-    /// <summary>
-    /// [DÉSACTIVÉ] Fera reculer le temps de la simulation.
-    /// Incompatible avec le système Rigidbody actuel.
-    /// </summary>
-    public void SetFastBackward()
-    {
-        Debug.LogWarning("Le retour en arrière est désactivé avec le moteur physique actuel. Prévu pour plus tard !");
-    }
-
-    public void SkipOneSecond() { Skip(1f); }
-    public void SkipFiveSeconds() { Skip(5f); }
-    public void SkipTenSeconds() { Skip(10f); }
-    
-    public void GoBackOneSecond() { Skip(-1f); }
-    public void GoBackFiveSeconds() { Skip(-5f); }
-    public void GoBackTenSeconds() { Skip(-10f); }
-
-    /// <summary>
-    /// [DÉSACTIVÉ] Fonction centrale pour sauter dans le temps.
-    /// </summary>
-    private void Skip(float seconds)
-    {
-        Debug.LogWarning("Les sauts dans le temps sont incompatibles avec les Rigidbodies pour l'instant. Fonction désactivée.");
-        
     }
 }
