@@ -21,7 +21,7 @@ public class ObjectProperties : MonoBehaviour
     
     [FormerlySerializedAs("mass")] 
     [SerializeField]
-    private float mass = 1f;
+    public float mass = 1f;
 
     public float Mass
     {

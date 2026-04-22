@@ -66,7 +66,7 @@ public class SystemeSauvegarde : MonoBehaviour
                 temperatureMagnitude = props.temperatureMagnitude,
                 periode = props.periode,
                 density = props.density,
-                etoileParentId = props.EtoileParent.GetComponent<PlanetID>().id,
+                etoileParent = props.EtoileParent != null ? props.EtoileParent.name : "",
 
                 albedo = props.albedo,
                 greenhouseEffect = props.greenhouseEffect
@@ -153,11 +153,10 @@ public class SystemeSauvegarde : MonoBehaviour
 
         foreach (var dataBodies in data.bodies)
         {
-            if (string.IsNullOrEmpty(dataBodies.etoileParentId)) continue;
+            if (string.IsNullOrEmpty(dataBodies.etoileParent)) continue;
 
-            if (!string.IsNullOrEmpty(dataBodies.etoileParentId) &&
-                spawned.TryGetValue(dataBodies.id, out GameObject obj) &&
-                spawned.TryGetValue(dataBodies.etoileParentId, out GameObject parent))
+                if (spawned.TryGetValue(dataBodies.objectName, out GameObject obj) &&
+                spawned.TryGetValue(dataBodies.etoileParent, out GameObject parent))
             {
                 obj.GetComponent<ObjectProperties>().EtoileParent = parent;
             }

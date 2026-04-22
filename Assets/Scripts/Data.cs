@@ -21,7 +21,7 @@ public class BodyData
     public float temperatureMagnitude;
     public float periode;
     public float density;
-    public string etoileParentId;
+    public string etoileParent;
 
     public float albedo;
     public float greenhouseEffect;
