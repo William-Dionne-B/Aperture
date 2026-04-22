@@ -245,7 +245,7 @@ public class PauseMenu : MonoBehaviour
         if (guideMenuUI != null) guideMenuUI.SetActive(false);
         if (keysMenuUI != null) keysMenuUI.SetActive(false);
         if (audioMenuUI != null) audioMenuUI.SetActive(false);
-        Resume();
+        //Resume();
     }
 
     // ==========================================
