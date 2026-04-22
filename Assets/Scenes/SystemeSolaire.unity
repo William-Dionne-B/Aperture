@@ -4139,7 +4139,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 743fb373d19261d4e9de73b6812ea8b3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a6782f947fbda094d938d8ed38b1cdc3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4193,9 +4193,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 1312f4019920e89439dacf79b93e25b0, type: 3}
-        m_TargetAssemblyTypeName: TimeManager, Assembly-CSharp
-        m_MethodName: 
+      - m_Target: {fileID: 1724912030}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: ToggleSimulation
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
