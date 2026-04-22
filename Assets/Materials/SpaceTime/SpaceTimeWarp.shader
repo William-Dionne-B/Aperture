@@ -33,7 +33,7 @@ Shader "Unlit/SpaceTimeWarp"
 
             #include "UnityCG.cginc"
 
-            #define MAX_MASSES 10
+            #define MAX_MASSES 64
 
             float _Strength;
             float _Falloff;

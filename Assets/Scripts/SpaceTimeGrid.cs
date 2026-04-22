@@ -7,10 +7,11 @@ using UnityEngine.Rendering;
 public class SpaceTimeGrid : MonoBehaviour
 {
     public int resolution = 200;
-    public float size = 500f;
+    public float size = 1500f;
     public float maxWarpDepth = 2000f;
     public float gridCellWorldSize = 500f;
     public float gridVerticalOffset = -0.5f;
+    public bool followCenterOfMassY = true;
     public bool followCamera = true;
     public Transform cameraTarget;
     public Color lineColor = new Color(0.45f, 0.45f, 0.45f, 0.28f);
@@ -114,33 +115,41 @@ public class SpaceTimeGrid : MonoBehaviour
     void ApplyVerticalOffset()
     {
         Vector3 position = transform.position;
-        position.y = gridVerticalOffset;
+        position.y = ResolveGridY();
         transform.position = position;
     }
 
     void ApplyCameraFollow()
     {
-        if (!followCamera)
-        {
-            return;
-        }
-
-        Transform target = cameraTarget;
-        if (target == null && Camera.main != null)
-        {
-            target = Camera.main.transform;
-        }
-
-        if (target == null)
-        {
-            return;
-        }
-
         Vector3 position = transform.position;
-        position.x = target.position.x;
-        position.z = target.position.z;
-        position.y = gridVerticalOffset;
+
+        if (followCamera)
+        {
+            Transform target = cameraTarget;
+            if (target == null && Camera.main != null)
+            {
+                target = Camera.main.transform;
+            }
+
+            if (target != null)
+            {
+                position.x = target.position.x;
+                position.z = target.position.z;
+            }
+        }
+
+        position.y = ResolveGridY();
         transform.position = position;
+    }
+
+    float ResolveGridY()
+    {
+        if (!followCenterOfMassY)
+        {
+            return gridVerticalOffset;
+        }
+
+        return GravityManager.GetCenterOfMass().y + gridVerticalOffset;
     }
 
     void ApplyGridMaterialSettings()
