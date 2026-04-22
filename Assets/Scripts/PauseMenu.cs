@@ -86,6 +86,11 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    public void QuitGame()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MenuAccueil");
+    }
+
     // --- LOGIQUE DE VITESSE ---
 
     /// <summary>
