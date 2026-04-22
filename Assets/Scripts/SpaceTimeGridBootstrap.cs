@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public static class SpaceTimeGridBootstrap
 {
+    private const string SpaceTimeWarpShaderName = "Unlit/SpaceTimeWarp";
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void RegisterSceneLoadHook()
     {
@@ -35,7 +37,7 @@ public static class SpaceTimeGridBootstrap
         gridObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = gridObject.AddComponent<MeshRenderer>();
 
-        Shader warpShader = Shader.Find("Unlit/SpaceTimeWarp");
+        Shader warpShader = Shader.Find(SpaceTimeWarpShaderName);
         if (warpShader != null)
         {
             Material runtimeMaterial = new Material(warpShader)
@@ -43,6 +45,21 @@ public static class SpaceTimeGridBootstrap
                 name = "SpaceTimeWarp (Runtime)"
             };
             meshRenderer.sharedMaterial = runtimeMaterial;
+        }
+        else
+        {
+            Shader fallbackShader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (fallbackShader != null)
+            {
+                Material fallbackMaterial = new Material(fallbackShader)
+                {
+                    name = "SpaceTimeGridFallback (Runtime)"
+                };
+                fallbackMaterial.SetColor("_BaseColor", new Color(0.45f, 0.45f, 0.45f, 0.28f));
+                meshRenderer.sharedMaterial = fallbackMaterial;
+            }
+
+            Debug.LogError($"SpaceTimeGridBootstrap: shader '{SpaceTimeWarpShaderName}' not found at runtime. Check shader inclusion in build settings.");
         }
 
         SpaceTimeGrid grid = gridObject.AddComponent<SpaceTimeGrid>();
