@@ -281,7 +281,7 @@ MonoBehaviour:
   objectName: Sol
   isOrbitalBody: 0
   speedMagnitude: 0
-  _mass: 1000000
+  mass: 1000000
   radius: 50.1
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -314,6 +314,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
   heightOffsetPercentage: 0.65
+  minTopOffset: 0.5
+  cameraOffsetPercentage: 0.35
+  minSurfacePadding: 0.2
+  closeRangeBoostDistance: 8
+  closeRangeBoostFactor: 0.1
   minScale: 0.5
   maxScale: 50
   scaleMultiplier: 0.1
