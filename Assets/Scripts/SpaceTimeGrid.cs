@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 public class SpaceTimeGrid : MonoBehaviour
 {
     public int resolution = 200;
-    public float size = 500f;
+    public float size = 1500f;
     public float maxWarpDepth = 2000f;
     public float gridCellWorldSize = 500f;
     public float gridVerticalOffset = -0.5f;
