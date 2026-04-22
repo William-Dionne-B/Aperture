@@ -1,8 +1,9 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class SpaceTimeController : MonoBehaviour
 {
-    const int MaxMasses = 10;
+    const int MaxMasses = 64;
 
     [Header("Configuration")]
     [Tooltip("Si coché, utilise automatiquement tous les astres du GravityManager")]
@@ -44,6 +45,7 @@ public class SpaceTimeController : MonoBehaviour
     int FillFromGravityBodies(Vector4[] positions, float[] values)
     {
         int count = 0;
+        HashSet<int> seenTransforms = new HashSet<int>();
         var bodies = GravityManager.Bodies;
 
         for (int i = 0; i < bodies.Count && count < MaxMasses; i++)
@@ -54,12 +56,64 @@ public class SpaceTimeController : MonoBehaviour
                 continue;
             }
 
-            positions[count] = body.transform.position;
-            values[count] = ResolveMassFromBody(body);
-            count++;
+            AddMassSource(body.transform, ResolveMassFromBody(body), positions, values, seenTransforms, ref count);
+        }
+
+        if (count < MaxMasses)
+        {
+            ObjectProperties[] objectsWithMass = FindObjectsOfType<ObjectProperties>();
+            for (int i = 0; i < objectsWithMass.Length && count < MaxMasses; i++)
+            {
+                ObjectProperties source = objectsWithMass[i];
+                if (source == null)
+                {
+                    continue;
+                }
+
+                float mass = source.Mass;
+                if (mass <= 0f)
+                {
+                    continue;
+                }
+
+                AddMassSource(source.transform, mass, positions, values, seenTransforms, ref count);
+            }
+        }
+
+        if (count < MaxMasses)
+        {
+            Rigidbody[] rigidbodies = FindObjectsOfType<Rigidbody>();
+            for (int i = 0; i < rigidbodies.Length && count < MaxMasses; i++)
+            {
+                Rigidbody rb = rigidbodies[i];
+                if (rb == null || rb.mass <= 0f)
+                {
+                    continue;
+                }
+
+                AddMassSource(rb.transform, rb.mass, positions, values, seenTransforms, ref count);
+            }
         }
 
         return count;
+    }
+
+    void AddMassSource(Transform source, float mass, Vector4[] positions, float[] values, HashSet<int> seenTransforms, ref int count)
+    {
+        if (source == null || mass <= 0f || count >= MaxMasses)
+        {
+            return;
+        }
+
+        int instanceId = source.GetInstanceID();
+        if (!seenTransforms.Add(instanceId))
+        {
+            return;
+        }
+
+        positions[count] = source.position;
+        values[count] = mass;
+        count++;
     }
 
     int FillFromManualSources(Vector4[] positions, float[] values)
