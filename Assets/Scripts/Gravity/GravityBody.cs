@@ -6,8 +6,8 @@ public class GravityBody : MonoBehaviour
     [Header("Initial Motion")]
     public Vector3 initialVelocity;
     public bool applyInitialVelocity = true;
-    
-    [HideInInspector]public float Mass = 1f;
+
+    [HideInInspector] public float Mass = 1f;
     [HideInInspector] public Rigidbody rb;
     [HideInInspector] public LineRenderer line;
 
