@@ -21,6 +21,7 @@ public class PauseMenu : MonoBehaviour
     [Header("Options UI Elements")] 
     public Slider fieldOfViewSlider;
     public Slider mouseSensitivitySlider;
+    public Slider movementSpeedSlider;
     public Slider simulationSpeedSlider;
     public TextMeshProUGUI speedValueText;
     
@@ -47,8 +48,8 @@ public class PauseMenu : MonoBehaviour
         if (fieldOfViewSlider != null && cameraScript != null)
             fieldOfViewSlider.value = PlayerPrefs.GetFloat("FieldOfView", 60f);
 
-        if (simulationSpeedSlider != null && cameraScript != null)
-            simulationSpeedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 100f);
+        if (movementSpeedSlider != null && cameraScript != null)
+            movementSpeedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 100f);
         
         if (simulationSpeedSlider != null)
         {
@@ -174,6 +175,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
         if (timeMenuUI != null) timeMenuUI.SetActive(false);
+        if (timeScrollMenuUI != null) timeScrollMenuUI.SetActive(false);
         
         TimeManager.Pause(); 
         isMenuOpen = true;
@@ -218,7 +220,7 @@ public class PauseMenu : MonoBehaviour
         {
             if (fieldOfViewSlider != null) fieldOfViewSlider.value = cameraScript.playerCamera.fieldOfView;
             if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = cameraScript.mouseSensitivity;
-            if (simulationSpeedSlider != null) simulationSpeedSlider.value = cameraScript.moveSpeed;
+            if (movementSpeedSlider != null) movementSpeedSlider.value = cameraScript.moveSpeed;
         }
     }
 
@@ -239,7 +241,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (fieldOfViewSlider != null) fieldOfViewSlider.value = 60f;
         if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = 3.5f;
-        if (simulationSpeedSlider != null) simulationSpeedSlider.value = 100f;
+        if (movementSpeedSlider != null) movementSpeedSlider.value = 100f;
         
         Debug.Log("Paramètres réinitialisés aux valeurs par défaut !");
     }
@@ -260,10 +262,10 @@ public class PauseMenu : MonoBehaviour
                 cameraScript.playerCamera.fieldOfView = fieldOfViewSlider.value;
             }
 
-            if (simulationSpeedSlider != null)
+            if (movementSpeedSlider != null)
             {
-                PlayerPrefs.SetFloat("MoveSpeed", simulationSpeedSlider.value);
-                cameraScript.moveSpeed = simulationSpeedSlider.value;
+                PlayerPrefs.SetFloat("MoveSpeed", movementSpeedSlider.value);
+                cameraScript.moveSpeed = movementSpeedSlider.value;
             }
 
             PlayerPrefs.Save();
