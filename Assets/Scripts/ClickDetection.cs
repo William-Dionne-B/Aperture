@@ -47,11 +47,19 @@ public class ClickDetection : MonoBehaviour
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (pendingDeselectionCoroutine != null)
-                        StopCoroutine(pendingDeselectionCoroutine);
+                    // Ne pas sélectionner si le pointeur est sur un élément UI (même transparent si il bloque les raycasts)
+                    if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                    {
+                        // Ignorer la sélection quand on clique sur l'UI
+                    }
+                    else
+                    {
+                        if (pendingDeselectionCoroutine != null)
+                            StopCoroutine(pendingDeselectionCoroutine);
 
-                    if (selectedObject != hitObj)
-                        selectedObject = hitObj;
+                        if (selectedObject != hitObj)
+                            selectedObject = hitObj;
+                    }
                 }
             }
         }
