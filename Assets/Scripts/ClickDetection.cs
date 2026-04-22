@@ -111,13 +111,13 @@ public class ClickDetection : MonoBehaviour
             sphere.transform.localPosition = Vector3.zero;
             sphere.transform.localRotation = Quaternion.identity;
 
-            float radius = GetObjectRadius(obj.gameObject);
+            float r = obj.gameObject.GetComponent<ObjectProperties>().radius;
 
             Destroy(sphere.GetComponent<MeshRenderer>());
 
             SphereCollider col = sphere.GetComponent<SphereCollider>();
             col.isTrigger = true;
-            col.radius = radius * 3.0f;
+            col.radius = r + 6.9f;
 
             sphere.layer = LayerMask.NameToLayer("Default");
         }

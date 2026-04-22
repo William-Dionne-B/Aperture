@@ -218,6 +218,8 @@ public class PlanetDestruction : MonoBehaviour
 
         if (loser != null)
         {
+            // détache ici toute caméra/anchor enfant de l'objet perdant
+            DetachCamerasParentedTo(loser);
             Destroy(loser);
         }
 
@@ -356,5 +358,47 @@ public class PlanetDestruction : MonoBehaviour
         }
 
         return 1f;
+    }
+
+    // Détache toute caméra ou anchor parentée à l'objet cible pour éviter de détruire la caméra.
+    void DetachCamerasParentedTo(GameObject target)
+    {
+        if (target == null) return;
+
+        // Détacher toutes les caméras qui sont enfants du target
+        Camera[] allCams = FindObjectsOfType<Camera>();
+        for (int i = 0; i < allCams.Length; i++)
+        {
+            var cam = allCams[i];
+            if (cam == null) continue;
+            if (cam.transform.IsChildOf(target.transform))
+            {
+                cam.transform.SetParent(null, true);
+            }
+        }
+
+        // Si un anchor nommé "MainCameraAnchor" est enfant du target, détacher ses enfants puis détruire l'anchor
+        GameObject mainAnchor = GameObject.Find("MainCameraAnchor");
+        if (mainAnchor != null && mainAnchor.transform.IsChildOf(target.transform))
+        {
+            // détacher les enfants (typiquement la MainCamera)
+            for (int i = mainAnchor.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = mainAnchor.transform.GetChild(i);
+                if (child != null)
+                    child.SetParent(null, true);
+            }
+            Destroy(mainAnchor);
+        }
+
+        // Nettoyer ClickDetection.selectedObject si la camera principale y fait référence
+        if (Camera.main != null)
+        {
+            var click = Camera.main.GetComponent<ClickDetection>();
+            if (click != null && click.selectedObject == target)
+            {
+                click.selectedObject = null;
+            }
+        }
     }
 }
