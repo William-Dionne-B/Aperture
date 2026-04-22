@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -20,16 +21,16 @@ public class ObjectProperties : MonoBehaviour
     
     [FormerlySerializedAs("mass")] 
     [SerializeField]
-    private float _mass = 1f;
+    public float mass = 1f;
 
     public float Mass
     {
-        get { return _mass; }
+        get { return mass; }
         set
         {
-            _mass = value;
-            if (thisRigidbody != null) thisRigidbody.mass = _mass;
-            if (thisGravityBody != null) thisGravityBody.Mass = _mass;
+            mass = value;
+            if (thisRigidbody != null) thisRigidbody.mass = mass;
+            if (thisGravityBody != null) thisGravityBody.Mass = mass;
         }
     }    
     
@@ -106,12 +107,12 @@ public class ObjectProperties : MonoBehaviour
         thisRigidbody = thisObject.GetComponent<Rigidbody>();
         thisGravityBody = thisObject.GetComponent<GravityBody>();
 
-        if (_mass <= 0) _mass = 1;
+        if (mass <= 0) mass = 1;
         if (distanceToEtoile < 0) distanceToEtoile = 0;
         if (speedMagnitude < 0) speedMagnitude = 0;
         if (radius <= 0) radius = 1;
         
-        Mass = _mass;
+        Mass = mass;
         
         if (string.IsNullOrEmpty(objectName)) objectName = thisObject.name;
         else thisObject.name = objectName;
@@ -127,7 +128,7 @@ public class ObjectProperties : MonoBehaviour
     {
         if (thisTransform != null) thisTransform.localScale = new Vector3(2 * radius, 2 * radius, 2 * radius);
 
-        if (thisGravityBody != null) thisGravityBody.Mass = _mass;
+        if (thisGravityBody != null) thisGravityBody.Mass = mass;
 
         EnsureStarRegistryState();
         TryConvertStarToBlackHole();
@@ -141,14 +142,19 @@ public class ObjectProperties : MonoBehaviour
         if (radius > 0 && GravityManager.Instance != null)
         {
             float vraiRayonEnMetres = radius * radiusToMetersScale;
-            float vraieMasseEnKg = _mass * unityToKgScale;
+            float vraieMasseEnKg = mass * unityToKgScale;
+
             float constanteGravitationnelle = GravityManager.G * GravityManager.Instance.gravityMultiplier;
-            
+
             gravityMagnitude = (constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres) / 1e9f;
         }
-        else gravityMagnitude = 0f;
-        
-        // --- DISTANCE & PÉRIODE ---
+
+        else
+        {
+            gravityMagnitude = 0f;
+        }
+
+        // Calcul de la distance à l'étoile parente
         if (EtoileParent != null && thisTransform != null)
         {
             Vector3 posEtoile = EtoileParent.transform.position;
@@ -160,7 +166,7 @@ public class ObjectProperties : MonoBehaviour
         else periode = 0f;
 
         // --- DENSITÉ ---
-        if (_mass > 0 && radius > 0) density = _mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
+        if (mass > 0 && radius > 0) density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
         else density = 0f;
 
         // --- THERMODYNAMIQUE ---
@@ -194,7 +200,7 @@ public class ObjectProperties : MonoBehaviour
         float massScale = Mathf.Max(unityToKgScale, 0.0001f);
         float blackHoleThreshold = (blackHoleFormationMassSolar * SolarMassKg) / massScale;
 
-        if (_mass < blackHoleThreshold)
+        if (mass < blackHoleThreshold)
         {
             return;
         }
@@ -252,13 +258,13 @@ public class ObjectProperties : MonoBehaviour
             blackHoleProperties.distanceToMetersScale = distanceToMetersScale;
             blackHoleProperties.albedo = albedo;
             blackHoleProperties.greenhouseEffect = greenhouseEffect;
-            blackHoleProperties.Mass = _mass;
+            blackHoleProperties.Mass = mass;
         }
 
         Rigidbody blackHoleBody = blackHoleObject.GetComponent<Rigidbody>();
         if (blackHoleBody != null)
         {
-            blackHoleBody.mass = _mass;
+            blackHoleBody.mass = mass;
             blackHoleBody.linearVelocity = velocity;
             blackHoleBody.angularVelocity = angularVelocity;
         }
@@ -331,7 +337,7 @@ public class ObjectProperties : MonoBehaviour
                 {
                     float vraieDistanceMetres = distUnity * distanceToMetersScale;
                     sommeEnergieStellaire += star.starLuminosity / (vraieDistanceMetres * vraieDistanceMetres);
-                }    
+                }
             }
 
             if (sommeEnergieStellaire > 0f)
@@ -346,6 +352,63 @@ public class ObjectProperties : MonoBehaviour
             else
             {
                 temperatureMagnitude = greenhouseEffect;
+                //TODO
+                // Calcul plus précis de la période orbitale (loi de Kepler)
+                if (EtoileParent != null && distanceToEtoile > 0)
+                {
+                    GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
+
+                    if (starGravity != null && starGravity.Mass > 0)
+                    {
+
+                        double G = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+                        double masseEtoileKg = starGravity.Mass * unityToKgScale;
+                        double v = (thisGravityBody.rb.linearVelocity.magnitude * distanceToMetersScale);
+                        double r = distanceToEtoile * distanceToMetersScale;
+                        double mu = G * masseEtoileKg;
+
+                        double denom = (2.0 / r) - (v * v) / mu;
+
+                        if (Math.Abs(denom) < 1e-12)
+                        {
+                            periode = 0f;
+                            return;
+                        }
+
+                        double a = 1.0 / denom;
+
+                        double T = 2.0 * Math.PI * Math.Sqrt((a * a * a) / mu);
+
+                        periode = (float)(T / 86400.0);
+                    }
+                    else
+                    {
+                        periode = 0f;
+                    }
+
+                    if (mass > 0 && radius > 0)
+                    {
+                        density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
+                    }
+                    else
+                    {
+                        density = 0f; // Densité indéfinie si masse ou rayon nulle
+                    }
+
+                    if (EtoileParent != null && distanceToEtoile > 0)
+                    {
+                        float vraieDistanceMetres = distanceToEtoile * distanceToMetersScale;
+
+                        float sigma = 5.67e-8f;
+
+                        float numerateur = starLuminosity * (1f - albedo);
+                        float denominateur = 16f * Mathf.PI * sigma * (vraieDistanceMetres * vraieDistanceMetres);
+
+                        float tempEquilibre = Mathf.Pow(numerateur / denominateur, 0.25f);
+
+                        temperatureMagnitude = tempEquilibre + greenhouseEffect;
+                    }
+                }
             }
         }
     }
