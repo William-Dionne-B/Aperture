@@ -27,7 +27,7 @@ public class PauseMenu : MonoBehaviour
     
     [Header("External Scripts")]
     public FreeFlyCamera cameraScript;
-    
+
     public static bool isMenuOpen = false; 
     public static bool isSimulationPaused = false; 
 
@@ -46,6 +46,7 @@ public class PauseMenu : MonoBehaviour
             speedSlider.value = PlayerPrefs.GetFloat("MoveSpeed", 100f);
         
         DesactivateAllMenus();
+        Debug.Log("PauseMenu initialized. Press ESC to open the menu, SPACE to toggle simulation pause.");
     }
 
     void Update()
@@ -143,8 +144,11 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void QuitGame()
     {
+        Debug.Log("Saving Simulation !");
+        SystemeSauvegarde.Instance.SaveScene("save");
         Debug.Log("Ending Simulator !");
         MainMenuManager.loadScene("MenuAccueil");
+        //Resume();
     }
 
     // ==========================================
@@ -195,6 +199,7 @@ public class PauseMenu : MonoBehaviour
         if (guideMenuUI != null) guideMenuUI.SetActive(false);
         if (keysMenuUI != null) keysMenuUI.SetActive(false);
         if (audioMenuUI != null) audioMenuUI.SetActive(false);
+        Resume();
     }
 
     // ==========================================

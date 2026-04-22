@@ -4,9 +4,9 @@ using System.IO;
 using Unity.Properties;
 using UnityEngine;
 
-public class GravitySaveSystem : MonoBehaviour
+public class SystemeSauvegarde : MonoBehaviour
 {
-    public static GravitySaveSystem Instance;
+    public static SystemeSauvegarde Instance;
 
     public List<GameObject> bodyPrefabs; // assign in inspector
 
