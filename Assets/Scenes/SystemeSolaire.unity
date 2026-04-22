@@ -17587,7 +17587,7 @@ MonoBehaviour:
   projectileSpeed: 30
   asteroidScale: 2
   asteroidMass: 100000
-  maxDistanceFromCamera: 1000
+  maxDistanceFromCamera: 2000
 --- !u!1 &1707779762
 GameObject:
   m_ObjectHideFlags: 0
