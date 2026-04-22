@@ -35,6 +35,7 @@ public class GravityBody : MonoBehaviour
         }
     }
 
+
     void OnDisable()
     {
         GravityManager.Unregister(this);

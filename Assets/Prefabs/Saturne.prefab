@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5680187314293438834
+--- !u!1 &8069864281385972324
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,53 +8,53 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5473706896242930239}
-  - component: {fileID: 4445662143457766535}
-  - component: {fileID: 3107924308469134432}
-  - component: {fileID: 528372869555289002}
-  - component: {fileID: 7622429067929673271}
-  - component: {fileID: 4158787442938298642}
-  - component: {fileID: 262444908340047077}
-  - component: {fileID: 6941821387401931020}
-  - component: {fileID: 7091994452661291789}
-  - component: {fileID: 6989745845959573685}
+  - component: {fileID: 6312463609943442138}
+  - component: {fileID: 6406784463724735853}
+  - component: {fileID: 8417984759166953563}
+  - component: {fileID: 3310737592781843482}
+  - component: {fileID: 6015846076247945382}
+  - component: {fileID: 3689269798714358485}
+  - component: {fileID: 8005280749827739560}
+  - component: {fileID: 4039015447815833184}
+  - component: {fileID: 6743862479417096996}
+  - component: {fileID: 1754804284022511519}
   m_Layer: 0
-  m_Name: Mars
+  m_Name: Saturne
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5473706896242930239
+--- !u!4 &6312463609943442138
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 132.6, y: 0, z: 0}
-  m_LocalScale: {x: 0.48799998, y: 0.48799998, z: 0.48799998}
+  m_LocalPosition: {x: 332.9, y: 0, z: 0}
+  m_LocalScale: {x: 8.62, y: 8.62, z: 8.62}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4445662143457766535
+--- !u!33 &6406784463724735853
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &3107924308469134432
+--- !u!23 &8417984759166953563
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bc9237c8647a9214da2798a16a5e052e, type: 2}
+  - {fileID: 2100000, guid: d7b2ba562480fa84d875cb0377606721, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -93,13 +93,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &528372869555289002
+--- !u!135 &3310737592781843482
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -114,15 +114,15 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &7622429067929673271
+--- !u!54 &6015846076247945382
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   serializedVersion: 4
-  m_Mass: 0.322716
+  m_Mass: 285.878
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -141,30 +141,30 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4158787442938298642
+--- !u!114 &3689269798714358485
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialVelocity: {x: 0, y: 0, z: 23}
+  initialVelocity: {x: 0, y: 0, z: 15}
   applyInitialVelocity: 1
   Mass: 1
   rb: {fileID: 0}
   line: {fileID: 0}
---- !u!114 &262444908340047077
+--- !u!114 &8005280749827739560
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
@@ -175,22 +175,22 @@ MonoBehaviour:
   minScale: 0.5
   maxScale: 20
   scaleMultiplier: 0.1
---- !u!114 &6941821387401931020
+--- !u!114 &4039015447815833184
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Mars
+  objectName: Saturne
   speedMagnitude: 0
-  mass: 0.322716
-  radius: 0.244
+  mass: 285.878
+  radius: 4.31
   distanceToEtoile: 0
   gravityMagnitude: 0
   temperatureMagnitude: 0
@@ -203,14 +203,14 @@ MonoBehaviour:
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
---- !u!120 &7091994452661291789
+--- !u!120 &6743862479417096996
 LineRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -310,13 +310,13 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &6989745845959573685
+--- !u!114 &1754804284022511519
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5680187314293438834}
+  m_GameObject: {fileID: 8069864281385972324}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
