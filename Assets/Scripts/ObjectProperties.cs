@@ -6,6 +6,8 @@ using UnityEngine.Serialization;
 
 public class ObjectProperties : MonoBehaviour
 {
+    const float SolarMassKg = 1.98847e30f;
+
     [SerializeField]
     public string objectName;
 
@@ -58,6 +60,13 @@ public class ObjectProperties : MonoBehaviour
     [Header("Thermodynamique (Étoile)")] 
     [Tooltip("Cochez ceci si cet astre est un Soleil")]
     public bool isStar = false;
+    [Tooltip("Cochez ceci si cet astre est un trou noir")]
+    public bool isBlackHole = false;
+    [Tooltip("Masse minimale (en masses solaires) pour qu'une étoile devienne un trou noir")]
+    [Min(0.01f)]
+    public float blackHoleFormationMassSolar = 3f;
+    [Tooltip("Prefab à instancier quand une étoile s'effondre en trou noir")]
+    public GameObject blackHolePrefab;
     [Tooltip("Température de surface si c'est une étoile (Soleil = 5778 K)")]
     public float starSurfaceTemperature = 5778f;
     [Tooltip("Luminosité de l'étoile en Watts (Soleil = 3.828e26")]
@@ -73,15 +82,13 @@ public class ObjectProperties : MonoBehaviour
     private Transform thisTransform;
     private Rigidbody thisRigidbody;
     private GravityBody thisGravityBody;
+    private bool hasConvertedToBlackHole;
 
     public static List<ObjectProperties> AllStarsInSystem = new List<ObjectProperties>();
     
     void OnEnable()
     {
-        if (isStar && !AllStarsInSystem.Contains(this))
-        {
-            AllStarsInSystem.Add(this);
-        }
+        EnsureStarRegistryState();
     }
 
     void OnDisable()
@@ -109,6 +116,9 @@ public class ObjectProperties : MonoBehaviour
         if (string.IsNullOrEmpty(objectName)) objectName = thisObject.name;
         else thisObject.name = objectName;
 
+        EnsureStarRegistryState();
+        TryConvertStarToBlackHole();
+
         if (thisRigidbody != null) StartCoroutine(UpdateSpeedRoutine());
         else speedMagnitude = 0f;
     }
@@ -118,6 +128,9 @@ public class ObjectProperties : MonoBehaviour
         if (thisTransform != null) thisTransform.localScale = new Vector3(2 * radius, 2 * radius, 2 * radius);
 
         if (thisGravityBody != null) thisGravityBody.Mass = _mass;
+
+        EnsureStarRegistryState();
+        TryConvertStarToBlackHole();
         
         if (EtoileParent == null && AllStarsInSystem.Count > 0)
         {
@@ -152,6 +165,133 @@ public class ObjectProperties : MonoBehaviour
 
         // --- THERMODYNAMIQUE ---
         ActualiserTemperature();
+    }
+
+    void EnsureStarRegistryState()
+    {
+        if (isStar)
+        {
+            if (!AllStarsInSystem.Contains(this))
+            {
+                AllStarsInSystem.Add(this);
+            }
+            return;
+        }
+
+        if (AllStarsInSystem.Contains(this))
+        {
+            AllStarsInSystem.Remove(this);
+        }
+    }
+
+    void TryConvertStarToBlackHole()
+    {
+        if (!isStar || isBlackHole || hasConvertedToBlackHole)
+        {
+            return;
+        }
+
+        float massScale = Mathf.Max(unityToKgScale, 0.0001f);
+        float blackHoleThreshold = (blackHoleFormationMassSolar * SolarMassKg) / massScale;
+
+        if (_mass < blackHoleThreshold)
+        {
+            return;
+        }
+
+        hasConvertedToBlackHole = true;
+
+        if (blackHolePrefab != null)
+        {
+            ReplaceByBlackHolePrefab();
+            return;
+        }
+
+        isBlackHole = true;
+        isStar = false;
+        starLuminosity = 0f;
+        starSurfaceTemperature = 0f;
+
+        EnsureStarRegistryState();
+
+        Debug.Log($"{name} has collapsed into a black hole (mass threshold reached).");
+    }
+
+    void ReplaceByBlackHolePrefab()
+    {
+        GameObject sourceObject = thisObject != null ? thisObject : gameObject;
+        Transform sourceTransform = sourceObject.transform;
+        Rigidbody sourceBody = sourceObject.GetComponent<Rigidbody>();
+
+        Vector3 position = sourceBody != null ? sourceBody.position : sourceTransform.position;
+        Quaternion rotation = sourceBody != null ? sourceBody.rotation : sourceTransform.rotation;
+        Vector3 velocity = sourceBody != null ? sourceBody.linearVelocity : Vector3.zero;
+        Vector3 angularVelocity = sourceBody != null ? sourceBody.angularVelocity : Vector3.zero;
+
+        Transform parent = sourceTransform.parent;
+        GameObject blackHoleObject = Instantiate(blackHolePrefab, position, rotation, parent);
+        blackHoleObject.name = sourceObject.name;
+        blackHoleObject.transform.localScale = sourceTransform.localScale;
+
+        ObjectProperties blackHoleProperties = blackHoleObject.GetComponent<ObjectProperties>();
+        if (blackHoleProperties != null)
+        {
+            blackHoleProperties.objectName = objectName;
+            blackHoleProperties.isStar = false;
+            blackHoleProperties.isBlackHole = true;
+            blackHoleProperties.isOrbitalBody = isOrbitalBody;
+            blackHoleProperties.radius = radius;
+            blackHoleProperties.distanceToEtoile = distanceToEtoile;
+            blackHoleProperties.periode = periode;
+            blackHoleProperties.EtoileParent = EtoileParent;
+            blackHoleProperties.starLuminosity = 0f;
+            blackHoleProperties.starSurfaceTemperature = 0f;
+            blackHoleProperties.blackHoleFormationMassSolar = blackHoleFormationMassSolar;
+            blackHoleProperties.unityToKgScale = unityToKgScale;
+            blackHoleProperties.radiusToMetersScale = radiusToMetersScale;
+            blackHoleProperties.distanceToMetersScale = distanceToMetersScale;
+            blackHoleProperties.albedo = albedo;
+            blackHoleProperties.greenhouseEffect = greenhouseEffect;
+            blackHoleProperties.Mass = _mass;
+        }
+
+        Rigidbody blackHoleBody = blackHoleObject.GetComponent<Rigidbody>();
+        if (blackHoleBody != null)
+        {
+            blackHoleBody.mass = _mass;
+            blackHoleBody.linearVelocity = velocity;
+            blackHoleBody.angularVelocity = angularVelocity;
+        }
+
+        ReassignChildrenStarParent(sourceObject, blackHoleObject);
+        EnsureStarRegistryState();
+
+        Debug.Log($"{sourceObject.name} has collapsed into a black hole prefab.", blackHoleObject);
+
+        Destroy(sourceObject);
+    }
+
+    void ReassignChildrenStarParent(GameObject previousStar, GameObject newStar)
+    {
+        if (previousStar == null || newStar == null)
+        {
+            return;
+        }
+
+        ObjectProperties[] allBodies = FindObjectsByType<ObjectProperties>(FindObjectsSortMode.None);
+        for (int index = 0; index < allBodies.Length; index++)
+        {
+            ObjectProperties body = allBodies[index];
+            if (body == null)
+            {
+                continue;
+            }
+
+            if (body.EtoileParent == previousStar)
+            {
+                body.EtoileParent = newStar;
+            }
+        }
     }
 
     void ChercherEtoileLaPlusProche()
