@@ -10,8 +10,6 @@ public class SystemeSauvegarde : MonoBehaviour
 
     public List<GameObject> bodyPrefabs; // assign in inspector
 
-    string SavePath(string name) => Application.persistentDataPath + "/" + name + ".json";
-
     void Awake()
     {
         Instance = this;
@@ -22,14 +20,9 @@ public class SystemeSauvegarde : MonoBehaviour
 
         bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
 
-        if (ctrl && Input.GetKeyDown(KeyCode.D))
+        if (ctrl && Input.GetKeyDown(KeyCode.S))
         {
             SaveScene("save");
-        }
-
-        if (ctrl && Input.GetKeyDown(KeyCode.L))
-        {
-            LoadScene("save");
         }
     }
 
@@ -42,10 +35,24 @@ public class SystemeSauvegarde : MonoBehaviour
             if (body == null || body.rb == null) continue;
 
             ObjectProperties props = body.GetComponent<ObjectProperties>();
+            
+            if (props == null)
+            {
+                Debug.LogWarning($"Missing ObjectProperties on {body.name}");
+                continue;
+            }
+
+            PlanetID pid = body.GetComponent<PlanetID>();
+            if (pid == null)
+            {
+                pid = body.gameObject.AddComponent<PlanetID>();
+            }
 
             BodyData dataBody = new BodyData
             {
-                prefabName = body.gameObject.name,
+                id = pid.id,
+
+                prefabName = body.gameObject.name.Replace("(Clone)", "").Trim(),
 
                 position = body.rb.position,
                 velocity = body.rb.linearVelocity,
@@ -59,7 +66,7 @@ public class SystemeSauvegarde : MonoBehaviour
                 temperatureMagnitude = props.temperatureMagnitude,
                 periode = props.periode,
                 density = props.density,
-                etoileParent = props.EtoileParent != null ? props.EtoileParent.name : "",
+                etoileParentId = props.EtoileParent.GetComponent<PlanetID>().id,
 
                 albedo = props.albedo,
                 greenhouseEffect = props.greenhouseEffect
@@ -69,20 +76,27 @@ public class SystemeSauvegarde : MonoBehaviour
         }
 
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(saveName, json);
+        string fullPath = Path.Combine(Application.persistentDataPath, saveName);
 
-        Debug.Log("Saved to: " + saveName);
+        if (!fullPath.EndsWith(".json"))
+            fullPath += ".json";
+
+        File.WriteAllText(fullPath, json);
+        Debug.Log("Saved to: " + fullPath);
     }
 
     public void LoadScene(string saveName)
     {
-        if (!File.Exists(saveName))
+        string fullPath = Path.Combine(Application.persistentDataPath, saveName);
+
+        if (!File.Exists(fullPath))
         {
             Debug.LogWarning("No save file found!");
             return;
         }
 
-        string json = File.ReadAllText(saveName);
+        string json = File.ReadAllText(fullPath);
+
         SceneData data = JsonUtility.FromJson<SceneData>(json);
 
         ClearScene();
@@ -101,6 +115,13 @@ public class SystemeSauvegarde : MonoBehaviour
 
             GameObject obj = Instantiate(prefab, dataBodies.position, Quaternion.identity);
 
+            PlanetID pid = obj.GetComponent<PlanetID>();
+            if (pid == null)
+                pid = obj.AddComponent<PlanetID>();
+            spawned[pid.id] = obj;
+
+            pid.id = dataBodies.id;
+
             GravityBody gb = obj.GetComponent<GravityBody>();
             if(gb == null)
                 gb = obj.AddComponent<GravityBody>();
@@ -114,12 +135,6 @@ public class SystemeSauvegarde : MonoBehaviour
 
             // Delay velocity to avoid Unity override
             StartCoroutine(ApplyVelocityNextFrame(gb, dataBodies.velocity));
-
-            IEnumerator ApplyVelocityNextFrame(GravityBody body, Vector3 vel)
-            {
-                yield return null;
-                body.rb.linearVelocity = vel;
-            }
 
             // Restore properties
             props.objectName = dataBodies.objectName;
@@ -138,10 +153,11 @@ public class SystemeSauvegarde : MonoBehaviour
 
         foreach (var dataBodies in data.bodies)
         {
-            if (string.IsNullOrEmpty(dataBodies.etoileParent)) continue;
+            if (string.IsNullOrEmpty(dataBodies.etoileParentId)) continue;
 
-            if (spawned.TryGetValue(dataBodies.objectName, out GameObject obj) &&
-                spawned.TryGetValue(dataBodies.etoileParent, out GameObject parent))
+            if (!string.IsNullOrEmpty(dataBodies.etoileParentId) &&
+                spawned.TryGetValue(dataBodies.id, out GameObject obj) &&
+                spawned.TryGetValue(dataBodies.etoileParentId, out GameObject parent))
             {
                 obj.GetComponent<ObjectProperties>().EtoileParent = parent;
             }
@@ -159,6 +175,12 @@ public class SystemeSauvegarde : MonoBehaviour
             if (body != null)
                 Destroy(body.gameObject);
         }
+    }
+
+    private IEnumerator ApplyVelocityNextFrame(GravityBody body, Vector3 vel)
+    {
+        yield return null;
+        body.rb.linearVelocity = vel;
     }
 
 }

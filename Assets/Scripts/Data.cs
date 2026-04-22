@@ -11,6 +11,7 @@ public class BodyData
     public Vector3 velocity;
 
     // ObjectProperties data
+    public string id;
     public string objectName;
     public float mass;
     public float radius;
@@ -20,7 +21,7 @@ public class BodyData
     public float temperatureMagnitude;
     public float periode;
     public float density;
-    public string etoileParent;
+    public string etoileParentId;
 
     public float albedo;
     public float greenhouseEffect;
