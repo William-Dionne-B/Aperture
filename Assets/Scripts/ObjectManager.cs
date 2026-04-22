@@ -217,7 +217,7 @@ public class ObjectManager : MonoBehaviour
 
     void DetachCameraFromSelection()
     {
-        // Déparent et suppriment uniquement l'anchor de la caméra principale (préserver preview indépendante)
+
         if (MainCamera != null) MainCamera.transform.SetParent(null, true);
 
         if (mainCameraAnchor != null)
@@ -226,7 +226,6 @@ public class ObjectManager : MonoBehaviour
             mainCameraAnchor = null;
         }
 
-        // garantir que la preview n'est pas parentée involontairement
         if (SelectionCamera != null && SelectionCamera.transform.parent != null)
         {
             SelectionCamera.transform.SetParent(null, true);
@@ -240,9 +239,6 @@ public class ObjectManager : MonoBehaviour
 
         cameraLockedToSelection = false;
     }
-
-    // appelé quand la sélection change pour réattacher l'anchor principal à la nouvelle sélection
-    // conserve la position world de la caméra (ne la déplace pas)
     void ReparentAnchorsToNewSelection()
     {
         if (selection == null) return;
@@ -260,8 +256,6 @@ public class ObjectManager : MonoBehaviour
             mainCameraAnchor.transform.position = camWorldPos;
             mainCameraAnchor.transform.rotation = camWorldRot;
         }
-
-        // on ne touche pas à la preview : elle doit rester indépendante
     }
 
     void InitializeListUI()
