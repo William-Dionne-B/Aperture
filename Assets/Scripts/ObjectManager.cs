@@ -297,7 +297,7 @@ public class ObjectManager : MonoBehaviour
         }
         else if (pendingSelectionActive)
         {
-            pendingSelectionElapsed += Time.deltaTime;
+            pendingSelectionElapsed += Time.unscaledDeltaTime;
             if (pendingSelectionElapsed >= selectionBufferDuration)
             {
                 if (selection != pendingSelection)
