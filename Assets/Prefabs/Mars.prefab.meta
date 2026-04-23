@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: eb8c8fa1292c1564185bd9b41a4256cb
+<<<<<<<< HEAD:Assets/Prefabs/Asteroid.prefab.meta
+guid: 89b42b73cd1f9854e9f5bb11ece677d3
+========
+guid: cabc19d969bbc19419974735aa8f06a2
+>>>>>>>> Orbites:Assets/Prefabs/Mars.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 

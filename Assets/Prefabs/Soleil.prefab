@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1544941027984095034
+--- !u!1 &758538654589561265
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,54 +8,54 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5892634834417267374}
-  - component: {fileID: 4662851523226462986}
-  - component: {fileID: 985709952069091107}
-  - component: {fileID: 8523169192094749120}
-  - component: {fileID: 1557204167598093639}
-  - component: {fileID: 5893172788963099703}
-  - component: {fileID: 1262627819960287473}
-  - component: {fileID: -8802154727256929741}
-  - component: {fileID: -865306041739595272}
-  - component: {fileID: -3990352540898623137}
+  - component: {fileID: 5634211386274163749}
+  - component: {fileID: 6864510094681372033}
+  - component: {fileID: 1322814417527153064}
+  - component: {fileID: 7619532525140037451}
+  - component: {fileID: 750458185955716044}
+  - component: {fileID: 5638124254868888252}
+  - component: {fileID: 1041356391243046522}
+  - component: {fileID: 1886466904362505400}
+  - component: {fileID: 7785516438348967795}
+  - component: {fileID: 6298581838826086356}
   m_Layer: 0
-  m_Name: Etoile
+  m_Name: Soleil
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5892634834417267374
+--- !u!4 &5634211386274163749
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 30.000002, y: 30.000002, z: 30.000002}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 6991955661070007224}
+  - {fileID: 9150769008470287667}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4662851523226462986
+--- !u!33 &6864510094681372033
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &985709952069091107
+--- !u!23 &1322814417527153064
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -94,13 +94,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &8523169192094749120
+--- !u!135 &7619532525140037451
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -115,13 +115,13 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &1557204167598093639
+--- !u!54 &750458185955716044
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   serializedVersion: 4
   m_Mass: 1000000
   m_Drag: 0
@@ -142,14 +142,14 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!120 &5893172788963099703
+--- !u!120 &5638124254868888252
 LineRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -249,13 +249,13 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &1262627819960287473
+--- !u!114 &1041356391243046522
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ebea5419302e5f4e8703eb1365ca05c, type: 3}
@@ -266,20 +266,19 @@ MonoBehaviour:
   Mass: 1
   rb: {fileID: 0}
   line: {fileID: 0}
---- !u!114 &-8802154727256929741
+--- !u!114 &1886466904362505400
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Sol
-  isOrbitalBody: 0
+  objectName: Soleil
   speedMagnitude: 0
   mass: 1000000
   radius: 50.1
@@ -288,25 +287,20 @@ MonoBehaviour:
   temperatureMagnitude: 0
   periode: 0
   density: 0
-  EtoileParent: {fileID: 1544941027984095034}
+  EtoileParent: {fileID: 758538654589561265}
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
-  isStar: 1
-  isBlackHole: 0
-  blackHoleFormationMassSolar: 3
-  blackHolePrefab: {fileID: 821638216226138241, guid: 1bd965871e8c6ff409b94f743fee249f, type: 3}
-  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
   greenhouseEffect: 0
---- !u!114 &-865306041739595272
+--- !u!114 &7785516438348967795
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
@@ -314,54 +308,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
   heightOffsetPercentage: 0.65
-  minTopOffset: 0.5
-  cameraOffsetPercentage: 0.35
-  minSurfacePadding: 0.2
-  closeRangeBoostDistance: 8
-  closeRangeBoostFactor: 0.1
   minScale: 0.5
   maxScale: 50
   scaleMultiplier: 0.1
---- !u!114 &-3990352540898623137
+--- !u!114 &6298581838826086356
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1544941027984095034}
+  m_GameObject: {fileID: 758538654589561265}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
-  mergeDuration: 0.35
-  mergeCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!1 &8308709504518242150
+--- !u!1 &7834031390305100269
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -369,9 +334,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6991955661070007224}
-  - component: {fileID: 8588169091678178373}
-  - component: {fileID: 5658973051063505491}
+  - component: {fileID: 9150769008470287667}
+  - component: {fileID: 7555117161919419086}
+  - component: {fileID: 5872363301383146712}
   m_Layer: 0
   m_Name: SunLight
   m_TagString: Untagged
@@ -379,28 +344,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6991955661070007224
+--- !u!4 &9150769008470287667
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8308709504518242150}
+  m_GameObject: {fileID: 7834031390305100269}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.09085953, y: 0.09085953, z: 0.09085953}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5892634834417267374}
+  m_Father: {fileID: 5634211386274163749}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &8588169091678178373
+--- !u!108 &7555117161919419086
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8308709504518242150}
+  m_GameObject: {fileID: 7834031390305100269}
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 2
@@ -459,13 +424,13 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!114 &5658973051063505491
+--- !u!114 &5872363301383146712
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8308709504518242150}
+  m_GameObject: {fileID: 7834031390305100269}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}

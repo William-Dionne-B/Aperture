@@ -1,0 +1,229 @@
+{
+    "bodies": [
+        {
+            "prefabName": "Neptune",
+            "position": {
+                "x": 588.7903442382813,
+                "y": 0.0,
+                "z": 20.696359634399415
+            },
+            "velocity": {
+                "x": -0.3440719544887543,
+                "y": 0.0,
+                "z": 11.494010925292969
+            },
+            "objectName": "Neptune",
+            "mass": 51.8129997253418,
+            "radius": 1.850000023841858,
+            "speedMagnitude": 11.499231338500977,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 10.39604663848877,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Mars",
+            "position": {
+                "x": 126.5839614868164,
+                "y": 0.0,
+                "z": 40.76469802856445
+            },
+            "velocity": {
+                "x": -6.625359535217285,
+                "y": 0.0,
+                "z": 21.957670211791993
+            },
+            "objectName": "Mars",
+            "mass": 0.32271599769592287,
+            "radius": 0.24400000274181367,
+            "speedMagnitude": 22.940555572509767,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 3.722320795059204,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Saturne",
+            "position": {
+                "x": 331.9228820800781,
+                "y": 0.0,
+                "z": 26.973812103271486
+            },
+            "velocity": {
+                "x": -1.0848013162612916,
+                "y": 0.0,
+                "z": 14.956862449645996
+            },
+            "objectName": "Saturne",
+            "mass": 285.87799072265627,
+            "radius": 4.309999942779541,
+            "speedMagnitude": 14.996469497680664,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 10.568154335021973,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Uranus",
+            "position": {
+                "x": 470.41473388671877,
+                "y": 0.0,
+                "z": 23.39195442199707
+            },
+            "velocity": {
+                "x": -0.5390007495880127,
+                "y": 0.0,
+                "z": 12.986749649047852
+            },
+            "objectName": "Uranus",
+            "mass": 43.667999267578128,
+            "radius": 1.7899999618530274,
+            "speedMagnitude": 12.998106002807618,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 9.359016418457032,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Jupiter",
+            "position": {
+                "x": 243.3271026611328,
+                "y": 0.0,
+                "z": 30.52513885498047
+            },
+            "velocity": {
+                "x": -1.967153549194336,
+                "y": 0.0,
+                "z": 16.87671661376953
+            },
+            "objectName": "Jupiter",
+            "mass": 955.1099853515625,
+            "radius": 5.025000095367432,
+            "speedMagnitude": 16.991710662841798,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 25.974916458129884,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Mercure",
+            "position": {
+                "x": 44.90774917602539,
+                "y": 0.0,
+                "z": 51.065189361572269
+            },
+            "velocity": {
+                "x": -23.092430114746095,
+                "y": 0.0,
+                "z": 21.551755905151368
+            },
+            "objectName": "Mercure",
+            "mass": 0.16601000726222993,
+            "radius": 0.17550000548362733,
+            "speedMagnitude": 31.615612030029298,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 3.701288938522339,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Venus",
+            "position": {
+                "x": 78.73019409179688,
+                "y": 0.0,
+                "z": 48.065555572509769
+            },
+            "velocity": {
+                "x": -13.465354919433594,
+                "y": 0.0,
+                "z": 24.21170425415039
+            },
+            "objectName": "Venus",
+            "mass": 2.4478399753570558,
+            "radius": 0.4350000023841858,
+            "speedMagnitude": 27.727497100830079,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 8.8833646774292,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Terre",
+            "position": {
+                "x": 98.4281005859375,
+                "y": 0.0,
+                "z": 45.46511459350586
+            },
+            "velocity": {
+                "x": -9.898390769958496,
+                "y": 0.0,
+                "z": 23.82259178161621
+            },
+            "objectName": "Terre",
+            "mass": 3.003000020980835,
+            "radius": 0.46000000834465029,
+            "speedMagnitude": 25.81356430053711,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 9.745691299438477,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        },
+        {
+            "prefabName": "Soleil",
+            "position": {
+                "x": 0.0020745773799717428,
+                "y": 0.0,
+                "z": 0.00009052384120877832
+            },
+            "velocity": {
+                "x": 0.002299683168530464,
+                "y": 0.0,
+                "z": 0.0001488479902036488
+            },
+            "objectName": "Soleil",
+            "mass": 1000000.0,
+            "radius": 50.099998474121097,
+            "speedMagnitude": 0.0022013450507074596,
+            "distanceToEtoile": 0.0,
+            "gravityMagnitude": 273.58831787109377,
+            "temperatureMagnitude": 0.0,
+            "periode": 0.0,
+            "density": 0.0,
+            "etoileParent": "Soleil",
+            "albedo": 0.30000001192092898,
+            "greenhouseEffect": 0.0
+        }
+    ]
+}
