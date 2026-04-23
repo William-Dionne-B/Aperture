@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using UnityEngine.EventSystems; // NOUVEAU
 
 /// <summary>
 /// Contrôle le menu de pause principal, la navigation entre les sous-menus
@@ -88,11 +89,6 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    public void QuitGame()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("MenuAccueil");
-    }
-
     // --- LOGIQUE DE VITESSE ---
 
     /// <summary>
@@ -103,15 +99,24 @@ public class PauseMenu : MonoBehaviour
         if (simulationSpeedSlider == null) return;
 
         float step = 1.0f;
+        bool changed = false;
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             simulationSpeedSlider.value += step;
+            changed = true;
         }
         
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             simulationSpeedSlider.value -= step;
+            changed = true;
+        }
+
+        // NOUVEAU : On enlève le focus de l'EventSystem si on a touché aux flèches
+        if (changed)
+        {
+            ClearUIFocus();
         }
     }
     
@@ -120,6 +125,8 @@ public class PauseMenu : MonoBehaviour
         if (timeManager != null && simulationSpeedSlider != null)
         {
             timeManager.SetSpeedMultiplier(simulationSpeedSlider.value);
+            // NOUVEAU : Désélectionne le slider si on vient de cliquer/glisser dessus avec la souris
+            ClearUIFocus();
         }
     }
 
@@ -130,6 +137,15 @@ public class PauseMenu : MonoBehaviour
             // Affiche la vitesse mémorisée dans le TimeManager
             float displaySpeed = TimeManager.currentSpeedMultiplier;
             speedValueText.text = "Vitesse: x" + displaySpeed.ToString("F1");
+        }
+    }
+
+    // --- NOUVEAU : FONCTION DE DÉSÉLECTION ---
+    private void ClearUIFocus()
+    {
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
     
@@ -173,6 +189,8 @@ public class PauseMenu : MonoBehaviour
         isMenuOpen = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        ClearUIFocus(); // NOUVEAU
     }
 
     /// <summary>

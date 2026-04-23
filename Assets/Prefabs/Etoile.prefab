@@ -282,7 +282,7 @@ MonoBehaviour:
   isOrbitalBody: 0
   speedMagnitude: 0
   mass: 1000000
-  radius: 50.1
+  radius: 50.05
   distanceToEtoile: 0
   gravityMagnitude: 0
   temperatureMagnitude: 0
@@ -298,7 +298,7 @@ MonoBehaviour:
   blackHolePrefab: {fileID: 821638216226138241, guid: 1bd965871e8c6ff409b94f743fee249f, type: 3}
   starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
-  albedo: 0.3
+  albedo: 0
   greenhouseEffect: 0
 --- !u!114 &-865306041739595272
 MonoBehaviour:

@@ -172,6 +172,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
   heightOffsetPercentage: 0.65
+  minTopOffset: 0.5
+  cameraOffsetPercentage: 0.35
+  minSurfacePadding: 0.2
+  closeRangeBoostDistance: 8
+  closeRangeBoostFactor: 0.1
   minScale: 0.5
   maxScale: 20
   scaleMultiplier: 0.1
@@ -188,20 +193,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Uranus
+  isOrbitalBody: 1
   speedMagnitude: 0
   mass: 43.668
-  radius: 1.79
+  radius: 1.82
   distanceToEtoile: 0
   gravityMagnitude: 0
   temperatureMagnitude: 0
   periode: 0
   density: 0
-  EtoileParent: {fileID: 0}
+  EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
+  isStar: 0
+  isBlackHole: 0
+  blackHoleFormationMassSolar: 3
+  blackHolePrefab: {fileID: 821638216226138241, guid: 1bd965871e8c6ff409b94f743fee249f, type: 3}
+  starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
-  albedo: 0.3
+  albedo: 0.51
   greenhouseEffect: 0
 --- !u!120 &9178461123978735202
 LineRenderer:
@@ -322,6 +333,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0186c77eed69b64c8de2677ede5f501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minImpactSpeed: 0.1
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
+  mergeDuration: 0.35
+  mergeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

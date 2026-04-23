@@ -3,16 +3,17 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using UnityEngine.EventSystems; // NOUVEAU
 
 public class ObjectManager : MonoBehaviour
 {
+    // ... [Garde TOUTES tes variables et tes fonctions Start/Update/etc. identiques ici] ...
     private GameObject selection;
     private GameObject lastSelection;
 
-    // Verrouillage / anchors pour empêcher l'héritage de rotation
     private bool cameraLockedToSelection = false;
     private GameObject mainCameraAnchor;
-    private Vector3 mainCameraOffset; // offset utilisé pour positionner l'anchor = cameraWorldPos - selectionPos
+    private Vector3 mainCameraOffset; 
     private Quaternion mainCameraRotationWhenLocked;
 
     private bool selectionCameraLockedToSelection = false;
@@ -24,7 +25,7 @@ public class ObjectManager : MonoBehaviour
     public GameObject InfoUI;
 
     public GameObject SelectionViewFrame;
-    public GameObject ListObjet; // Contient TMP_Dropdown ou Dropdown
+    public GameObject ListObjet; 
     public GameObject CameraFocusButton;
 
     public Camera SelectionCamera;
@@ -54,29 +55,26 @@ public class ObjectManager : MonoBehaviour
     public float cameraPadding = 1.5f;
 
     [Header("Verrou caméra - déplacement")]
-    public float lockedMoveSpeed = 5f;         // vitesse WASD pour la caméra principale quand verrouillée
-    public float previewLockedMoveSpeed = 2f; // (conservé si besoin mais WASD n'affecte plus la preview)
+    public float lockedMoveSpeed = 5f;         
+    public float previewLockedMoveSpeed = 2f; 
 
     [Header("Buffer de sélection")]
-    public float selectionBufferDuration = 0.15f; // délai pendant lequel la sélection doit être stable
+    public float selectionBufferDuration = 0.15f; 
     private GameObject pendingSelection;
     private float pendingSelectionElapsed;
     private bool pendingSelectionActive = false;
 
-    // Références liées aux listeners
     TMP_InputField massTmp; InputField massUi; UnityAction<string> massListener;
     TMP_InputField speedTmp; InputField speedUi; UnityAction<string> speedListener;
     TMP_InputField radiusTmp; InputField radiusUi; UnityAction<string> radiusListener;
     TMP_InputField nameTmp; InputField nameUi; UnityAction<string> nameListener;
 
-    // Dropdown-based list UI
     private TMP_Dropdown tmpDropdown;
     private Dropdown legacyDropdown;
     private List<GameObject> dropdownObjects = new List<GameObject>();
     private List<ObjectProperties> lastFrameObjects = new List<ObjectProperties>();
 
-    // --- Preview layer logic ---
-    private const int SelectionLayer = 31; // couche temporaire utilisée pour la prévisualisation
+    private const int SelectionLayer = 31; 
     private int SelectionLayerMask => (1 << SelectionLayer);
     private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
 
@@ -139,6 +137,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
         props.Mass *= factor;
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
     }
 
     void MultiplySpeed(float factor)
@@ -147,6 +146,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
         props.speedMagnitude *= factor;
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
     }
 
     void MultiplyRadius(float factor)
@@ -155,6 +155,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
         props.radius *= factor;
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
     }
 
     void FocusMainCameraOnSelection()
@@ -173,9 +174,9 @@ public class ObjectManager : MonoBehaviour
         MainCamera.transform.LookAt(center);
 
         AttachCameraToSelection();
+        ClearUIFocus(); // NOUVEAU
     }
 
-    // Création utilitaire d'un anchor
     GameObject CreateAnchor(string name)
     {
         var go = new GameObject(name);
@@ -186,7 +187,6 @@ public class ObjectManager : MonoBehaviour
     {
         if (selection == null || MainCamera == null) return;
 
-        // MAIN CAMERA anchor only — la preview reste indépendante
         if (mainCameraAnchor == null)
         {
             mainCameraAnchor = CreateAnchor("MainCameraAnchor");
@@ -205,7 +205,6 @@ public class ObjectManager : MonoBehaviour
         mainCameraRotationWhenLocked = MainCamera.transform.rotation;
         cameraLockedToSelection = true;
 
-        // s'assurer que la preview n'est pas parentée (doit rester indépendante)
         if (selectionCameraAnchor != null)
         {
             if (SelectionCamera != null) SelectionCamera.transform.SetParent(null, true);
@@ -279,8 +278,6 @@ public class ObjectManager : MonoBehaviour
             legacyDropdown.options.Clear();
             return;
         }
-
-        Debug.LogWarning("[ObjectManager] `ListObjet` ne contient ni `TMP_Dropdown` ni `Dropdown`. Veuillez ajouter un dropdown dans l'inspecteur.");
     }
 
     void Update()
@@ -292,7 +289,6 @@ public class ObjectManager : MonoBehaviour
 
         var clicked = click.selectedObject;
 
-        // --- BUFFER / DEBOUNCE: on stocke la sélection candidate et on applique seulement si stable ---
         if (clicked != pendingSelection)
         {
             pendingSelection = clicked;
@@ -304,10 +300,8 @@ public class ObjectManager : MonoBehaviour
             pendingSelectionElapsed += Time.deltaTime;
             if (pendingSelectionElapsed >= selectionBufferDuration)
             {
-                // si la sélection candidate est différente de l'actuelle, on l'applique
                 if (selection != pendingSelection)
                 {
-                    // si verrou présent -> détache immédiatement (ne réapplique pas automatiquement)
                     if (cameraLockedToSelection || selectionCameraLockedToSelection)
                     {
                         DetachCameraFromSelection();
@@ -320,11 +314,9 @@ public class ObjectManager : MonoBehaviour
                     RestoreSelectionLayers();
                     ApplySelectionLayer(selection);
 
-                    // mettre à jour la preview APRÈS le détachement / changement de sélection
                     UpdateSelectionCamera();
 
-                    // mettre à jour la dropdown pour refléter la sélection confirmée
-                    UpdateObjectList(); // s'assurer que dropdownObjects est à jour
+                    UpdateObjectList(); 
                     int idx = dropdownObjects.IndexOf(selection);
                     if (tmpDropdown != null)
                     {
@@ -346,7 +338,6 @@ public class ObjectManager : MonoBehaviour
             }
         }
 
-        // Toggle lock avec la touche L (si un objet est sélectionné)
         if (Input.GetKeyDown(KeyCode.L) && selection != null)
         {
             if (cameraLockedToSelection || selectionCameraLockedToSelection)
@@ -361,7 +352,6 @@ public class ObjectManager : MonoBehaviour
 
         UpdateObjectList();
 
-        // Déplacement WASD relatif à l'orientation de la caméra principale (en mode verrou)
         if (cameraLockedToSelection && selection != null && MainCamera != null && mainCameraAnchor != null)
         {
             float h = Input.GetAxis("Horizontal");
@@ -369,7 +359,6 @@ public class ObjectManager : MonoBehaviour
 
             if (Mathf.Abs(h) > 0.0001f || Mathf.Abs(v) > 0.0001f)
             {
-                // mouvement relatif à l'orientation de la caméra (strafe et forward dans le plan XZ)
                 Vector3 right = MainCamera.transform.right;
                 Vector3 forward = Vector3.ProjectOnPlane(MainCamera.transform.forward, Vector3.up).normalized;
                 Vector3 move = (right * h + forward * v) * lockedMoveSpeed * Time.deltaTime;
@@ -377,21 +366,16 @@ public class ObjectManager : MonoBehaviour
                 mainCameraOffset += move;
             }
 
-            // positionner l'anchor en position monde = selection.position + offset (conserve la position monde de la caméra)
             mainCameraAnchor.transform.position = selection.transform.position + mainCameraOffset;
-            // maintenir la rotation fixe enregistrée (empêche la sélection d'affecter la rotation)
             mainCameraAnchor.transform.rotation = mainCameraRotationWhenLocked;
         }
 
-        // IMPORTANT: ne plus appliquer WASD à la caméra de preview — la preview ne bouge pas via WASD
         if (selectionCameraLockedToSelection && selection != null && SelectionCamera != null && selectionCameraAnchor != null)
         {
-            // on conserve l'anchor position/rotation (pas de modification par WASD)
             selectionCameraAnchor.transform.position = selection.transform.position + selectionCameraOffset;
             selectionCameraAnchor.transform.rotation = selectionCameraRotationWhenLocked;
         }
 
-        // Si la caméra de preview n'est pas en mode locked, comportement standard
         UpdateSelectionCamera();
 
         if (IsAnyFieldEditing()) return;
@@ -472,12 +456,14 @@ public class ObjectManager : MonoBehaviour
     {
         if (index < 0 || index >= dropdownObjects.Count) return;
         SelectObject(dropdownObjects[index]);
+        ClearUIFocus(); // NOUVEAU
     }
 
     void OnLegacyDropdownValueChanged(int index)
     {
         if (index < 0 || index >= dropdownObjects.Count) return;
         SelectObject(dropdownObjects[index]);
+        ClearUIFocus(); // NOUVEAU
     }
 
     void SelectObject(GameObject obj)
@@ -497,7 +483,6 @@ public class ObjectManager : MonoBehaviour
         float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
         float distance = size * cameraPadding;
 
-        // Si verrouillée, la position est gérée dans Update() via l'anchor
         if (!selectionCameraLockedToSelection)
         {
             SelectionCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
@@ -664,6 +649,7 @@ public class ObjectManager : MonoBehaviour
             SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
         }
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
     }
 
     void OnSpeedEndEdit(string input)
@@ -675,6 +661,7 @@ public class ObjectManager : MonoBehaviour
         else SetText(speed, props.speedMagnitude.ToString("F2") + " km/s");
 
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
     }
 
     void OnRadiusEndEdit(string input)
@@ -692,6 +679,7 @@ public class ObjectManager : MonoBehaviour
             SetText(radius, FormaterScientifiqueTMP(vraiRayon) + " m");
         }
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
     }
 
     void OnNameEndEdit(string input)
@@ -707,6 +695,16 @@ public class ObjectManager : MonoBehaviour
         else SetText(obj_name, props.objectName);
 
         updateUIVisibility();
+        ClearUIFocus(); // NOUVEAU
+    }
+
+    // --- NOUVEAU : FONCTION DE DÉSÉLECTION ---
+    private void ClearUIFocus()
+    {
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
     }
 
     bool LireEntreeUtilisateur(string input, out float resultatFinal)
@@ -754,7 +752,6 @@ public class ObjectManager : MonoBehaviour
         if (tmpDropdown != null) tmpDropdown.onValueChanged.RemoveAllListeners();
         if (legacyDropdown != null) legacyDropdown.onValueChanged.RemoveAllListeners();
 
-        // remove multiplier listeners
         if (massMultiply10Button != null) massMultiply10Button.onClick.RemoveListener(OnMassMultiply10);
         if (massDivide10Button != null) massDivide10Button.onClick.RemoveListener(OnMassDivide10);
         if (speedMultiply10Button != null) speedMultiply10Button.onClick.RemoveListener(OnSpeedMultiply10);
@@ -763,7 +760,6 @@ public class ObjectManager : MonoBehaviour
         if (radiusDivide10Button != null) radiusDivide10Button.onClick.RemoveListener(OnRadiusDivide10);
     }
 
-    // --- Layer helper methods ---
     private void ApplySelectionLayer(GameObject root)
     {
         if (root == null) return;
