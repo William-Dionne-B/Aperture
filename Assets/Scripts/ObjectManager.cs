@@ -3,11 +3,10 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
 using System.Collections.Generic;
-using UnityEngine.EventSystems; // NOUVEAU
+using UnityEngine.EventSystems;
 
 public class ObjectManager : MonoBehaviour
 {
-    // ... [Garde TOUTES tes variables et tes fonctions Start/Update/etc. identiques ici] ...
     private GameObject selection;
     private GameObject lastSelection;
 
@@ -137,7 +136,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
         props.Mass *= factor;
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void MultiplySpeed(float factor)
@@ -146,7 +145,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
         props.speedMagnitude *= factor;
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void MultiplyRadius(float factor)
@@ -155,7 +154,7 @@ public class ObjectManager : MonoBehaviour
         if (props == null) return;
         props.radius *= factor;
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void FocusMainCameraOnSelection()
@@ -174,7 +173,7 @@ public class ObjectManager : MonoBehaviour
         MainCamera.transform.LookAt(center);
 
         AttachCameraToSelection();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     GameObject CreateAnchor(string name)
@@ -456,14 +455,14 @@ public class ObjectManager : MonoBehaviour
     {
         if (index < 0 || index >= dropdownObjects.Count) return;
         SelectObject(dropdownObjects[index]);
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void OnLegacyDropdownValueChanged(int index)
     {
         if (index < 0 || index >= dropdownObjects.Count) return;
         SelectObject(dropdownObjects[index]);
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void SelectObject(GameObject obj)
@@ -649,7 +648,7 @@ public class ObjectManager : MonoBehaviour
             SetText(mass, FormaterScientifiqueTMP(vraieMasse) + " kg");
         }
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void OnSpeedEndEdit(string input)
@@ -661,7 +660,7 @@ public class ObjectManager : MonoBehaviour
         else SetText(speed, props.speedMagnitude.ToString("F2") + " km/s");
 
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void OnRadiusEndEdit(string input)
@@ -679,7 +678,7 @@ public class ObjectManager : MonoBehaviour
             SetText(radius, FormaterScientifiqueTMP(vraiRayon) + " m");
         }
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     void OnNameEndEdit(string input)
@@ -695,10 +694,9 @@ public class ObjectManager : MonoBehaviour
         else SetText(obj_name, props.objectName);
 
         updateUIVisibility();
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
-    // --- NOUVEAU : FONCTION DE DÉSÉLECTION ---
     private void ClearUIFocus()
     {
         if (EventSystem.current != null)

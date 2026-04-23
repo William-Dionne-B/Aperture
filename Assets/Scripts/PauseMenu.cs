@@ -110,7 +110,6 @@ public class PauseMenu : MonoBehaviour
             changed = true;
         }
 
-        // NOUVEAU : On enlève le focus de l'EventSystem si on a touché aux flèches
         if (changed)
         {
             ClearUIFocus();
@@ -122,7 +121,6 @@ public class PauseMenu : MonoBehaviour
         if (timeManager != null && simulationSpeedSlider != null)
         {
             timeManager.SetSpeedMultiplier(simulationSpeedSlider.value);
-            // NOUVEAU : Désélectionne le slider si on vient de cliquer/glisser dessus avec la souris
             ClearUIFocus();
         }
     }
