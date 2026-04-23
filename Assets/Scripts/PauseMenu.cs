@@ -15,9 +15,6 @@ public class PauseMenu : MonoBehaviour
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
-    public GameObject audioMenuUI;
-    public GameObject timeMenuUI;
-    public GameObject timeScrollMenuUI;
 
     [Header("Options UI Elements")] 
     public Slider fieldOfViewSlider;
@@ -69,7 +66,7 @@ public class PauseMenu : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (keysMenuUI != null && keysMenuUI.activeSelf || audioMenuUI != null && audioMenuUI.activeSelf) 
+            if (keysMenuUI != null && keysMenuUI.activeSelf) 
                 OpenOptions();
             else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf) 
                 OpenPauseMenu();
@@ -180,8 +177,6 @@ public class PauseMenu : MonoBehaviour
     public void Resume()
     {
         DesactivateAllMenus();
-        if (timeMenuUI != null) timeMenuUI.SetActive(true);
-        if (timeScrollMenuUI != null) timeScrollMenuUI.SetActive(true);
         
         if (isSimulationPaused) TimeManager.Pause();
         else TimeManager.Resume();
@@ -199,8 +194,6 @@ public class PauseMenu : MonoBehaviour
     public void Pause()
     {
         if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
-        if (timeMenuUI != null) timeMenuUI.SetActive(false);
-        if (timeScrollMenuUI != null) timeScrollMenuUI.SetActive(false);
         
         TimeManager.Pause(); 
         isMenuOpen = true;
@@ -241,12 +234,6 @@ public class PauseMenu : MonoBehaviour
         DesactivateAllMenus();
         keysMenuUI.SetActive(true);
     }
-
-    public void OpenAudio()
-    {
-        DesactivateAllMenus();
-        audioMenuUI.SetActive(true);
-    }
     
     public void OpenOptions()
     {
@@ -267,7 +254,6 @@ public class PauseMenu : MonoBehaviour
         if (optionMenuUI != null) optionMenuUI.SetActive(false);
         if (guideMenuUI != null) guideMenuUI.SetActive(false);
         if (keysMenuUI != null) keysMenuUI.SetActive(false);
-        if (audioMenuUI != null) audioMenuUI.SetActive(false);
         //Resume();
     }
 
