@@ -2,125 +2,86 @@ using UnityEngine;
 
 public class PlanetSpawner : MonoBehaviour
 {
-    [Header("Prefabs")]
-    public GameObject[] celestialPrefabs;
-    
-    private int planetCount = 0;
-    private int selectedPrefabIndex = 0;
+    private GameObject selectedPrefab;
+    private int spawnCount = 0;
 
-    void Start()
+    public void SetPrefab(GameObject prefab)
     {
-        DragDropManager dragDropManager = FindFirstObjectByType<DragDropManager>();
-        if (dragDropManager != null)
-        {
-            dragDropManager.OnButtonPressed.AddListener(OnPrefabButtonPressed);
-        }
-    }
-
-    void OnDestroy()
-    {
-        DragDropManager dragDropManager = FindFirstObjectByType<DragDropManager>();
-        if (dragDropManager != null)
-        {
-            dragDropManager.OnButtonPressed.RemoveListener(OnPrefabButtonPressed);
-        }
-    }
-
-    public void OnPrefabButtonPressed(int buttonID)
-    {
-        if (celestialPrefabs != null && buttonID >= 0 && buttonID < celestialPrefabs.Length)
-        {
-            selectedPrefabIndex = buttonID;
-            Debug.Log($"Selected prefab changed to: {celestialPrefabs[selectedPrefabIndex].name}");
-        }
+        selectedPrefab = prefab;
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (!Input.GetMouseButtonDown(1)) return;
+        if (selectedPrefab == null) return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, Vector3.zero);
+
+        if (!plane.Raycast(ray, out float distance)) return;
+
+        Vector3 spawnPos = ray.GetPoint(distance);
+        spawnPos.y = 0f;
+
+        GameObject instance = Instantiate(selectedPrefab, spawnPos, Quaternion.identity);
+        spawnCount++;
+        instance.name = $"Astre_{spawnCount}";
+
+        Debug.Log($"[PlanetSpawner] Spawned '{instance.name}' at {spawnPos}.");
+
+        ObjectProperties prefabProps = selectedPrefab.GetComponent<ObjectProperties>();
+        bool shouldOrbit = (prefabProps == null || prefabProps.isOrbitalBody);
+
+        if (!shouldOrbit || ObjectProperties.AllStarsInSystem == null || ObjectProperties.AllStarsInSystem.Count == 0)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane spawnPlane = new Plane(Vector3.up, Vector3.zero);      
+            Debug.Log($"[PlanetSpawner] '{instance.name}' spawned as a free body.");
+            return;
+        }
 
-            if (spawnPlane.Raycast(ray, out float distance))
+        // Find nearest star
+        GameObject nearestStar = null;
+        float minDist = float.MaxValue;
+
+        foreach (ObjectProperties star in ObjectProperties.AllStarsInSystem)
+        {
+            if (star == null) continue;
+            float dist = Vector3.Distance(spawnPos, star.transform.position);
+            if (dist < minDist)
             {
-                Vector3 spawnPosition = ray.GetPoint(distance);
-                spawnPosition.y = 0;
-
-                GameObject prefabToSpawn = celestialPrefabs != null && celestialPrefabs.Length > 0 
-                    ? celestialPrefabs[selectedPrefabIndex] 
-                    : null;
-
-                if (prefabToSpawn == null) return;
-
-                ObjectProperties prefabProps = prefabToSpawn.GetComponent<ObjectProperties>();
-                bool doitOrbiter = (prefabProps == null || prefabProps.isOrbitalBody);
-
-                GameObject starSelectionnee = null;
-                
-                if (ObjectProperties.AllStarsInSystem.Count > 0)
-                {
-                    float distanceMinimum = float.MaxValue;
-
-                    foreach (ObjectProperties star in ObjectProperties.AllStarsInSystem)
-                    {
-                        if (star == null) continue;
-
-                        float dist = Vector3.Distance(spawnPosition, star.transform.position);
-                        
-                        if (dist < distanceMinimum)
-                        {
-                            distanceMinimum = dist;
-                            starSelectionnee = star.gameObject;
-                        }
-                    }
-                }
-                
-                GameObject astre = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
-                planetCount++;
-                astre.name = "Astre_" + planetCount;
-
-                ObjectProperties astreProps = astre.GetComponent<ObjectProperties>();
-                if (astreProps != null && starSelectionnee != null)
-                {
-                    astreProps.EtoileParent = starSelectionnee;
-                }
-
-                if (doitOrbiter && starSelectionnee != null)
-                {
-                    Rigidbody sunRb = starSelectionnee.GetComponent<Rigidbody>();
-                    if (sunRb != null)
-                    {
-                        float G_jeu = GravityManager.G * GravityManager.Instance.gravityMultiplier;
-                        
-                        float distUnity = Vector3.Distance(spawnPosition, starSelectionnee.transform.position);
-                        
-                        float vOrbitaleMag = Mathf.Sqrt((G_jeu * sunRb.mass) / distUnity);
-                        Vector3 dirVersSoleil = (starSelectionnee.transform.position - spawnPosition).normalized;
-                        Vector3 dirTangente = Vector3.Cross(dirVersSoleil, Vector3.up).normalized;
-                        Vector3 velociteOrbitalePure = dirTangente * vOrbitaleMag;
-
-                        Vector3 velociteFinale = velociteOrbitalePure + sunRb.linearVelocity;
-
-                        Rigidbody astreRb = astre.GetComponent<Rigidbody>();
-                        GravityBody gravityBody = astre.GetComponent<GravityBody>();
-                        
-                        if (astreRb != null) astreRb.linearVelocity = velociteFinale;
-                        if (gravityBody != null)
-                        {
-                            gravityBody.initialVelocity = velociteFinale;
-                            gravityBody.applyInitialVelocity = true;
-                        }
-                        
-                        Debug.Log($"{astre.name} orbite désormais autour de {starSelectionnee.name} !");
-                    }
-                }
-                else
-                {
-                    string refDistance = starSelectionnee != null ? $" (Distance mesurée par rapport à {starSelectionnee.name})" : "";
-                    Debug.Log($"{astre.name} créé en tant que corps libre{refDistance}.");
-                }
+                minDist = dist;
+                nearestStar = star.gameObject;
             }
         }
+
+        if (nearestStar == null)
+        {
+            Debug.Log($"[PlanetSpawner] No valid star found, '{instance.name}' spawned as a free body.");
+            return;
+        }
+
+        Rigidbody starRb = nearestStar.GetComponent<Rigidbody>();
+        if (starRb == null)
+        {
+            Debug.LogWarning($"[PlanetSpawner] Nearest star '{nearestStar.name}' has no Rigidbody.");
+            return;
+        }
+
+        float G = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+        Vector3 toStar = (nearestStar.transform.position - spawnPos).normalized;
+        Vector3 tangent = Vector3.Cross(toStar, Vector3.up).normalized;
+        float orbitalSpeed = Mathf.Sqrt((G * starRb.mass) / minDist);
+        Vector3 orbitalVelocity = -1.0f * (tangent * orbitalSpeed + starRb.linearVelocity);
+
+        Rigidbody instanceRb = instance.GetComponent<Rigidbody>();
+        GravityBody gravityBody = instance.GetComponent<GravityBody>();
+
+        if (instanceRb != null) instanceRb.linearVelocity = orbitalVelocity;
+        if (gravityBody != null)
+        {
+            gravityBody.initialVelocity = orbitalVelocity;
+            gravityBody.applyInitialVelocity = true;
+        }
+
+        Debug.Log($"[PlanetSpawner] '{instance.name}' now orbiting '{nearestStar.name}' at speed {orbitalSpeed:F2}.");
     }
 }

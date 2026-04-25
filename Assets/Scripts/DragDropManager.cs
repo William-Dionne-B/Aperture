@@ -1,18 +1,26 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class DragDropManager : MonoBehaviour
 {
-    // Create a signal for button presses
-    public UnityEvent<int> OnButtonPressed;
+    [Tooltip("Prefab to spawn when this button is pressed.")]
+    public GameObject prefab;
 
-    // Call this when a button is pressed
-    public void ButtonPressed(int buttonID)
+    public void ButtonPressed()
     {
-        Debug.Log("Button " + buttonID + " pressed");
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[DragDropManager] No prefab assigned on '{gameObject.name}'.");
+            return;
+        }
 
-        // Invoke the signal for listeners
-        if (OnButtonPressed != null)
-            OnButtonPressed.Invoke(buttonID);
+        PlanetSpawner spawner = Camera.main?.GetComponent<PlanetSpawner>();
+        if (spawner == null)
+        {
+            Debug.LogWarning("[DragDropManager] PlanetSpawner not found on Main Camera.");
+            return;
+        }
+
+        spawner.SetPrefab(prefab);
+        Debug.Log($"[DragDropManager] Sent prefab '{prefab.name}' to PlanetSpawner.");
     }
 }
