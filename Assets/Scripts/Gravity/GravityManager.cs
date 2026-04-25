@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public class GravityManager : MonoBehaviour
 
     public static float G = 6.674e-8f; // Constante gravitationnelle ajustée
 
-    public float gravityMultiplier = 1e13f; 
+    public float gravityMultiplier = 1e13f;
     public float softening = 0.1f; // Prévient les explosions physiques
     public float Timestep = 3600f;
     public bool enableOrbitPrediction = true;
@@ -29,19 +30,59 @@ public class GravityManager : MonoBehaviour
     private GravityBody soleil = null;
     private float orbitPredictionTimer = 0f;
 
+    [Header("GPU Settings")]
+    public bool useGpu = true;
+    public ComputeShader gravityComputeShader;
+    public int threadGroupSize = 256;
+
+    // Compute buffers
+    private ComputeBuffer inputBuffer;
+    private ComputeBuffer outputBuffer;
+    private bool buffersInitialized = false;
+
     void Awake()
     {
         Instance = this;
     }
 
+    void OnEnable()
+    {
+        // lazy init buffers on first FixedUpdate when needed
+    }
+
+    void OnDisable()
+    {
+        ReleaseBuffers();
+    }
+
+    void OnDestroy()
+    {
+        ReleaseBuffers();
+    }
+
+    void ReleaseBuffers()
+    {
+        if (inputBuffer != null)
+        {
+            inputBuffer.Release();
+            inputBuffer = null;
+        }
+        if (outputBuffer != null)
+        {
+            outputBuffer.Release();
+            outputBuffer = null;
+        }
+        buffersInitialized = false;
+    }
+
     void Update()
     {
-        predictionTimer += Time.unscaledDeltaTime; 
-        
-        if (predictionTimer >= 0.06f) 
+        predictionTimer += Time.unscaledDeltaTime;
+
+        if (predictionTimer >= 0.06f)
         {
             predictionTimer = 0f;
-            
+
             foreach (var body in bodies)
             {
                 if (body != null && body.line != null)
@@ -55,13 +96,13 @@ public class GravityManager : MonoBehaviour
     public void SetSimulationSpeed(float speed)
     {
         Time.timeScale = speed;
-        
+
         if (speed > 0f)
         {
             float physicsResolution = Mathf.Clamp(speed / 3f, 1f, 4f);
             Time.fixedDeltaTime = 0.02f * physicsResolution;
         }
-        
+
         Debug.Log("Simulation speed set to " + speed + "x");
     }
 
@@ -80,6 +121,13 @@ public class GravityManager : MonoBehaviour
     {
         CleanupInvalidBodies();
 
+        if (useGpu && gravityComputeShader != null)
+        {
+            RunGpuStep();
+            return;
+        }
+
+        // Fallback CPU behaviour (original)
         int count = bodies.Count;
         bool shouldPredictOrbit = false;
 
@@ -153,6 +201,118 @@ public class GravityManager : MonoBehaviour
 
         if (totalMass == 0f) return Vector3.zero;
         return weightedSum / totalMass;
+    }
+
+    // GPU data struct (must match HLSL layout)
+    struct GpuBody
+    {
+        public Vector3 pos;
+        public Vector3 vel;
+        public float mass;
+        public float pad; // pour alignement à 32 bytes
+    }
+
+    void EnsureBuffersInitialized()
+    {
+        int count = bodies.Count;
+        if (count == 0) return;
+
+        if (buffersInitialized && inputBuffer != null && inputBuffer.count == count) return;
+
+        ReleaseBuffers();
+
+        int stride = sizeof(float) * 8; // pos.xyz, vel.xyz, mass, pad = 8 floats
+        inputBuffer = new ComputeBuffer(Math.Max(1, count), stride);
+        outputBuffer = new ComputeBuffer(Math.Max(1, count), stride);
+
+        buffersInitialized = true;
+    }
+
+    void RunGpuStep()
+    {
+        int count = bodies.Count;
+        if (count == 0) return;
+        if (gravityComputeShader == null) return;
+
+        EnsureBuffersInitialized();
+        if (!buffersInitialized) return;
+
+        // prepare data
+        GpuBody[] arr = new GpuBody[count];
+        for (int i = 0; i < count; i++)
+        {
+            var b = bodies[i];
+            if (b == null || b.rb == null)
+            {
+                arr[i].pos = Vector3.zero;
+                arr[i].vel = Vector3.zero;
+                arr[i].mass = 0f;
+                arr[i].pad = 0f;
+            }
+            else
+            {
+                arr[i].pos = b.rb.position;
+                // Some projects use rb.linearVelocity; keep compatibility by writing both fields below when applying back
+                arr[i].vel = b.rb.velocity;
+                arr[i].mass = b.rb.mass;
+                arr[i].pad = 0f;
+            }
+        }
+
+        inputBuffer.SetData(arr);
+
+        int kernel = gravityComputeShader.FindKernel("NBody");
+        gravityComputeShader.SetBuffer(kernel, "_InputBodies", inputBuffer);
+        gravityComputeShader.SetBuffer(kernel, "_OutputBodies", outputBuffer);
+
+        float gravConst = gravityMultiplier * G;
+        gravityComputeShader.SetFloat("_DeltaTime", Timestep);
+        gravityComputeShader.SetFloat("_Softening", softening);
+        gravityComputeShader.SetFloat("_GravityConst", gravConst);
+        gravityComputeShader.SetInt("_Count", count);
+
+        int groups = Mathf.CeilToInt((float)count / threadGroupSize);
+        gravityComputeShader.Dispatch(kernel, groups, 1, 1);
+
+        // read back
+        GpuBody[] results = new GpuBody[count];
+        outputBuffer.GetData(results);
+
+        // apply positions and velocities on CPU side (main thread)
+        for (int i = 0; i < count; i++)
+        {
+            var b = bodies[i];
+            if (b == null || b.rb == null) continue;
+
+            Vector3 newPos = results[i].pos;
+            Vector3 newVel = results[i].vel;
+
+            // Apply to Rigidbody: prefer direct assignment to velocity and linearVelocity if present
+            try
+            {
+                // Some projects use non-standard 'linearVelocity'. Keep setting both when available.
+                b.rb.velocity = newVel;
+            }
+            catch (Exception) { /* ignore if not present */ }
+
+            // Attempt to set 'linearVelocity' if the property exists (kept compatible with existing code using it)
+            var rbType = b.rb.GetType();
+            var prop = rbType.GetProperty("linearVelocity");
+            if (prop != null && prop.CanWrite)
+            {
+                try { prop.SetValue(b.rb, newVel, null); } catch { }
+            }
+
+            // set position directly — note: setting position directly may interfere with physics; if undesirable use MovePosition
+            try
+            {
+                b.rb.position = newPos;
+            }
+            catch (Exception)
+            {
+                try { b.rb.MovePosition(newPos); } catch { }
+            }
+        }
     }
 
     //structure d'éléments orbitaux pour stocker les paramètres d'une orbite calculés à partir de la position et de la vitesse
@@ -250,9 +410,9 @@ public class GravityManager : MonoBehaviour
             foreach (var other in bodies)
             {
                 if (other == body || other.rb == null) continue;
-                
+
                 Vector3 positionFutureDeLautre = other.rb.position + (other.rb.linearVelocity * tempsEcoule);
-                
+
                 Vector3 dir = positionFutureDeLautre - position;
                 float dist = dir.magnitude + softening;
                 accel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
@@ -264,7 +424,7 @@ public class GravityManager : MonoBehaviour
             foreach (var other in bodies)
             {
                 if (other == body || other.rb == null) continue;
-                
+
                 Vector3 positionFutureDeLautre = other.rb.position + (other.rb.linearVelocity * (tempsEcoule + dt));
                 Vector3 dir = positionFutureDeLautre - position;
                 float dist = dir.magnitude + softening;
