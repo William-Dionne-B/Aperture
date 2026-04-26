@@ -12,16 +12,19 @@ public class GravityManager : MonoBehaviour
     public float Timestep = 3600f;
     public bool enableOrbitPrediction = true;
     public float orbitPredictionInterval = 0.25f;
-    public int maxOrbitPredictionSteps = 256;
-    public float maxOrbitPredictionDuration = 120f;
+    public int maxOrbitPredictionSteps = 2000;
+    public float maxOrbitPredictionDuration = 100000f;
     public float orbitSampleInterval = 0.5f;
-    public float maxOrbitPredictionDistance = 500f;
+    public float maxOrbitPredictionDistance = 1e7f;
     public int minOrbitPointsToRender = 12;
-    public float maxOrbitSegmentLength = 60f;
-    public float maxOrbitSegmentToAverageRatio = 4f;
+    public float maxOrbitSegmentLength = 500f;
+    public float maxOrbitSegmentToAverageRatio = 10f;
     public float maxOrbitSharpTurnDegrees = 120f;
-    public float maxOrbitSharpTurnRatio = 0.35f;
+    public float maxOrbitSharpTurnRatio = 0.8f;
     private float predictionTimer = 0f;
+
+    public float semiMajorAxis;
+    public float mu;
 
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
     public static IReadOnlyList<GravityBody> Bodies => bodies;
@@ -176,7 +179,7 @@ public class GravityManager : MonoBehaviour
         if (IsTwoBodyDominated(body, out GravityBody mainAttractor))
         {
             float period = CalculateOrbitalPeriod(body, mainAttractor);
-            float duration = Mathf.Min(period, Mathf.Max(0.1f, maxOrbitPredictionDuration));
+            float duration = period * 1.05f;
 
             // Calculate steps based on period
             float sample = Mathf.Max(0.01f, orbitSampleInterval);
@@ -226,19 +229,21 @@ public class GravityManager : MonoBehaviour
     float CalculateOrbitalPeriod(GravityBody body, GravityBody centralBody)
     {
         float distance = Vector3.Distance(body.rb.position, centralBody.rb.position);
-        float mu = G * gravityMultiplier * (body.rb.mass + centralBody.rb.mass);
-        float semiMajorAxis = 1 / ((2 / distance) - (Mathf.Pow(body.rb.linearVelocity.magnitude, 2)) / mu);
+        mu = G * gravityMultiplier * (body.rb.mass + centralBody.rb.mass);
+        semiMajorAxis = Mathf.Clamp(1 / ((2 / distance) - (Mathf.Pow(body.rb.linearVelocity.magnitude, 2)) / mu), 0.1f, 10000f);
         return 2f * Mathf.PI * Mathf.Sqrt(Mathf.Pow(semiMajorAxis, 3) / mu);
     }
 
     void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
     {
-        float dt = period / steps;
+        float maxDt = 0.5f; // or even 0.1f for high precision
+        float dt = Mathf.Min(period / steps, maxDt);
+        steps = Mathf.CeilToInt(period / dt);
         Vector3 startPosition = body.rb.position;
         Vector3 position = startPosition;
         Vector3 velocity = body.rb.linearVelocity;
         float gravConst = G * gravityMultiplier;
-        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance);
+        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance * 10f);
 
         List<Vector3> points = new List<Vector3> { position };
 
@@ -395,7 +400,7 @@ public class GravityManager : MonoBehaviour
 
         float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance);
         float maxDistanceSqr = maxDistance * maxDistance;
-        float hardMaxSegment = Mathf.Max(0.01f, maxOrbitSegmentLength);
+        float hardMaxSegment = Mathf.Max(0.01f, maxOrbitSegmentLength * semiMajorAxis);
         float segmentToAverageRatioLimit = Mathf.Max(1f, maxOrbitSegmentToAverageRatio);
         float sharpTurnAngle = Mathf.Clamp(maxOrbitSharpTurnDegrees, 1f, 179f);
         float sharpTurnRatioLimit = Mathf.Clamp01(maxOrbitSharpTurnRatio);
@@ -410,7 +415,7 @@ public class GravityManager : MonoBehaviour
 
         for (int i = 1; i < points.Count; i++)
         {
-            if ((points[i] - origin).sqrMagnitude > maxDistanceSqr)
+            if ((points[i] - origin).sqrMagnitude > maxDistanceSqr * 10f)
             {
                 return false;
             }
