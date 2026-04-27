@@ -45,7 +45,7 @@ public class PlanetSpawner : MonoBehaviour
 
         foreach (ObjectProperties star in ObjectProperties.AllStarsInSystem)
         {
-            if (star == null) continue;
+            if (star == null || star.gameObject == instance) continue;
             float dist = Vector3.Distance(spawnPos, star.transform.position);
             if (dist < minDist)
             {

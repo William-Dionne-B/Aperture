@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -154,7 +153,6 @@ public class ObjectProperties : MonoBehaviour
             gravityMagnitude = 0f;
         }
 
-        // Calcul de la distance à l'étoile parente
         if (EtoileParent != null && distanceToEtoile > 0 && thisGravityBody != null)
         {
             GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
@@ -164,23 +162,20 @@ public class ObjectProperties : MonoBehaviour
                 double G_phys = GravityManager.G * GravityManager.Instance.gravityMultiplier;
                 double mu = G_phys * starGravity.Mass;
 
-                // CORRECTION MAJEURE : On utilise la vitesse relative à l'étoile !
                 Vector3 relativeVelocity = thisGravityBody.rb.linearVelocity - starGravity.rb.linearVelocity;
                 double v = relativeVelocity.magnitude;
                 double r = distanceToEtoile;
 
                 double denom = (2.0 / r) - (v * v) / mu;
 
-                // Si denom est positif, c'est une orbite fermée (Cercle ou Ellipse)
                 if (denom > 1e-12)
                 {
                     double a = 1.0 / denom;
                     double T = 2.0 * Math.PI * Math.Sqrt((a * a * a) / mu);
-                    periode = (float)(T / 86400.0); // Conversion en jours
+                    periode = (float)(T / 86400.0);
                 }
                 else
                 {
-                    // Si denom est négatif, l'astre s'échappe de l'étoile (Hyperbole) !
                     periode = 0f;
                 }
             }
@@ -361,7 +356,6 @@ public class ObjectProperties : MonoBehaviour
         float distMin = float.MaxValue;
         foreach (var star in AllStarsInSystem)
         {
-            // CORRECTION : On s'assure à 100% que l'astre ne s'adopte pas lui-même !
             if (star == null || star.gameObject == this.gameObject) continue;
             
             float d = Vector3.Distance(transform.position, star.transform.position);
