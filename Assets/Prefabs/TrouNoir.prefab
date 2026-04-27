@@ -292,9 +292,12 @@ MonoBehaviour:
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
   isStar: 0
-  starSurfaceTemperature: 5778
-  starLuminosity: 3.828e+26
-  albedo: 0.3
+  isBlackHole: 1
+  blackHoleFormationMassSolar: 3
+  blackHolePrefab: {fileID: 821638216226138241}
+  starSurfaceTemperature: 0
+  starLuminosity: 0
+  albedo: 0
   greenhouseEffect: 0
 --- !u!114 &6505932524256143332
 MonoBehaviour:
@@ -310,6 +313,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
   heightOffsetPercentage: 0.65
+  minTopOffset: 0.5
+  cameraOffsetPercentage: 0.35
+  minSurfacePadding: 0.2
+  closeRangeBoostDistance: 8
+  closeRangeBoostFactor: 0.1
   minScale: 0.5
   maxScale: 50
   scaleMultiplier: 0.1
@@ -327,7 +335,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   requireGravityBodyOnOther: 0
   logCollisionDetection: 1
-  mergePriority: 0
   mergeDuration: 0.35
   mergeCurve:
     serializedVersion: 2
