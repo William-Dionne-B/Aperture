@@ -370,10 +370,17 @@ public class ObjectProperties : MonoBehaviour
     // Gestion propre de la température
     void ActualiserTemperature()
     {
-        if (isStar)
+        if (isBlackHole)
+        {
+            temperatureMagnitude = 0f;
+            albedo = 0f; 
+        }
+        
+        else if (isStar)
         {
             temperatureMagnitude = starSurfaceTemperature;
         }
+        
         else
         {
             float sommeEnergieStellaire = 0f;
