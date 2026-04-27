@@ -155,13 +155,41 @@ public class ObjectProperties : MonoBehaviour
         }
 
         // Calcul de la distance à l'étoile parente
-        if (EtoileParent != null && thisTransform != null)
+        if (EtoileParent != null && distanceToEtoile > 0 && thisGravityBody != null)
         {
-            Vector3 posEtoile = EtoileParent.transform.position;
-            Vector3 posBody = thisTransform.position;
-            distanceToEtoile = Vector3.Distance(posEtoile, posBody);
-        }
+            GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
 
+            if (starGravity != null && starGravity.rb != null)
+            {
+                double G_phys = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+                double mu = G_phys * starGravity.Mass;
+
+                // CORRECTION MAJEURE : On utilise la vitesse relative à l'étoile !
+                Vector3 relativeVelocity = thisGravityBody.rb.linearVelocity - starGravity.rb.linearVelocity;
+                double v = relativeVelocity.magnitude;
+                double r = distanceToEtoile;
+
+                double denom = (2.0 / r) - (v * v) / mu;
+
+                // Si denom est positif, c'est une orbite fermée (Cercle ou Ellipse)
+                if (denom > 1e-12)
+                {
+                    double a = 1.0 / denom;
+                    double T = 2.0 * Math.PI * Math.Sqrt((a * a * a) / mu);
+                    periode = (float)(T / 86400.0); // Conversion en jours
+                }
+                else
+                {
+                    // Si denom est négatif, l'astre s'échappe de l'étoile (Hyperbole) !
+                    periode = 0f;
+                }
+            }
+        }
+        else
+        {
+            periode = 0f;
+        }
+        
         if (speedMagnitude > 0 && distanceToEtoile > 0)
         {
             GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
@@ -380,55 +408,6 @@ public class ObjectProperties : MonoBehaviour
             else
             {
                 temperatureMagnitude = greenhouseEffect;
-                //TODO
-                // Calcul plus précis de la période orbitale (loi de Kepler)
-                if (EtoileParent != null && distanceToEtoile > 0)
-                {
-                    GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
-
-                    if (starGravity != null && starGravity.Mass > 0)
-                    {
-                        const float SecondsToDays = 1f / 86400f;
-
-                        double G = GravityManager.G * GravityManager.Instance.gravityMultiplier;
-                        double masseEtoileKg = starGravity.Mass * unityToKgScale;
-                        double v = (thisGravityBody.rb.linearVelocity.magnitude * distanceToMetersScale);
-                        double r = distanceToEtoile * distanceToMetersScale;
-                        double mu = G * masseEtoileKg;
-
-                        double denom = (2.0 / r) - (v * v) / mu;
-
-                        if (Math.Abs(denom) < 1e-12)
-                        {
-                            periode = 0f;
-                            return;
-                        }
-
-                        double a = 1.0 / denom;
-
-                        double T = 2.0 * Math.PI * Math.Sqrt((a * a * a) / mu);
-
-                        periode = (float)(T / 86400.0);
-                    }
-                    else
-                    {
-                        periode = 0f;
-                    }
-
-                    if (EtoileParent != null && distanceToEtoile > 0)
-                    {
-                        float vraieDistanceMetres = distanceToEtoile * distanceToMetersScale;
-
-                        float sigma = 5.67e-8f;
-
-                        float numerateur = starLuminosity * (1f - albedo);
-                        float denominateur = 16f * Mathf.PI * sigma * (vraieDistanceMetres * vraieDistanceMetres);
-
-                        float tempEquilibre = Mathf.Pow(numerateur / denominateur, 0.25f);
-
-                        temperatureMagnitude = tempEquilibre + greenhouseEffect;
-                    }
-                }
             }
         }
     }

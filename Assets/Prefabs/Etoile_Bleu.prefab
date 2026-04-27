@@ -279,9 +279,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Bleu
-  isOrbitalBody: 1
+  isOrbitalBody: 0
   speedMagnitude: 0
-  _mass: 1000000
+  mass: 2500000
   radius: 15
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -292,13 +292,13 @@ MonoBehaviour:
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
-  isStar: 0
+  isStar: 1
   isBlackHole: 0
   blackHoleFormationMassSolar: 3
   blackHolePrefab: {fileID: 821638216226138241, guid: 1bd965871e8c6ff409b94f743fee249f, type: 3}
   starSurfaceTemperature: 5778
   starLuminosity: 3.52e+30
-  albedo: 0.3
+  albedo: 0
   greenhouseEffect: 0
 --- !u!114 &7738383565594045505
 MonoBehaviour:
@@ -314,6 +314,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
   heightOffsetPercentage: 0.65
+  minTopOffset: 0.5
+  cameraOffsetPercentage: 0.35
+  minSurfacePadding: 0.2
+  closeRangeBoostDistance: 8
+  closeRangeBoostFactor: 0.1
   minScale: 0.5
   maxScale: 50
   scaleMultiplier: 0.1

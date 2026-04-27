@@ -32,13 +32,14 @@ public class PlanetSpawner : MonoBehaviour
         ObjectProperties prefabProps = selectedPrefab.GetComponent<ObjectProperties>();
         bool shouldOrbit = (prefabProps == null || prefabProps.isOrbitalBody);
 
-        if (!shouldOrbit || ObjectProperties.AllStarsInSystem == null || ObjectProperties.AllStarsInSystem.Count == 0)
+        ObjectProperties instanceProps = instance.GetComponent<ObjectProperties>();
+        
+        if (ObjectProperties.AllStarsInSystem == null || ObjectProperties.AllStarsInSystem.Count == 0)
         {
-            Debug.Log($"[PlanetSpawner] '{instance.name}' spawned as a free body.");
+            Debug.Log($"[PlanetSpawner] '{instance.name}' spawned as a free body (No stars in system).");
             return;
         }
-
-        // Find nearest star
+        
         GameObject nearestStar = null;
         float minDist = float.MaxValue;
 
@@ -53,15 +54,19 @@ public class PlanetSpawner : MonoBehaviour
             }
         }
 
-        if (nearestStar == null)
+        if (instanceProps != null && nearestStar != null)
         {
-            Debug.Log($"[PlanetSpawner] No valid star found, '{instance.name}' spawned as a free body.");
+            instanceProps.EtoileParent = nearestStar;
+        }
+        
+        if (!shouldOrbit || nearestStar == null)
+        {
+            Debug.Log($"[PlanetSpawner] '{instance.name}' spawned as a free body.");
             return;
         }
 
         Rigidbody starRb = nearestStar.GetComponent<Rigidbody>();
-        if (starRb == null)
-        {
+        if (starRb == null) {
             Debug.LogWarning($"[PlanetSpawner] Nearest star '{nearestStar.name}' has no Rigidbody.");
             return;
         }
