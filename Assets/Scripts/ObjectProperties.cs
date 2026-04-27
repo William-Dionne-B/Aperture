@@ -161,12 +161,40 @@ public class ObjectProperties : MonoBehaviour
             Vector3 posBody = thisTransform.position;
             distanceToEtoile = Vector3.Distance(posEtoile, posBody);
         }
-        
-        if (speedMagnitude > 0 && distanceToEtoile > 0) periode = (float)Math.Round((2 * Mathf.PI * distanceToEtoile) / speedMagnitude, 2);
-        else periode = 0f;
+
+        if (speedMagnitude > 0 && distanceToEtoile > 0)
+        {
+            GravityBody starGravity = EtoileParent.GetComponent<GravityBody>();
+            const float SecondsToDays = 1f / 86400f;
+
+            double G = GravityManager.G * GravityManager.Instance.gravityMultiplier;
+            double masseEtoileKg = starGravity.Mass;
+            double v = (thisGravityBody.rb.linearVelocity.magnitude);
+            double r = distanceToEtoile;
+            double mu = G * masseEtoileKg;
+
+            double denom = (2.0 / r) - (v * v) / mu;
+
+            Debug.Log("denom"+denom);
+            //if (Math.Abs(denom) < 1e-12)
+            //{
+            //    periode = 0f;
+            //    return;
+            //}
+
+            double a = 1.0 / denom;
+
+            double T = 2.0 * Math.PI * Math.Sqrt((a * a * a) / mu);
+
+            periode = (float)(T / 86400.0);
+        }
+        else
+        {
+            periode = 0f;
+        }
 
         // --- DENSITÉ ---
-        if (mass > 0 && radius > 0) density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
+        if (mass > 0 && radius > 0) density = mass * unityToKgScale / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius * radiusToMetersScale, 3));
         else density = 0f;
 
         // --- THERMODYNAMIQUE ---
@@ -360,6 +388,7 @@ public class ObjectProperties : MonoBehaviour
 
                     if (starGravity != null && starGravity.Mass > 0)
                     {
+                        const float SecondsToDays = 1f / 86400f;
 
                         double G = GravityManager.G * GravityManager.Instance.gravityMultiplier;
                         double masseEtoileKg = starGravity.Mass * unityToKgScale;
@@ -384,15 +413,6 @@ public class ObjectProperties : MonoBehaviour
                     else
                     {
                         periode = 0f;
-                    }
-
-                    if (mass > 0 && radius > 0)
-                    {
-                        density = mass / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius, 3));
-                    }
-                    else
-                    {
-                        density = 0f; // Densité indéfinie si masse ou rayon nulle
                     }
 
                     if (EtoileParent != null && distanceToEtoile > 0)
