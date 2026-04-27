@@ -22,7 +22,7 @@ public class SystemeSauvegarde : MonoBehaviour
 
         if (ctrl && Input.GetKeyDown(KeyCode.S))
         {
-            SaveScene("save");
+            SaveScene("Autosave");
         }
     }
 

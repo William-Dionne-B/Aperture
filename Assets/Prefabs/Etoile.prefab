@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -8802154727256929741}
   - component: {fileID: -865306041739595272}
   - component: {fileID: -3990352540898623137}
+  - component: {fileID: -4284574290284699263}
   m_Layer: 0
   m_Name: Etoile
   m_TagString: Untagged
@@ -361,6 +362,19 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-4284574290284699263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544941027984095034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bbe3134ba97c844db657bcb5a6e8860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
 --- !u!1 &8308709504518242150
 GameObject:
   m_ObjectHideFlags: 0

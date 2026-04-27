@@ -7,7 +7,7 @@ public class SaveCreatorWindow : EditorWindow
     private string fileName = "save_";
     private Vector2 scroll;
 
-    [MenuItem("Tools/Save Creator %#k")]
+    [MenuItem("Tools/JSON Writer _F5")] // ctrl shift f5
     public static void Open()
     {
         GetWindow<SaveCreatorWindow>("Save Creator");

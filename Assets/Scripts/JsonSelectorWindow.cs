@@ -7,7 +7,7 @@ public class JsonSelectorWindow : EditorWindow
     private string[] jsonFiles;
     private Vector2 scroll;
 
-    [MenuItem("Tools/JSON Selector %l")] // Ctrl + Shift + L by default
+    [MenuItem("Tools/JSON Selector _F9")] // ctrl shift f9
     public static void ShowWindow()
     {
         GetWindow<JsonSelectorWindow>("JSON Selector");

@@ -205,7 +205,7 @@ public class PauseMenu : MonoBehaviour
     public void QuitGame()
     {
         Debug.Log("Saving Simulation !");
-        SystemeSauvegarde.Instance.SaveScene("save");
+        SystemeSauvegarde.Instance.SaveScene("Autosave");
         Debug.Log("Ending Simulator !");
         MainMenuManager.loadScene("MenuAccueil");
         //Resume();
