@@ -172,6 +172,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
   heightOffsetPercentage: 0.65
+  minTopOffset: 0.5
+  cameraOffsetPercentage: 0.35
+  minSurfacePadding: 0.2
+  closeRangeBoostDistance: 8
+  closeRangeBoostFactor: 0.1
   minScale: 0.5
   maxScale: 20
   scaleMultiplier: 0.1
@@ -190,7 +195,7 @@ MonoBehaviour:
   objectName: Asteroide
   isOrbitalBody: 1
   speedMagnitude: 0
-  _mass: 0.322716
+  mass: 1
   radius: 0.244
   distanceToEtoile: 0
   gravityMagnitude: 0
@@ -233,7 +238,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 964374285f3958b42bbdbed46e38e3a5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
