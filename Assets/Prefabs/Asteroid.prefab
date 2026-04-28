@@ -195,7 +195,7 @@ MonoBehaviour:
   objectName: Asteroide
   isOrbitalBody: 1
   speedMagnitude: 0
-  mass: 1
+  mass: 0.322716
   radius: 0.244
   distanceToEtoile: 0
   gravityMagnitude: 0
