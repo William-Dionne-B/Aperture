@@ -3,9 +3,10 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [RequireComponent(typeof(MeshFilter))]
- [RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshRenderer))]
 public class SpaceTimeGrid : MonoBehaviour
 {
+    [Header("Grid Settings")]
     public int resolution = 200;
     public float size = 1500f;
     public float maxWarpDepth = 2000f;
@@ -14,13 +15,24 @@ public class SpaceTimeGrid : MonoBehaviour
     public bool followCenterOfMassY = true;
     public bool followCamera = true;
     public Transform cameraTarget;
+
+    [Header("Line Appearance")]
     public Color lineColor = new Color(0.45f, 0.45f, 0.45f, 0.28f);
     [Range(0.0001f, 0.01f)] public float lineWidth = 0.0006f;
+
+    [Header("Warp Settings")]
     public float warpStrength = 0.01f;
     public float warpMultiplier = 4f;
-    public float fadeStartDistance = 350f;
-    public float fadeEndDistance = 1600f;
 
+    [Header("Distance Fade")]
+    public float fadeStartDistance = 150f;
+    public float fadeEndDistance = 750f;
+
+    [Header("Camera Distance Transparency")]
+    public float alphaMin = 0.0f;   // Alpha quand très proche
+    public float alphaMax = 1.0f;   // Alpha quand très loin
+
+    // Shader property IDs
     static readonly int GridScaleId = Shader.PropertyToID("_GridScale");
     static readonly int LineColorId = Shader.PropertyToID("_LineColor");
     static readonly int LineWidthId = Shader.PropertyToID("_LineWidth");
@@ -28,6 +40,11 @@ public class SpaceTimeGrid : MonoBehaviour
     static readonly int WarpMultiplierId = Shader.PropertyToID("_WarpMultiplier");
     static readonly int FadeStartDistanceId = Shader.PropertyToID("_FadeStartDistance");
     static readonly int FadeEndDistanceId = Shader.PropertyToID("_FadeEndDistance");
+    static readonly int CameraPosId = Shader.PropertyToID("_CameraWorldPos");
+    static readonly int AlphaMinId = Shader.PropertyToID("_AlphaMin");
+    static readonly int AlphaMaxId = Shader.PropertyToID("_AlphaMax");
+
+    private Material materialInstance;
 
     void Start()
     {
@@ -35,6 +52,12 @@ public class SpaceTimeGrid : MonoBehaviour
         size = Mathf.Max(0.01f, size);
         gridCellWorldSize = Mathf.Max(0.01f, gridCellWorldSize);
         fadeEndDistance = Mathf.Max(fadeStartDistance + 0.01f, fadeEndDistance);
+
+        // Crée une instance du material propre à cet objet
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer.sharedMaterial != null)
+            materialInstance = meshRenderer.material; // crée l'instance
+
         ApplyVerticalOffset();
         ApplyCameraFollow();
 
@@ -44,9 +67,7 @@ public class SpaceTimeGrid : MonoBehaviour
 
         int vertCount = (resolution + 1) * (resolution + 1);
         if (vertCount > 65535)
-        {
             mesh.indexFormat = IndexFormat.UInt32;
-        }
 
         Vector3[] vertices = new Vector3[vertCount];
         Vector2[] uv = new Vector2[vertCount];
@@ -59,7 +80,7 @@ public class SpaceTimeGrid : MonoBehaviour
         {
             for (int x = 0; x <= resolution; x++)
             {
-                vertices[v] = new Vector3(x * step - size/2, 0, z * step - size/2);
+                vertices[v] = new Vector3(x * step - size / 2, 0, z * step - size / 2);
                 uv[v] = new Vector2((float)x / resolution, (float)z / resolution);
                 v++;
             }
@@ -86,12 +107,9 @@ public class SpaceTimeGrid : MonoBehaviour
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
-
-        float extent = size * 0.5f;
-        float depth = Mathf.Max(1f, maxWarpDepth);
         mesh.bounds = new Bounds(
             Vector3.zero,
-            new Vector3(size, depth * 2f, size)
+            new Vector3(size, Mathf.Max(1f, maxWarpDepth) * 2f, size)
         );
 
         ApplyGridMaterialSettings();
@@ -110,7 +128,12 @@ public class SpaceTimeGrid : MonoBehaviour
     void LateUpdate()
     {
         ApplyCameraFollow();
+        UpdateCameraDistanceFade();
     }
+
+    // ==========================================
+    // POSITION DE LA GRILLE
+    // ==========================================
 
     void ApplyVerticalOffset()
     {
@@ -127,9 +150,7 @@ public class SpaceTimeGrid : MonoBehaviour
         {
             Transform target = cameraTarget;
             if (target == null && Camera.main != null)
-            {
                 target = Camera.main.transform;
-            }
 
             if (target != null)
             {
@@ -145,35 +166,65 @@ public class SpaceTimeGrid : MonoBehaviour
     float ResolveGridY()
     {
         if (!followCenterOfMassY)
-        {
             return gridVerticalOffset;
-        }
 
         return GravityManager.GetCenterOfMass().y + gridVerticalOffset;
     }
 
+    // ==========================================
+    // MATERIAL
+    // ==========================================
+
     void ApplyGridMaterialSettings()
     {
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-        if (meshRenderer == null)
-        {
-            return;
-        }
-
-        Material material = meshRenderer.sharedMaterial;
-        if (material == null)
-        {
-            return;
-        }
+        Material mat = GetActiveMaterial();
+        if (mat == null) return;
 
         float gridScale = 1f / gridCellWorldSize;
-        material.SetFloat(GridScaleId, gridScale);
-        material.SetColor(LineColorId, lineColor);
-        material.SetFloat(LineWidthId, lineWidth);
-        material.SetFloat(StrengthId, warpStrength);
-        material.SetFloat(WarpMultiplierId, warpMultiplier);
-        material.SetFloat(FadeStartDistanceId, fadeStartDistance);
-        material.SetFloat(FadeEndDistanceId, fadeEndDistance);
-        material.renderQueue = (int)RenderQueue.Transparent - 100;
+        mat.SetFloat(GridScaleId, gridScale);
+        mat.SetColor(LineColorId, lineColor);
+        mat.SetFloat(LineWidthId, lineWidth);
+        mat.SetFloat(StrengthId, warpStrength);
+        mat.SetFloat(WarpMultiplierId, warpMultiplier);
+        mat.SetFloat(FadeStartDistanceId, fadeStartDistance);
+        mat.SetFloat(FadeEndDistanceId, fadeEndDistance);
+        mat.SetFloat(AlphaMinId, alphaMin);
+        mat.SetFloat(AlphaMaxId, alphaMax);
+        mat.renderQueue = (int)RenderQueue.Transparent - 100;
+    }
+
+    void UpdateCameraDistanceFade()
+    {
+        Material mat = GetActiveMaterial();
+        if (mat == null) return;
+
+        Camera cam = Camera.main;
+        if (cam == null) return;
+
+        mat.SetVector(CameraPosId, cam.transform.position);
+        mat.SetFloat(AlphaMinId, alphaMin);
+        mat.SetFloat(AlphaMaxId, alphaMax);
+    }
+
+    // Retourne l'instance du material (en jeu) ou le sharedMaterial (en éditeur)
+    Material GetActiveMaterial()
+    {
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer == null) return null;
+
+        if (Application.isPlaying)
+        {
+            if (materialInstance == null)
+                materialInstance = meshRenderer.material;
+            return materialInstance;
+        }
+
+        return meshRenderer.sharedMaterial;
+    }
+
+    void OnDestroy()
+    {
+        if (materialInstance != null)
+            Destroy(materialInstance);
     }
 }
