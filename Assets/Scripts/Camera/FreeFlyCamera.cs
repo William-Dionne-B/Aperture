@@ -160,12 +160,18 @@ public class FreeFlyCamera : MonoBehaviour
     /// </summary>
     void HandleMovement()
     {
-        float x = Input.GetAxisRaw("Horizontal"); // A / D
-        float z = Input.GetAxisRaw("Vertical"); // W / S
+        // Lecture manuelle — exclut les flèches du mouvement
+        float x = 0f;
+        float z = 0f;
+
+        if (Input.GetKey(KeyCode.D)) x += 1f;
+        if (Input.GetKey(KeyCode.A)) x -= 1f;
+        if (Input.GetKey(KeyCode.W)) z += 1f;
+        if (Input.GetKey(KeyCode.S)) z -= 1f;
 
         float y = 0f;
-        if (Input.GetKey(KeyCode.E)) y += 1f; // Up
-        if (Input.GetKey(KeyCode.Q)) y -= 1f; // Down
+        if (Input.GetKey(KeyCode.E)) y += 1f;
+        if (Input.GetKey(KeyCode.Q)) y -= 1f;
 
         Vector3 input = new Vector3(x, y, z).normalized;
 
@@ -182,7 +188,7 @@ public class FreeFlyCamera : MonoBehaviour
     // ==========================================
     // GESTION DU CURSEUR
     // ==========================================
-    
+
     void ToggleCursor()
     {
         if (Cursor.lockState == CursorLockMode.Locked) UnlockCursor();
