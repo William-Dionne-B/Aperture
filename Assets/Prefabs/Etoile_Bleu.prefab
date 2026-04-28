@@ -278,11 +278,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c9b427d4052fa4ba21a72fb227bdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: Bleu
+  objectName: Etoile
   isOrbitalBody: 0
   speedMagnitude: 0
   mass: 2500000
-  radius: 15
+  radius: 31.5
   distanceToEtoile: 0
   gravityMagnitude: 0
   temperatureMagnitude: 0

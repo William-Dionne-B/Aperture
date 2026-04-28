@@ -280,7 +280,7 @@ MonoBehaviour:
   objectName: Trou Noir
   isOrbitalBody: 0
   speedMagnitude: 0
-  mass: 10000000
+  mass: 6000000
   radius: 5
   distanceToEtoile: 0
   gravityMagnitude: 0
