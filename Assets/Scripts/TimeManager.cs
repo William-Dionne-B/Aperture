@@ -6,11 +6,10 @@ using UnityEngine;
 /// </summary>
 public class TimeManager : MonoBehaviour
 {
-    // On mémorise la vitesse choisie par le joueur (par défaut 1x)
     public static float currentSpeedMultiplier = 1f;
 
     // ==========================================
-    // CONTRÔLE DYNAMIQUE (Pour tes Sliders / Boutons UI)
+    // CONTRÔLE DYNAMIQUE (Pour les Sliders / Boutons UI)
     // ==========================================
 
     /// <summary>
@@ -20,14 +19,12 @@ public class TimeManager : MonoBehaviour
     {
         currentSpeedMultiplier = newSpeed;
 
-        // On applique la nouvelle vitesse UNIQUEMENT si le jeu n'est pas en pause
         if (!PauseMenu.isSimulationPaused && !PauseMenu.isMenuOpen)
         {
             ApplySpeed(currentSpeedMultiplier);
         }
     }
 
-    // Boutons UI rapides pour te faciliter la vie
     public void SetSpeedNormal() { SetSpeedMultiplier(1f); }
     public void SetSpeedFast() { SetSpeedMultiplier(5f); }
     public void SetSpeedUltra() { SetSpeedMultiplier(10f); }
