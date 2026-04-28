@@ -296,7 +296,7 @@ MonoBehaviour:
   isBlackHole: 0
   blackHoleFormationMassSolar: 3
   blackHolePrefab: {fileID: 821638216226138241, guid: 1bd965871e8c6ff409b94f743fee249f, type: 3}
-  starSurfaceTemperature: 5778
+  starSurfaceTemperature: 35000
   starLuminosity: 3.52e+30
   albedo: 0
   greenhouseEffect: 0
