@@ -20330,7 +20330,7 @@ MonoBehaviour:
   spawnDistance: 2
   projectileSpeed: 30
   asteroidScale: 2
-  asteroidMass: 100000
+  asteroidMass: 10
   maxDistanceFromCamera: 2000
 --- !u!1 &1707779762
 GameObject:

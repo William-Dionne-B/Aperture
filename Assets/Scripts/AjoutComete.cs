@@ -13,8 +13,8 @@ public class AjoutComete : MonoBehaviour
     [Header("Projectile")]
     [Min(0.01f)] public float spawnDistance = 2f;
     [Min(0.01f)] public float projectileSpeed = 30f;
-    [Min(0.01f)] public float asteroidScale = 2f;
-    [Min(0.001f)] public float asteroidMass = 100000f;
+    [Min(0.01f)] public float asteroidScale = 1f;
+    [Min(0.001f)] public float asteroidMass = 10f;
     [Min(1f)] public float maxDistanceFromCamera = 2000f;
 
     readonly Queue<GameObject> activeProjectiles = new Queue<GameObject>();
