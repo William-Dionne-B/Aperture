@@ -160,7 +160,7 @@ public class ObjectProperties : MonoBehaviour
             float vraiRayonEnMetres = radius * radiusToMetersScale;
             float vraieMasseEnKg = mass * unityToKgScale;
             float constanteGravitationnelle = GravityManager.G * GravityManager.Instance.gravityMultiplier;
-            gravityMagnitude = (constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres) / 1e9f;
+            gravityMagnitude = (float)System.Math.Round(((constanteGravitationnelle * vraieMasseEnKg) / (vraiRayonEnMetres * vraiRayonEnMetres) / 1e9f), 2);
         }
         else
         {
@@ -182,7 +182,7 @@ public class ObjectProperties : MonoBehaviour
                 double r3 = vraieDistanceInitialeMetres * vraieDistanceInitialeMetres * vraieDistanceInitialeMetres;
                 double periodeEnSecondes = 2.0 * Math.PI * Math.Sqrt(r3 / mu);
 
-                periode = (float)(periodeEnSecondes / 86400.0);
+                periode = (float)System.Math.Round(periodeEnSecondes / 86400.0, 2);
             }
             else
             {
@@ -195,8 +195,16 @@ public class ObjectProperties : MonoBehaviour
         }
 
         // --- DENSITÉ ---
-        if (mass > 0 && radius > 0) density = mass * unityToKgScale / ((4f / 3f) * Mathf.PI * Mathf.Pow(radius * radiusToMetersScale, 3));
-        else density = 0f;
+        if (mass > 0 && radius > 0) 
+        {
+            float volumeM3 = (4f / 3f) * Mathf.PI * Mathf.Pow(radius * radiusToMetersScale, 3);
+            float densityKgM3 = (mass * unityToKgScale) / volumeM3;
+            density = (float)System.Math.Round(densityKgM3 / 1000f, 2);
+        }
+        else 
+        {
+            density = 0f;
+        }
 
         // --- THERMODYNAMIQUE ---
         ActualiserTemperature();
