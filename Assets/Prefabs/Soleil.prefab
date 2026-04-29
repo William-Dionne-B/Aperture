@@ -18,9 +18,10 @@ GameObject:
   - component: {fileID: -8802154727256929741}
   - component: {fileID: -865306041739595272}
   - component: {fileID: -3990352540898623137}
-  - component: {fileID: -4284574290284699263}
+  - component: {fileID: -4567654950596321797}
+  - component: {fileID: 2768034071060236978}
   m_Layer: 0
-  m_Name: Etoile
+  m_Name: Soleil
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -362,7 +363,20 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-4284574290284699263
+--- !u!114 &-4567654950596321797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544941027984095034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edb791a6a568efc4985a4a546c2ff7e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabID: soleil
+--- !u!114 &2768034071060236978
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

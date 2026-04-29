@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public class BodyData
 {
-    public string prefabName;
+    public string prefabID;
 
     public Vector3 position;
     public Vector3 velocity;

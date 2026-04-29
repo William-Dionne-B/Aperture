@@ -10,6 +10,26 @@ public class SystemeSauvegarde : MonoBehaviour
 
     public List<GameObject> bodyPrefabs; // assign in inspector
 
+    private Dictionary<string, GameObject> prefabLookup;
+
+    void Start()
+    {
+        prefabLookup = new Dictionary<string, GameObject>();
+
+        foreach (var prefab in bodyPrefabs)
+        {
+            PrefabID pid = prefab.GetComponent<PrefabID>();
+
+            if (pid == null || string.IsNullOrEmpty(pid.prefabID))
+            {
+                Debug.LogWarning($"Prefab {prefab.name} missing PrefabID!");
+                continue;
+            }
+
+            prefabLookup[pid.prefabID] = prefab;
+        }
+    }
+
     void Awake()
     {
         Instance = this;
@@ -35,7 +55,7 @@ public class SystemeSauvegarde : MonoBehaviour
             if (body == null || body.rb == null) continue;
 
             ObjectProperties props = body.GetComponent<ObjectProperties>();
-            
+
             if (props == null)
             {
                 Debug.LogWarning($"Missing ObjectProperties on {body.name}");
@@ -60,11 +80,19 @@ public class SystemeSauvegarde : MonoBehaviour
                 parentID = parentPID.id;
             }
 
+            PrefabID prefabIDComp = body.GetComponent<PrefabID>();
+
+            if (prefabIDComp == null)
+            {
+                Debug.LogWarning($"Missing PrefabID on {body.name}");
+                continue;
+            }
+
             BodyData dataBody = new BodyData
             {
                 id = pid.id,
 
-                prefabName = body.gameObject.name.Replace("(Clone)", "").Trim(),
+                prefabID = prefabIDComp.prefabID,
 
                 position = body.rb.position,
                 velocity = body.rb.linearVelocity,
@@ -117,11 +145,9 @@ public class SystemeSauvegarde : MonoBehaviour
 
         foreach (var dataBodies in data.bodies)
         {
-            GameObject prefab = bodyPrefabs.Find(p => p.name == dataBodies.prefabName);
-
-            if (prefab == null)
+            if (!prefabLookup.TryGetValue(dataBodies.prefabID, out GameObject prefab))
             {
-                Debug.LogWarning("Missing prefab: " + dataBodies.prefabName);
+                Debug.LogWarning("Missing prefab ID: " + dataBodies.prefabID);
                 continue;
             }
 
@@ -130,16 +156,16 @@ public class SystemeSauvegarde : MonoBehaviour
             PlanetID pid = obj.GetComponent<PlanetID>();
             if (pid == null)
                 pid = obj.AddComponent<PlanetID>();
+            
+            pid.id = dataBodies.id;
             spawned[pid.id] = obj;
 
-            pid.id = dataBodies.id;
-
             GravityBody gb = obj.GetComponent<GravityBody>();
-            if(gb == null)
+            if (gb == null)
                 gb = obj.AddComponent<GravityBody>();
 
             ObjectProperties props = obj.GetComponent<ObjectProperties>();
-            if(props == null)
+            if (props == null)
                 props = obj.AddComponent<ObjectProperties>();
 
             // Restore physics
@@ -167,8 +193,8 @@ public class SystemeSauvegarde : MonoBehaviour
         {
             if (string.IsNullOrEmpty(dataBodies.etoileParentID)) continue;
 
-                if (spawned.TryGetValue(dataBodies.id, out GameObject obj) &&
-                    spawned.TryGetValue(dataBodies.etoileParentID, out GameObject parent))
+            if (spawned.TryGetValue(dataBodies.id, out GameObject obj) &&
+                spawned.TryGetValue(dataBodies.etoileParentID, out GameObject parent))
             {
                 obj.GetComponent<ObjectProperties>().EtoileParent = parent;
             }
