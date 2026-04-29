@@ -1,12 +1,11 @@
-using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
     public void OnStartButtonPressed()
     {
-        loadScene("SystemeSolaire");
-        // UnityEngine.SceneManagement.SceneManager.LoadScene("SystemeSolaire");
+        LoadScene("SystemeSolaire");
     }
 
     public void OnQuitButtonPressed()
@@ -18,9 +17,15 @@ public class MainMenuManager : MonoBehaviour
         #endif
     }
 
-    public static void loadScene(string sceneName)
+    public void LoadScene(string sceneName)
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogWarning("Cannot load a scene because the scene name is empty.");
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 
 }
