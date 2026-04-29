@@ -17,6 +17,21 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SystemeSolaire.unity
     guid: 091acb722985c9245a15eb536b182777
+  - enabled: 1
+    path: "Assets/Scenes/ScenesVari\xE9es/1Sb1P.unity"
+    guid: b0b6dc37a48e6db489f490db36a5765f
+  - enabled: 1
+    path: "Assets/Scenes/ScenesVari\xE9es/1So1P.unity"
+    guid: 2a4e14663505c1147b800005d5d2d04c
+  - enabled: 1
+    path: "Assets/Scenes/ScenesVari\xE9es/1TN2So.unity"
+    guid: 125fb3e8a3713a54d8a31fb94d1d99b9
+  - enabled: 1
+    path: "Assets/Scenes/ScenesVari\xE9es/1TN4So.unity"
+    guid: e9c8cef3f0e18e942a302dd320d70be6
+  - enabled: 1
+    path: "Assets/Scenes/ScenesVari\xE9es/2So.unity"
+    guid: 66e87ac169efe374c85c5651f7c2ab9b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

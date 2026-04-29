@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.EventSystems; // NOUVEAU
@@ -207,7 +208,7 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Saving Simulation !");
         SystemeSauvegarde.Instance.SaveScene("Autosave");
         Debug.Log("Ending Simulator !");
-        MainMenuManager.loadScene("MenuAccueil");
+            SceneManager.LoadScene("MenuAccueil");
         //Resume();
     }
 
