@@ -353,19 +353,26 @@ public class ObjectManager : MonoBehaviour
 
         if (cameraLockedToSelection && selection != null && MainCamera != null && mainCameraAnchor != null)
         {
-            float h = Input.GetAxis("Horizontal");
-            float v = Input.GetAxis("Vertical");
+            // N'utiliser que WASD pour déplacer l'ancre quand la caméra est verrouillée
+            float h = 0f;
+            float v = 0f;
+            if (Input.GetKey(KeyCode.D)) h += 1f;
+            if (Input.GetKey(KeyCode.A)) h -= 1f;
+            if (Input.GetKey(KeyCode.W)) v += 1f;
+            if (Input.GetKey(KeyCode.S)) v -= 1f;
 
             if (Mathf.Abs(h) > 0.0001f || Mathf.Abs(v) > 0.0001f)
             {
-                Vector3 right = MainCamera.transform.right;
-                Vector3 forward = Vector3.ProjectOnPlane(MainCamera.transform.forward, Vector3.up).normalized;
+                // Calculer le déplacement relatif à la rotation verrouillée (pas à la rotation actuelle de l'objet caméra)
+                Vector3 right = mainCameraRotationWhenLocked * Vector3.right;
+                Vector3 forward = Vector3.ProjectOnPlane(mainCameraRotationWhenLocked * Vector3.forward, Vector3.up).normalized;
                 Vector3 move = (right * h + forward * v) * lockedMoveSpeed * Time.deltaTime;
 
                 mainCameraOffset += move;
             }
 
             mainCameraAnchor.transform.position = selection.transform.position + mainCameraOffset;
+            // Laisser la rotation de la caméra être gérée par le FreeFlyCamera (souris).
             mainCameraAnchor.transform.rotation = mainCameraRotationWhenLocked;
         }
 
