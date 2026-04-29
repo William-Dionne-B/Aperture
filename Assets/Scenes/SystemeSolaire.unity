@@ -7068,8 +7068,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2109533802}
   - {fileID: 1665283502}
+  - {fileID: 2109533802}
   - {fileID: 18559408}
   - {fileID: 21205093}
   m_Father: {fileID: 0}
@@ -20143,7 +20143,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Densit\xE9e (kg/m\xB3)"
+  m_text: "Densit\xE9e (g/cm\xB3)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -20671,7 +20671,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6960352195962517376, guid: 5bb7045707e76694aac707c7201e9d90, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 107.5
+      value: 107.49
       objectReference: {fileID: 0}
     - target: {fileID: 6960352195962517376, guid: 5bb7045707e76694aac707c7201e9d90, type: 3}
       propertyPath: m_LocalPosition.y
