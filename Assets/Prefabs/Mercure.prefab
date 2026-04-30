@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 8043081488228684370}
   - component: {fileID: 8616099641752463017}
   - component: {fileID: 8727431188296596382}
-  - component: {fileID: 7468075000399216406}
   - component: {fileID: 4274439807238117668}
+  - component: {fileID: 7468075000399216406}
   - component: {fileID: 7825457084920444107}
   - component: {fileID: 4808047127507751593}
   - component: {fileID: -6855780994547189369}
@@ -159,28 +159,6 @@ MonoBehaviour:
   Mass: 1
   rb: {fileID: 0}
   line: {fileID: 0}
---- !u!114 &7468075000399216406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8409388890369471149}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
-  heightOffsetPercentage: 0.65
-  minTopOffset: 0.5
-  cameraOffsetPercentage: 0.35
-  minSurfacePadding: 0.2
-  closeRangeBoostDistance: 8
-  closeRangeBoostFactor: 0.1
-  minScale: 0.5
-  maxScale: 20
-  scaleMultiplier: 0.1
 --- !u!114 &4274439807238117668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,6 +193,28 @@ MonoBehaviour:
   starLuminosity: 3.828e+26
   albedo: 0.12
   greenhouseEffect: 0
+--- !u!114 &7468075000399216406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8409388890369471149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d8d7aa0a69ea44a9118ad19f20f030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textPrefab: {fileID: 7098197108407327824, guid: 85101924d7330014382e0200cf15e543, type: 3}
+  heightOffsetPercentage: 0.65
+  minTopOffset: 0.5
+  cameraOffsetPercentage: 0.35
+  minSurfacePadding: 0.2
+  closeRangeBoostDistance: 8
+  closeRangeBoostFactor: 0.1
+  minScale: 0.5
+  maxScale: 20
+  scaleMultiplier: 0.1
 --- !u!120 &7825457084920444107
 LineRenderer:
   serializedVersion: 2
