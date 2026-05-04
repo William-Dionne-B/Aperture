@@ -71,7 +71,7 @@ public class PauseMenu : MonoBehaviour
         {
             if (keysMenuUI != null && keysMenuUI.activeSelf)
                 OpenOptions();
-            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf)
+            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf || saveMenuUI != null && saveMenuUI.activeSelf ||  loadMenuUI != null && loadMenuUI.activeSelf)
                 OpenPauseMenu();
             else if (isMenuOpen)
                 Resume();
