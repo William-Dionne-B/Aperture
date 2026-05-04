@@ -255,6 +255,12 @@ public class PauseMenu : MonoBehaviour
         saveMenuUI.SetActive(true);
     }
 
+    public void OpenLoad()
+    {
+        DesactivateAllMenus();
+        loadMenuUI.SetActive(true);
+    }
+
     private void DesactivateAllMenus()
     {
         if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
@@ -262,6 +268,7 @@ public class PauseMenu : MonoBehaviour
         if (guideMenuUI != null) guideMenuUI.SetActive(false);
         if (keysMenuUI != null) keysMenuUI.SetActive(false);
         if (saveMenuUI != null) saveMenuUI.SetActive(false);
+        if (loadMenuUI!= null) loadMenuUI.SetActive(false);
         //Resume();
     }
 
