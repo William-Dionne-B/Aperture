@@ -49,7 +49,7 @@ public class ObjectManager : MonoBehaviour
     public Button radiusMultiply10Button;
     public Button radiusDivide10Button;
 
-    private float initialYOffset = 95f;
+    // private float initialYOffset = 95f;
     private RawImage selectionRawImage;
     public float cameraPadding = 1.5f;
 

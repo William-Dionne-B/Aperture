@@ -29,7 +29,7 @@ public class GravityManager : MonoBehaviour
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
     public static IReadOnlyList<GravityBody> Bodies => bodies;
     private static readonly List<float> periodes = new List<float>();
-    private GravityBody soleil = null;
+    // private GravityBody soleil = null;
     private float orbitPredictionTimer = 0f;
 
     [Header("Orbit Line Appearance")]
