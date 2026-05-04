@@ -275,14 +275,20 @@ public class PauseMenu : MonoBehaviour
     // ==========================================
     // GESTION DES PARAMÈTRES (OPTIONS)
     // ==========================================
-
+    //TODO Mettre les valeurs sauvegardes et non les valeurs par default
     public void Reset()
     {
-        if (fieldOfViewSlider != null) fieldOfViewSlider.value = 60f;
-        if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = 3.5f;
-        if (movementSpeedSlider != null) movementSpeedSlider.value = 100f;
+        if (fieldOfViewSlider != null) fieldOfViewSlider.value = PlayerPrefs.GetFloat("FieldOfView");
+        if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity");
+        if (movementSpeedSlider != null) movementSpeedSlider.value = PlayerPrefs.GetFloat("MoveSpeed");
         
-        Debug.Log("Paramètres réinitialisés aux valeurs par défaut !");
+        Debug.Log("Paramètres réinitialisés aux valeurs enregistrées !");
+        
+        // if (fieldOfViewSlider != null) fieldOfViewSlider.value = 60f;
+        // if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = 3.5f;
+        // if (movementSpeedSlider != null) movementSpeedSlider.value = 100f;
+        //
+        // Debug.Log("Paramètres réinitialisés aux valeurs par défaut !");
     }
 
     public void SaveOptions()
@@ -310,7 +316,28 @@ public class PauseMenu : MonoBehaviour
             PlayerPrefs.Save();
             Debug.Log("Paramètres sauvegardés avec succès !");
         }
+    }
+    
+    public void QuitOptions()
+    {
+        if (cameraScript != null)
+        {
+            if (mouseSensitivitySlider != null)
+            {
+                cameraScript.mouseSensitivity = mouseSensitivitySlider.value;
+            }
 
+            if (fieldOfViewSlider != null)
+            {
+                cameraScript.playerCamera.fieldOfView = fieldOfViewSlider.value;
+            }
+
+            if (movementSpeedSlider != null)
+            {
+                cameraScript.moveSpeed = movementSpeedSlider.value;
+            }
+        }
+        
         OpenPauseMenu();
     }
 }
