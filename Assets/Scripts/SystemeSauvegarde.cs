@@ -12,6 +12,7 @@ public class SystemeSauvegarde : MonoBehaviour
 
     private Dictionary<string, GameObject> prefabLookup;
 
+
     void Start()
     {
         prefabLookup = new Dictionary<string, GameObject>();
@@ -42,8 +43,10 @@ public class SystemeSauvegarde : MonoBehaviour
 
         if (ctrl && Input.GetKeyDown(KeyCode.S))
         {
-            SaveScene("Autosave");
+            SaveMenuUI menu = Object.FindFirstObjectByType<SaveMenuUI>();
+            menu.CreateSave();
         }
+
     }
 
     public void SaveScene(string saveName)

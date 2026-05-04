@@ -16,6 +16,8 @@ public class PauseMenu : MonoBehaviour
     public GameObject optionMenuUI;
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
+    public GameObject saveMenuUI;
+    public GameObject loadMenuUI;
 
     [Header("Options UI Elements")] 
     public Slider fieldOfViewSlider;
@@ -67,13 +69,13 @@ public class PauseMenu : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (keysMenuUI != null && keysMenuUI.activeSelf) 
+            if (keysMenuUI != null && keysMenuUI.activeSelf)
                 OpenOptions();
-            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf) 
+            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf)
                 OpenPauseMenu();
-            else if (isMenuOpen) 
-                Resume(); 
-            else 
+            else if (isMenuOpen)
+                Resume();
+            else
                 Pause(); 
         }
         else if (!isMenuOpen)
@@ -245,6 +247,12 @@ public class PauseMenu : MonoBehaviour
             if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = cameraScript.mouseSensitivity;
             if (movementSpeedSlider != null) movementSpeedSlider.value = cameraScript.moveSpeed;
         }
+    }
+
+    public void OpenSave()
+    {
+        DesactivateAllMenus();
+        saveMenuUI.SetActive(true);
     }
 
     private void DesactivateAllMenus()
