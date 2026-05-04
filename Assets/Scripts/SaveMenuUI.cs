@@ -10,7 +10,6 @@ public class SaveMenuUI : MonoBehaviour
     [SerializeField] private TMP_InputField saveNameInput;
     [SerializeField] private Transform contentParent;
     [SerializeField] private GameObject saveItemPrefab;
-    [SerializeField] private KeyCode toggleKey = KeyCode.F5;
     [SerializeField] private GameObject menuRoot;
 
     private string saveExtension = ".json";
@@ -28,14 +27,6 @@ public class SaveMenuUI : MonoBehaviour
         RefreshSaveList();
         menuRoot.SetActive(false);
         isOpen = false;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(toggleKey))
-        {
-            ToggleMenu();
-        }
     }
 
     public void ToggleMenu()
