@@ -1,138 +1,124 @@
+using System.Collections.Generic;
+using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.IO;
-using System.Collections.Generic;
 
 public class SaveMenuUI : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private TMP_InputField saveNameInput;
-    [SerializeField] private Transform contentParent;
-    [SerializeField] private GameObject saveItemPrefab;
-    [SerializeField] private GameObject menuRoot;
+    public TMP_InputField inputField;
+    public Transform contentParent; // ScrollView Content
+    public GameObject saveButtonPrefab;
 
-    private string saveExtension = ".json";
+    private string selectedSave = null;
+    private List<string> saves = new List<string>();
 
-    private SystemeSauvegarde loader;
-    private bool isOpen;
-
-    private void Awake()
+    void Start()
     {
-        loader = Object.FindFirstObjectByType<SystemeSauvegarde>();
+        RefreshList();
     }
 
-    private void Start()
+    // Refresh save list UI
+    public void RefreshList()
     {
-        RefreshSaveList();
-        menuRoot.SetActive(false);
-        isOpen = false;
-    }
-
-    public void ToggleMenu()
-    {
-        isOpen = !isOpen;
-
-        menuRoot.SetActive(isOpen);
-
-        Time.timeScale = isOpen ? 0f : 1f;
-
-        Debug.Log("Menu state: " + isOpen);
-    }
-
-
-    // CREATE SAVE
-    public void CreateSave()
-    {
-
-        if (loader == null)
-        {
-            Debug.LogWarning("No SystemeSauvegarde found in scene!");
-            return;
-        }
-
-        string fileName = saveNameInput.text;
-
-        if (string.IsNullOrWhiteSpace(fileName))
-            fileName = "save_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
-
-        string fullPath = Path.Combine(Application.persistentDataPath, fileName + saveExtension);
-
-        loader.SaveScene(fullPath);
-
-        Debug.Log("Saved: " + fullPath);
-
-        RefreshSaveList();
-    }
-
-
-    // LOAD SAVE
-    public void LoadSave(string filePath)
-    {
-
-        if (loader == null)
-            return;
-
-        loader.LoadScene(filePath);
-
-        Debug.Log("Loaded: " + filePath);
-    }
-
-
-    // DELETE SAVE
-    public void DeleteSave(string filePath)
-    {
-        if (File.Exists(filePath))
-        {
-            try
-            {
-                File.Delete(filePath);
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError(e);
-            }
-            Debug.Log("Deleted: " + filePath);
-        }
-
-        RefreshSaveList();
-    }
-
-
-    // REFRESH UI LIST
-    public void RefreshSaveList()
-    {
+        // Clear UI
         foreach (Transform child in contentParent)
         {
-            for (int i = contentParent.childCount - 1; i >= 0; i--)
-            {
-                Destroy(contentParent.GetChild(i).gameObject);
-            }
+            Destroy(child.gameObject);
         }
 
-        string[] files = Directory.GetFiles(Application.persistentDataPath, "*" + saveExtension);
+        saves.Clear();
+
+        string path = Application.persistentDataPath;
+
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+
+        string[] files = Directory.GetFiles(path, "*.json");
 
         foreach (string file in files)
         {
-            CreateSaveItem(file);
+            string fileName = Path.GetFileName(file);
+            saves.Add(fileName);
+
+            GameObject btnObj = Instantiate(saveButtonPrefab, contentParent);
+
+            TMP_Text txt = btnObj.GetComponentInChildren<TMP_Text>();
+            txt.text = fileName;
+
+            Button btn = btnObj.GetComponent<Button>();
+
+            btn.onClick.AddListener(() =>
+            {
+                SelectSave(fileName, btnObj);
+            });
         }
     }
 
-
-    // CREATE ONE UI ENTRY
-    private void CreateSaveItem(string filePath)
+    // Select a save
+    void SelectSave(string saveName, GameObject buttonObj)
     {
-        GameObject item = Instantiate(saveItemPrefab, contentParent);
+        selectedSave = saveName;
 
-        string fileName = Path.GetFileNameWithoutExtension(filePath);
+        Debug.Log("Selected save: " + saveName);
 
-        TMP_Text label = item.transform.Find("FileName").GetComponent<TMP_Text>();
-        Button loadBtn = item.transform.Find("LoadButton").GetComponent<Button>();
-        Button deleteBtn = item.transform.Find("DeleteButton").GetComponent<Button>();
+        // Optional: highlight selected button
+        foreach (Transform child in contentParent)
+        {
+            child.GetComponent<Image>().color = Color.white;
+        }
 
-        label.text = fileName;
+        buttonObj.GetComponent<Image>().color = Color.green;
+    }
 
-        loadBtn.onClick.AddListener(() => LoadSave(filePath));
-        deleteBtn.onClick.AddListener(() => DeleteSave(filePath));
+    // Create new save
+    public void CreateSave()
+    {
+        string saveName = inputField.text;
+
+        if (string.IsNullOrEmpty(saveName))
+        {
+            Debug.LogWarning("Save name is empty!");
+            return;
+        }
+
+        SystemeSauvegarde.Instance.SaveScene(saveName);
+
+        RefreshList();
+    }
+
+    // Load selected save
+    public void LoadSelected()
+    {
+        if (string.IsNullOrEmpty(selectedSave))
+        {
+            Debug.LogWarning("No save selected!");
+            return;
+        }
+
+        SystemeSauvegarde.Instance.LoadScene(selectedSave);
+    }
+
+    // Delete selected save
+    public void DeleteSelected()
+    {
+        if (string.IsNullOrEmpty(selectedSave))
+        {
+            Debug.LogWarning("No save selected!");
+            return;
+        }
+
+        string path = Path.Combine(Application.persistentDataPath, selectedSave);
+
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            Debug.Log("Deleted: " + selectedSave);
+        }
+
+        selectedSave = null;
+
+        RefreshList();
     }
 }

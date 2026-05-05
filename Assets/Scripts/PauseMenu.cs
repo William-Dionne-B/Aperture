@@ -17,7 +17,6 @@ public class PauseMenu : MonoBehaviour
     public GameObject guideMenuUI;
     public GameObject keysMenuUI;
     public GameObject saveMenuUI;
-    public GameObject loadMenuUI;
 
     [Header("Options UI Elements")] 
     public Slider fieldOfViewSlider;
@@ -71,18 +70,23 @@ public class PauseMenu : MonoBehaviour
         {
             if (keysMenuUI != null && keysMenuUI.activeSelf)
                 OpenOptions();
-            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf || saveMenuUI != null && saveMenuUI.activeSelf ||  loadMenuUI != null && loadMenuUI.activeSelf)
+            else if (optionMenuUI != null && optionMenuUI.activeSelf || guideMenuUI != null && guideMenuUI.activeSelf || saveMenuUI != null && saveMenuUI.activeSelf)
                 OpenPauseMenu();
             else if (isMenuOpen)
                 Resume();
             else
-                Pause(); 
+                Pause();
         }
         else if (!isMenuOpen)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 ToggleSimulation();
+            }
+            else if (Input.GetKeyDown(KeyCode.F5))
+            {
+                Pause();
+                OpenSave();
             }
 
             HandleKeyboardSpeedControl();
@@ -255,12 +259,6 @@ public class PauseMenu : MonoBehaviour
         saveMenuUI.SetActive(true);
     }
 
-    public void OpenLoad()
-    {
-        DesactivateAllMenus();
-        loadMenuUI.SetActive(true);
-    }
-
     private void DesactivateAllMenus()
     {
         if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
@@ -268,7 +266,6 @@ public class PauseMenu : MonoBehaviour
         if (guideMenuUI != null) guideMenuUI.SetActive(false);
         if (keysMenuUI != null) keysMenuUI.SetActive(false);
         if (saveMenuUI != null) saveMenuUI.SetActive(false);
-        if (loadMenuUI!= null) loadMenuUI.SetActive(false);
         //Resume();
     }
 
