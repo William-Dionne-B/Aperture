@@ -27,6 +27,10 @@ public class GravityManager : MonoBehaviour
     public float maxOrbitSharpTurnRatio = 0.8f;
     private float predictionTimer = 0f;
 
+    public UnityEngine.UI.Toggle OrbitesCheck;
+    public KeyCode toggleOrbitesKey = KeyCode.O;
+    public bool orbitesOn = true;
+
     public float semiMajorAxis;
     public float mu;
 
@@ -50,6 +54,7 @@ public class GravityManager : MonoBehaviour
     void Start()
     {
         mainCam = Camera.main;
+        OrbitesCheck.onValueChanged.AddListener(OnToggleChanged);
     }
 
     void Awake()
@@ -61,7 +66,7 @@ public class GravityManager : MonoBehaviour
     {
         predictionTimer += Time.unscaledDeltaTime; 
         
-        if (predictionTimer >= 0.06f) 
+        if (predictionTimer >= 0.06f && orbitesOn) 
         {
             predictionTimer = 0f;
             
@@ -70,17 +75,35 @@ public class GravityManager : MonoBehaviour
                 if (body != null && body.line != null)
                 {
                     PredictOrbitHybrid(body);
+                    UpdateOrbitLineColors();
                 }
             }
         }
 
-        UpdateOrbitLineColors();
-    }
+        if (Input.GetKeyDown(toggleOrbitesKey))
+        {
+            orbitesOn = !orbitesOn;
 
+            // Sync the UI toggle without triggering duplicate logic
+            if (OrbitesCheck != null)
+            {
+                OrbitesCheck.isOn = orbitesOn;
+            }
+
+            // If turning OFF → clear lines immediately
+            if (!orbitesOn)
+            {
+                ClearAllOrbitLines();
+            }
+        }
+
+
+    }
+    
     // ==========================================
     // ADMINISTRATION DU SYSTEME
     // ==========================================
-
+    
     /// <summary>
     /// Permet aux scripts GravityBody de s'ajouter.
     /// </summary>
@@ -153,7 +176,7 @@ public class GravityManager : MonoBehaviour
                 ApplyGravity(bodies[i], bodies[j]);
             }
 
-            if (shouldPredictOrbit)
+            if (shouldPredictOrbit && orbitesOn)
             {
                 PredictOrbitHybrid(bodies[i]);
             }
@@ -194,7 +217,7 @@ public class GravityManager : MonoBehaviour
         
         Debug.Log("Simulation speed set to " + speed + "x");
     }
-
+    
     // ==========================================
     // GESTION DE L'ATTRACTION PHYSIQUE
     // ==========================================
@@ -547,6 +570,28 @@ public class GravityManager : MonoBehaviour
 
         return true;
     }
+    
+    void OnToggleChanged(bool value)
+    {
+        orbitesOn = value;
+
+        if (!orbitesOn)
+        {
+            ClearAllOrbitLines();
+        }
+    }
+
+    void ClearAllOrbitLines()
+    {
+        foreach (var body in bodies)
+        {
+            if (body != null && body.line != null)
+            {
+                body.line.positionCount = 0;
+            }
+        }
+    }
+    
     
     /// <summary>
     /// Envoie les points calcules au composant LineRenderer de l'objet pour afficher la ligne.
