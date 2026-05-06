@@ -84,20 +84,16 @@ public class GravityManager : MonoBehaviour
         {
             orbitesOn = !orbitesOn;
 
-            // Sync the UI toggle without triggering duplicate logic
             if (OrbitesCheck != null)
             {
                 OrbitesCheck.isOn = orbitesOn;
             }
 
-            // If turning OFF → clear lines immediately
             if (!orbitesOn)
             {
                 ClearAllOrbitLines();
             }
         }
-
-
     }
     
     // ==========================================
@@ -592,7 +588,6 @@ public class GravityManager : MonoBehaviour
         }
     }
     
-    
     /// <summary>
     /// Envoie les points calcules au composant LineRenderer de l'objet pour afficher la ligne.
     /// </summary>
@@ -632,7 +627,6 @@ public class GravityManager : MonoBehaviour
             }
         }
     }
-
     
     /// <summary>
     /// structure d'éléments orbitaux pour stocker les paramètres d'une orbite calculés à partir de la position et de la vitesse.
