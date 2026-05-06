@@ -1,13 +1,24 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Contrôle la gestion de transition entre les menus de l'application.
+/// </summary>
 public class MainMenuManager : MonoBehaviour
 {
+    
+    /// <summary>
+    /// Contrôle la transition entre le menu d'acceuil et la scene du systeme solaire
+    /// </summary>
     public void OnStartButtonPressed()
     {
         LoadScene("SystemeSolaire");
     }
 
+    
+    /// <summary>
+    /// Contrôle la gestion de ce qui se passe lorsqu'on quitte l'application.
+    /// </summary>
     public void OnQuitButtonPressed()
     {
         #if UNITY_EDITOR
@@ -17,6 +28,9 @@ public class MainMenuManager : MonoBehaviour
         #endif
     }
 
+    /// <summary>
+    /// Fonction generale permettant de load une scene
+    /// </summary>
     public void LoadScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))

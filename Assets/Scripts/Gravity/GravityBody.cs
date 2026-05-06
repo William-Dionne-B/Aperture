@@ -40,5 +40,4 @@ public class GravityBody : MonoBehaviour
     {
         GravityManager.Unregister(this);
     }
-
 }

@@ -1,6 +1,9 @@
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// Contrôle le texte qui flotte au dessus des astres du systeme solaire.
+/// </summary>
 public class Floating3DText : MonoBehaviour
 {
     [Header("Text Settings")]
@@ -23,6 +26,10 @@ public class Floating3DText : MonoBehaviour
     private Renderer objectRenderer;
     private Renderer textRenderer;
 
+    // ==========================================
+    // MÉTHODES UNITY
+    // ==========================================
+    
     void Start()
     {
         if (Camera.main != null)
@@ -100,6 +107,9 @@ public class Floating3DText : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// TODO La description
+    /// </summary>
     float ResolveObjectRadius()
     {
         if (objectRenderer != null)
@@ -110,6 +120,9 @@ public class Floating3DText : MonoBehaviour
         return Mathf.Max(transform.lossyScale.y * 0.5f, 0.0001f);
     }
     
+    /// <summary>
+    /// Gestion du texte quand une planete se fait detruire
+    /// </summary>
     void OnDestroy()
     {
         if (textTransform != null)

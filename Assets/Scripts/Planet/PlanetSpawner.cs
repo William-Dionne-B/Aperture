@@ -5,11 +5,10 @@ public class PlanetSpawner : MonoBehaviour
     private GameObject selectedPrefab;
     private int spawnCount = 0;
 
-    public void SetPrefab(GameObject prefab)
-    {
-        selectedPrefab = prefab;
-    }
-
+    // ==========================================
+    // MÉTHODES UNITY
+    // ==========================================
+    
     void Update()
     {
         if (!Input.GetMouseButtonDown(1)) return;
@@ -88,5 +87,13 @@ public class PlanetSpawner : MonoBehaviour
         }
 
         Debug.Log($"[PlanetSpawner] '{instance.name}' now orbiting '{nearestStar.name}' at speed {orbitalSpeed:F2}.");
+    }
+    
+    /// <summary>
+    /// Permet de set des prefabs pour les planetes
+    /// </summary>
+    public void SetPrefab(GameObject prefab)
+    {
+        selectedPrefab = prefab;
     }
 }

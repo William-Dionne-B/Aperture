@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Contrôle-la gravité des astres dans la simulation et les calculs de prediction
+/// d'orbites des astres qui orbitent des astres.
+/// </summary>
 public class GravityManager : MonoBehaviour
 {
     public static GravityManager Instance;
@@ -29,7 +33,6 @@ public class GravityManager : MonoBehaviour
     private static readonly List<GravityBody> bodies = new List<GravityBody>();
     public static IReadOnlyList<GravityBody> Bodies => bodies;
     private static readonly List<float> periodes = new List<float>();
-    // private GravityBody soleil = null;
     private float orbitPredictionTimer = 0f;
 
     [Header("Orbit Line Appearance")]
@@ -40,6 +43,10 @@ public class GravityManager : MonoBehaviour
 
     private Camera mainCam;
 
+    // ==========================================
+    // MÉTHODES UNITY
+    // ==========================================
+    
     void Start()
     {
         mainCam = Camera.main;
@@ -70,52 +77,57 @@ public class GravityManager : MonoBehaviour
         UpdateOrbitLineColors();
     }
 
-    void UpdateOrbitLineColors()
-    {
-        if (mainCam == null) mainCam = Camera.main;
-        if (mainCam == null) return;
+    // ==========================================
+    // ADMINISTRATION DU SYSTEME
+    // ==========================================
 
-        Vector3 camPos = mainCam.transform.position;
-
-        foreach (var body in bodies)
-        {
-            if (body == null || body.line == null || body.rb == null) continue;
-
-            float distance = Vector3.Distance(camPos, body.rb.position);
-
-            float t = Mathf.InverseLerp(lineAlphaDistanceMin, lineAlphaDistanceMax, distance);
-            float alpha = Mathf.Lerp(lineAlphaMin, lineAlphaMax, t);
-
-            Color c = new Color(1f, 1f, 1f, alpha);
-            body.line.startColor = c;
-            body.line.endColor = c;
-        }
-    }
-
-    public void SetSimulationSpeed(float speed)
-    {
-        Time.timeScale = speed;
-        
-        if (speed > 0f)
-        {
-            float physicsResolution = Mathf.Clamp(speed / 3f, 1f, 4f);
-            Time.fixedDeltaTime = 0.02f * physicsResolution;
-        }
-        
-        Debug.Log("Simulation speed set to " + speed + "x");
-    }
-
+    /// <summary>
+    /// Permet aux scripts GravityBody de s'ajouter.
+    /// </summary>
     public static void Register(GravityBody body)
     {
         if (!bodies.Contains(body))
             bodies.Add(body);
     }
 
+    /// <summary>
+    /// Permet aux scripts GravityBody de s'enlever
+    /// </summary>
     public static void Unregister(GravityBody body)
     {
         bodies.Remove(body);
     }
+    
+    /// <summary>
+    /// Calcule le point d'equilibre gravitationnel de tout le systeme solaire.
+    /// </summary>
+    public static Vector3 GetCenterOfMass()
+    {
+        if (bodies.Count == 0) return Vector3.zero;
 
+        Vector3 weightedSum = Vector3.zero;
+        float totalMass = 0f;
+
+        foreach (var body in bodies)
+        {
+            if (body != null && body.rb != null)
+            {
+                weightedSum += body.rb.position * body.rb.mass;
+                totalMass += body.rb.mass;
+            }
+        }
+
+        if (totalMass == 0f) return Vector3.zero;
+        return weightedSum / totalMass;
+    }
+
+    // ==========================================
+    // GESTION DE L'ATTRACTION PHYSIQUE
+    // ==========================================
+    
+    /// <summary>
+    /// Permet de calculer les mouvements a chaque pas de temps physique des objets de la simulation et d'appliquer les mouvements.
+    /// </summary>
     void FixedUpdate()
     {
         CleanupInvalidBodies();
@@ -146,21 +158,12 @@ public class GravityManager : MonoBehaviour
                 PredictOrbitHybrid(bodies[i]);
             }
         }
-
     }
-
-    void CleanupInvalidBodies()
-    {
-        for (int index = bodies.Count - 1; index >= 0; index--)
-        {
-            GravityBody body = bodies[index];
-            if (body == null || body.rb == null)
-            {
-                bodies.RemoveAt(index);
-            }
-        }
-    }
-
+    
+    /// <summary>
+    /// Calcule la force d'attraction entre deux objets en utilisant la formule F = G*(m1*m2)/(d^2),
+    /// ajoute un parametre de softening pour eviter que les forces deviennent infinies.
+    /// </summary>
     void ApplyGravity(GravityBody a, GravityBody b)
     {
         if (a == null || b == null || a.rb == null || b.rb == null) return;
@@ -174,38 +177,32 @@ public class GravityManager : MonoBehaviour
         a.rb.AddForce(force);
         b.rb.AddForce(-force);
     }
-
-    public static Vector3 GetCenterOfMass()
+    
+    /// <summary>
+    /// Modifie la vitesse de l'ecoulement du temps, ajuste aussi la precision physique
+    /// pour eviter les saccades quand on accelere le temps.
+    /// </summary>
+    public void SetSimulationSpeed(float speed)
     {
-        if (bodies.Count == 0) return Vector3.zero;
-
-        Vector3 weightedSum = Vector3.zero;
-        float totalMass = 0f;
-
-        foreach (var body in bodies)
+        Time.timeScale = speed;
+        
+        if (speed > 0f)
         {
-            if (body != null && body.rb != null)
-            {
-                weightedSum += body.rb.position * body.rb.mass;
-                totalMass += body.rb.mass;
-            }
+            float physicsResolution = Mathf.Clamp(speed / 3f, 1f, 4f);
+            Time.fixedDeltaTime = 0.02f * physicsResolution;
         }
-
-        if (totalMass == 0f) return Vector3.zero;
-        return weightedSum / totalMass;
+        
+        Debug.Log("Simulation speed set to " + speed + "x");
     }
 
-    //structure d'éléments orbitaux pour stocker les paramètres d'une orbite calculés à partir de la position et de la vitesse
-    public struct OrbitalElements
-    {
-        public float semiMajorAxis;
-        public float eccentricity;
-        public float periapsis;
-        public float apoapsis;
-        public float period;
-    }
-
-    // Hybrid approach: if one body dominates the gravity, use orbital elements for a clean ellipse. Otherwise, do a short-term n-body prediction.
+    // ==========================================
+    // GESTION DE L'ATTRACTION PHYSIQUE
+    // ==========================================
+    
+    /// <summary>
+    /// Determine quelle methode de dessin utiliser, si une planete est domincee par une seule etoile,
+    /// dessine une ellipse propre. Si plusieurs forces s'affrontent, elle simule une trajectoire complexe.
+    /// </summary>
     void PredictOrbitHybrid(GravityBody body)
     {
         if (body == null || body.rb == null || body.line == null)
@@ -217,17 +214,14 @@ public class GravityManager : MonoBehaviour
         {
             float period = CalculateOrbitalPeriod(body, mainAttractor);
             float duration = period * 1.05f;
-
-            // Calculate steps based on period
+            
             float sample = Mathf.Max(0.01f, orbitSampleInterval);
             int steps = Mathf.Clamp(Mathf.CeilToInt(duration / sample), 8, Mathf.Max(8, maxOrbitPredictionSteps));
-
-            // Dominated by one body → draw clean ellipse
+            
             DrawOrbitHybrid(body, mainAttractor, duration, steps);
         }
         else
         {
-            // No single dominant body → full short-term n-body integration
             float duration = Mathf.Min(50f, Mathf.Max(0.1f, maxOrbitPredictionDuration));
             float sample = Mathf.Max(0.01f, orbitSampleInterval);
             int steps = Mathf.Clamp(Mathf.CeilToInt(duration / sample), 8, Mathf.Max(8, maxOrbitPredictionSteps));
@@ -235,6 +229,11 @@ public class GravityManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Verifie si un objet est principalement attire par un seul corps.
+    /// Si la force de l'astre principal est 5 fois superieure a la seconde,
+    /// on considere que c'est une orbite stable a 2 corps.
+    /// </summary>
     bool IsTwoBodyDominated(GravityBody body, out GravityBody mainAttractor)
     {
         mainAttractor = null;
@@ -263,6 +262,10 @@ public class GravityManager : MonoBehaviour
         return maxForce > secondMaxForce * 5f;
     }
 
+    /// <summary>
+    /// Utilise la 3e loi de Kepler et l'energie orbitale pour calculer la duree exacte d'une revolution complete.
+    /// Permet de savoir quelle longueur de ligne dessiner pour faire un cercle parfait.
+    /// </summary>
     float CalculateOrbitalPeriod(GravityBody body, GravityBody centralBody)
     {
         float distance = Vector3.Distance(body.rb.position, centralBody.rb.position);
@@ -270,63 +273,15 @@ public class GravityManager : MonoBehaviour
         semiMajorAxis = Mathf.Clamp(1 / ((2 / distance) - (Mathf.Pow(body.rb.linearVelocity.magnitude, 2)) / mu), 0.1f, 10000f);
         return 2f * Mathf.PI * Mathf.Sqrt(Mathf.Pow(semiMajorAxis, 3) / mu);
     }
+    
+    // ==========================================
+    // GESTION DE L'ATTRACTION PHYSIQUE
+    // ==========================================
 
-    void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
-    {
-        float maxDt = 0.5f; // or even 0.1f for high precision
-        float dt = Mathf.Min(period / steps, maxDt);
-        steps = Mathf.CeilToInt(period / dt);
-        Vector3 startPosition = body.rb.position;
-        Vector3 position = startPosition;
-        Vector3 velocity = body.rb.linearVelocity;
-        float gravConst = G * gravityMultiplier;
-        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance * 10f);
-
-        List<Vector3> points = new List<Vector3> { position };
-
-        for (int i = 0; i < steps; i++)
-        {
-            Vector3 accel = Vector3.zero;
-            float tempsEcoule = i * dt;
-
-            foreach (var other in bodies)
-            {
-                if (other == body || other.rb == null) continue;
-                
-                Vector3 positionFutureDeLautre = other.rb.position + (other.rb.linearVelocity * tempsEcoule);
-                
-                Vector3 dir = positionFutureDeLautre - position;
-                float dist = dir.magnitude + softening;
-                accel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
-            }
-
-            position += velocity * dt + 0.5f * accel * dt * dt;
-
-            Vector3 newAccel = Vector3.zero;
-            foreach (var other in bodies)
-            {
-                if (other == body || other.rb == null) continue;
-                
-                Vector3 positionFutureDeLautre = other.rb.position + (other.rb.linearVelocity * (tempsEcoule + dt));
-                Vector3 dir = positionFutureDeLautre - position;
-                float dist = dir.magnitude + softening;
-                newAccel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
-            }
-
-            velocity += 0.5f * (accel + newAccel) * dt;
-
-            if ((position - startPosition).sqrMagnitude > maxDistance * maxDistance)
-            {
-                break;
-            }
-
-            points.Add(position);
-        }
-
-
-        ApplyOrbitLineIfStable(body.line, points, startPosition);
-    }
-
+    /// <summary>
+    /// Prend les positions actuelles de tous les astres et calcules ou ils seront dans le futur
+    /// en iterant rapidemnet sans impacter la vraie position des objets.
+    /// </summary>
     void OrbitPredictor(GravityBody mainBody, float predictionTime, int steps)
     {
         if (mainBody == null || mainBody.rb == null || mainBody.line == null) return;
@@ -403,25 +358,102 @@ public class GravityManager : MonoBehaviour
 
         ApplyOrbitLineIfStable(mainBody.line, orbitPoints, startPosition);
     }
-
-    void ApplyOrbitLineIfStable(LineRenderer line, List<Vector3> points, Vector3 origin)
+    
+    /// <summary>
+    /// Prend les positions actuelles de tous les astres et calculs ou ils seront dans le futur
+    /// en iterant rapidements sans impacter la vraie position des objets.
+    /// Optimisee pour les cas ou les objets bougent de facon previsible autour d'un astre.
+    /// </summary>
+    void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
     {
-        if (line == null)
+        float maxDt = 0.5f;
+        float dt = Mathf.Min(period / steps, maxDt);
+        steps = Mathf.CeilToInt(period / dt);
+        Vector3 startPosition = body.rb.position;
+        Vector3 position = startPosition;
+        Vector3 velocity = body.rb.linearVelocity;
+        float gravConst = G * gravityMultiplier;
+        float maxDistance = Mathf.Max(1f, maxOrbitPredictionDistance * 10f);
+
+        List<Vector3> points = new List<Vector3> { position };
+
+        for (int i = 0; i < steps; i++)
         {
-            return;
+            Vector3 accel = Vector3.zero;
+            float tempsEcoule = i * dt;
+
+            foreach (var other in bodies)
+            {
+                if (other == body || other.rb == null) continue;
+                
+                Vector3 positionFutureDeLautre = other.rb.position + (other.rb.linearVelocity * tempsEcoule);
+                
+                Vector3 dir = positionFutureDeLautre - position;
+                float dist = dir.magnitude + softening;
+                accel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
+            }
+
+            position += velocity * dt + 0.5f * accel * dt * dt;
+
+            Vector3 newAccel = Vector3.zero;
+            foreach (var other in bodies)
+            {
+                if (other == body || other.rb == null) continue;
+                
+                Vector3 positionFutureDeLautre = other.rb.position + (other.rb.linearVelocity * (tempsEcoule + dt));
+                Vector3 dir = positionFutureDeLautre - position;
+                float dist = dir.magnitude + softening;
+                newAccel += gravConst * other.rb.mass / (dist * dist) * dir.normalized;
+            }
+
+            velocity += 0.5f * (accel + newAccel) * dt;
+
+            if ((position - startPosition).sqrMagnitude > maxDistance * maxDistance)
+            {
+                break;
+            }
+
+            points.Add(position);
         }
 
-        if (!IsOrbitPredictionStable(points, origin))
-        {
-            line.positionCount = 0;
-            return;
-        }
 
-        line.useWorldSpace = true;
-        line.positionCount = points.Count;
-        line.SetPositions(points.ToArray());
+        ApplyOrbitLineIfStable(body.line, points, startPosition);
     }
+    
+    // ==========================================
+    // AFFICHAGE ET STABILITE VISUELLE
+    // ==========================================
 
+    /// <summary>
+    /// Change la transparence des lignes d'orbites selon la distance de la camera.
+    /// Plus vous etes loin, plus les lignes deviennent opaques pour rester visibles.
+    /// </summary>
+    void UpdateOrbitLineColors()
+    {
+        if (mainCam == null) mainCam = Camera.main;
+        if (mainCam == null) return;
+
+        Vector3 camPos = mainCam.transform.position;
+
+        foreach (var body in bodies)
+        {
+            if (body == null || body.line == null || body.rb == null) continue;
+
+            float distance = Vector3.Distance(camPos, body.rb.position);
+
+            float t = Mathf.InverseLerp(lineAlphaDistanceMin, lineAlphaDistanceMax, distance);
+            float alpha = Mathf.Lerp(lineAlphaMin, lineAlphaMax, t);
+
+            Color c = new Color(1f, 1f, 1f, alpha);
+            body.line.startColor = c;
+            body.line.endColor = c;
+        }
+    }
+    
+    /// <summary>
+    /// Fonction de securite si la trajectoire calculee fait des virages trop brusques ou des segments trop longs,
+    /// la focntion refuse de dessiner la ligne pour eviter des glitchs.
+    /// </summary>
     bool IsOrbitPredictionStable(List<Vector3> points, Vector3 origin)
     {
         if (points == null)
@@ -514,5 +546,58 @@ public class GravityManager : MonoBehaviour
         }
 
         return true;
+    }
+    
+    /// <summary>
+    /// Envoie les points calcules au composant LineRenderer de l'objet pour afficher la ligne.
+    /// </summary>
+    void ApplyOrbitLineIfStable(LineRenderer line, List<Vector3> points, Vector3 origin)
+    {
+        if (line == null)
+        {
+            return;
+        }
+
+        if (!IsOrbitPredictionStable(points, origin))
+        {
+            line.positionCount = 0;
+            return;
+        }
+
+        line.useWorldSpace = true;
+        line.positionCount = points.Count;
+        line.SetPositions(points.ToArray());
+    }
+    
+    // ==========================================
+    // FONCTIONS DIVERS
+    // ==========================================
+    
+    /// <summary>
+    /// Cette fonction sert à garder la liste d'astres propre et à éviter que le jeu plante.
+    /// </summary>
+    void CleanupInvalidBodies()
+    {
+        for (int index = bodies.Count - 1; index >= 0; index--)
+        {
+            GravityBody body = bodies[index];
+            if (body == null || body.rb == null)
+            {
+                bodies.RemoveAt(index);
+            }
+        }
+    }
+
+    
+    /// <summary>
+    /// structure d'éléments orbitaux pour stocker les paramètres d'une orbite calculés à partir de la position et de la vitesse.
+    /// </summary>
+    public struct OrbitalElements
+    {
+        public float semiMajorAxis;
+        public float eccentricity;
+        public float periapsis;
+        public float apoapsis;
+        public float period;
     }
 }

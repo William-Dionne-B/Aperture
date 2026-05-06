@@ -2,14 +2,14 @@ using UnityEngine;
 
 /// <summary>
 /// Sert d'interface entre les boutons UI de gestion du temps et 
-/// le système physique de gravité globale (GravityManager).
+/// le système physique de gravité globale.
 /// </summary>
 public class TimeManager : MonoBehaviour
 {
     public static float currentSpeedMultiplier = 1f;
 
     // ==========================================
-    // CONTRÔLE DYNAMIQUE (Pour les Sliders / Boutons UI)
+    // CONTRÔLE DYNAMIQUE
     // ==========================================
 
     /// <summary>
@@ -30,7 +30,7 @@ public class TimeManager : MonoBehaviour
     public void SetSpeedUltra() { SetSpeedMultiplier(10f); }
 
     // ==========================================
-    // GESTION DES PAUSES (Appelé par PauseMenu)
+    // GESTION DES PAUSES
     // ==========================================
     
     /// <summary>
@@ -49,6 +49,9 @@ public class TimeManager : MonoBehaviour
         ApplySpeed(0f);
     }
 
+    /// <summary>
+    /// Etablit une vitesse pour la simulation
+    /// </summary>
     private static void ApplySpeed(float speed)
     {
         if (GravityManager.Instance != null)

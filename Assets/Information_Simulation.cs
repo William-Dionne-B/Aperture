@@ -18,3 +18,14 @@
  * | Neptune  |  3244.4  | 60 182  |    5.4  |  11.15  |   1.64  |      72     |
  * +----------+----------+---------+---------+---------+---------+-------------+
  */
+ 
+ /*
+  * Points clés de la troisième loi de Kepler :
+  * Formule : \(T^2 / a^3 = k\) (avec \(k\) une constante).
+  * Signification : Plus une planète est éloignée de l'astre autour duquel elle gravite (grand \(a\)), plus sa période de révolution (temps pour faire un tour) est longue (\(T\)).
+  * Constante : Cette constante (\(k\)) est la même pour tous les corps en orbite autour du même astre attracteur (ex: le Soleil).
+  * Démonstration Newtonienne : Newton a montré que cette constante vaut \(\frac{4\pi ^{2}}{GM}\), où \(G\) est la constante gravitationnelle et \(M\) la masse de l'astre central.
+  * Unités SI : La période \(T\) est en secondes (\(s\)) et le demi-grand axe \(a\) en mètres (\(m\)
+  */
+  
+  // L'énergie orbitale est la somme constante de l'énergie cinétique et de l'énergie potentielle gravitationnelle d'un corps en orbite

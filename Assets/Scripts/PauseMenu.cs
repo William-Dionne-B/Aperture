@@ -1,9 +1,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; // NOUVEAU
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Contrôle le menu de pause principal, la navigation entre les sous-menus
@@ -41,6 +40,7 @@ public class PauseMenu : MonoBehaviour
     // ==========================================
     // MÉTHODES UNITY
     // ==========================================
+    
     void Start()
     {
         if (mouseSensitivitySlider != null && cameraScript != null)
@@ -123,6 +123,9 @@ public class PauseMenu : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Actions fait quand on change une valeur sur le slider de la vitesse de la simulation.
+    /// </summary>
     public void OnSpeedSliderChanged()
     {
         if (timeManager != null && simulationSpeedSlider != null)
@@ -132,6 +135,9 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Change le texte qui represente la vitesse de la simulation.
+    /// </summary>
     private void UpdateSpeedText()
     {
         if (speedValueText != null)
@@ -141,8 +147,10 @@ public class PauseMenu : MonoBehaviour
             speedValueText.text = "Vitesse: x" + displaySpeed.ToString("F1");
         }
     }
-
-    // --- NOUVEAU : FONCTION DE DÉSÉLECTION ---
+    
+    /// <summary>
+    /// Focntion de deselection
+    /// </summary>
     private void ClearUIFocus()
     {
         if (EventSystem.current != null)
@@ -152,9 +160,12 @@ public class PauseMenu : MonoBehaviour
     }
     
     // ==========================================
-    // CONTRÔLE DU TEMPS DE SIMULATION (ESPACE)
+    // CONTRÔLE DU TEMPS DE SIMULATION
     // ==========================================
     
+    /// <summary>
+    /// Change l'etat du temps (pause/resume)
+    /// </summary>
     public void ToggleSimulation()
     {
         isSimulationPaused = !isSimulationPaused;
@@ -173,11 +184,11 @@ public class PauseMenu : MonoBehaviour
 
 
     // ==========================================
-    // CONTRÔLE DE L'ÉTAT DU MENU (ÉCHAP)
+    // CONTRÔLE DE L'ÉTAT DU MENU
     // ==========================================
 
     /// <summary>
-    /// Ferme le menu Échap et relance le moteur Unity, en respectant le multiplicateur de vitesse.
+    /// Ferme le menu pause et relance le moteur Unity, en respectant le multiplicateur de vitesse.
     /// </summary>
     public void Resume()
     {
@@ -190,11 +201,11 @@ public class PauseMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         
-        ClearUIFocus(); // NOUVEAU
+        ClearUIFocus();
     }
 
     /// <summary>
-    /// Ouvre le menu Échap et fige tout le moteur Unity de force.
+    /// Ouvre le menu pause et fige tout le moteur Unity de force.
     /// </summary>
     public void Pause()
     {
@@ -214,32 +225,43 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Saving Simulation !");
         SystemeSauvegarde.Instance.SaveScene("Autosave");
         Debug.Log("Ending Simulator !");
-            SceneManager.LoadScene("MenuAccueil");
-        //Resume();
+        SceneManager.LoadScene("MenuAccueil");
     }
 
     // ==========================================
     // NAVIGATION DES MENUS
     // ==========================================
     
+    /// <summary>
+    /// Fonction qui ouvre le menu pause
+    /// </summary>
     public void OpenPauseMenu()
     {
         DesactivateAllMenus();
         pauseMenuUI.SetActive(true);
     }
     
+    /// <summary>
+    /// Fonction qui ouvre le menu guide
+    /// </summary>
     public void OpenGuide()
     {
         DesactivateAllMenus();
         guideMenuUI.SetActive(true);
     }
     
+    /// <summary>
+    /// Fonction qui ouvre le menu cles
+    /// </summary>
     public void OpenKeys()
     {
         DesactivateAllMenus();
         keysMenuUI.SetActive(true);
     }
     
+    /// <summary>
+    /// Fonction qui ouvre le menu options
+    /// </summary>
     public void OpenOptions()
     {
         DesactivateAllMenus();
@@ -253,12 +275,18 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Fonction qui ouvre le menu save
+    /// </summary>
     public void OpenSave()
     {
         DesactivateAllMenus();
         saveMenuUI.SetActive(true);
     }
 
+    /// <summary>
+    /// Fonction qui ferme tout les menus
+    /// </summary>
     private void DesactivateAllMenus()
     {
         if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
@@ -266,13 +294,15 @@ public class PauseMenu : MonoBehaviour
         if (guideMenuUI != null) guideMenuUI.SetActive(false);
         if (keysMenuUI != null) keysMenuUI.SetActive(false);
         if (saveMenuUI != null) saveMenuUI.SetActive(false);
-        //Resume();
     }
 
     // ==========================================
-    // GESTION DES PARAMÈTRES (OPTIONS)
+    // GESTION DES PARAMÈTRES
     // ==========================================
-    //TODO Mettre les valeurs sauvegardes et non les valeurs par default
+    
+    /// <summary>
+    /// Fonction qui change les options pour les dernieres valeurs enregistree
+    /// </summary>
     public void Reset()
     {
         if (fieldOfViewSlider != null) fieldOfViewSlider.value = PlayerPrefs.GetFloat("FieldOfView");
@@ -280,14 +310,11 @@ public class PauseMenu : MonoBehaviour
         if (movementSpeedSlider != null) movementSpeedSlider.value = PlayerPrefs.GetFloat("MoveSpeed");
         
         Debug.Log("Paramètres réinitialisés aux valeurs enregistrées !");
-        
-        // if (fieldOfViewSlider != null) fieldOfViewSlider.value = 60f;
-        // if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = 3.5f;
-        // if (movementSpeedSlider != null) movementSpeedSlider.value = 100f;
-        //
-        // Debug.Log("Paramètres réinitialisés aux valeurs par défaut !");
     }
 
+    /// <summary>
+    /// Fonction qui sauvegarde les options
+    /// </summary>
     public void SaveOptions()
     {
         if (cameraScript != null)
@@ -315,6 +342,10 @@ public class PauseMenu : MonoBehaviour
         }
     }
     
+    
+    /// <summary>
+    /// Fonction qui permet de changer les changements des options sans les sauvegardes et de quitter le menu options
+    /// </summary>
     public void QuitOptions()
     {
         if (cameraScript != null)
