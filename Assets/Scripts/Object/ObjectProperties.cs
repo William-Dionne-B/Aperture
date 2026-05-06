@@ -46,7 +46,7 @@ public class ObjectProperties : MonoBehaviour
     [SerializeField]
     public float density;
     public GameObject EtoileParent;
-
+    
     [Header("Simulation Scales (Système Solaire)")]
     [Tooltip("1 unité de rayon = 13 900 km (soit 13 900 000 mètres)")]
     public float radiusToMetersScale = 13900000f;
@@ -75,6 +75,10 @@ public class ObjectProperties : MonoBehaviour
     [Header("Thermodynamique (Planète)")] 
     [Tooltip("Albédo : Capacité à refléter la lumière (Terre = 0.3")] 
     [Range(0f, 1f)] public float albedo = 0.3f;
+    [Tooltip("Émissivité thermique (ε). Un corps noir parfait est à 1.0.")]
+    [Range(0.1f, 1f)] public float emissivity = 1.0f;
+    [Tooltip("0.25 = Pas de redistribution (Chaleur concentrée face au Soleil), 1.0 = Température moyenne globale")]
+    [Range(0.25f, 1.0f)] public float heatRedistributionFactor = 1.0f;
     [Tooltip("Effet de serre en Kelvin (Terre = environ +33 K")]
     public float greenhouseEffect = 0f;
     
@@ -87,6 +91,10 @@ public class ObjectProperties : MonoBehaviour
     private double vraieDistanceInitialeMetres = 0;
 
     public static List<ObjectProperties> AllStarsInSystem = new List<ObjectProperties>();
+    
+    // ==========================================
+    // MÉTHODES UNITY
+    // ==========================================
     
     void OnEnable()
     {
@@ -210,6 +218,9 @@ public class ObjectProperties : MonoBehaviour
         ActualiserTemperature();
     }
 
+    /// <summary>
+    /// Permet aux planetes de savoir quelles etoiles existent pour calculer leur temperature.
+    /// </summary>
     void EnsureStarRegistryState()
     {
         if (isStar)
@@ -224,6 +235,77 @@ public class ObjectProperties : MonoBehaviour
         if (AllStarsInSystem.Contains(this))
         {
             AllStarsInSystem.Remove(this);
+        }
+    }
+    
+    /// <summary>
+    /// Scanne la liste des etoiles et definit laquelle est le "parent"
+    /// </summary>
+    void ChercherEtoileLaPlusProche()
+    {
+        float distMin = float.MaxValue;
+        foreach (var star in AllStarsInSystem)
+        {
+            if (star == null || star.gameObject == this.gameObject) continue;
+            
+            float d = Vector3.Distance(transform.position, star.transform.position);
+            if (d < distMin)
+            {
+                distMin = d;
+                EtoileParent = star.gameObject;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Utilise la loi de Stefan-Boltzmann pour calculer la temperature d'equilibre.
+    /// Additionne l'energie recue de toutes les etoiles du systeme, prend en compte l'Albedo et l'Effet de serre.
+    /// </summary>
+    void ActualiserTemperature()
+    {
+        if (isBlackHole)
+        {
+            temperatureMagnitude = 0f;
+            albedo = 0f; 
+        }
+        
+        else if (isStar)
+        {
+            temperatureMagnitude = starSurfaceTemperature;
+        }
+        
+        else
+        {
+            float sommeEnergieStellaire = 0f;
+
+            foreach (ObjectProperties star in AllStarsInSystem)
+            {
+                if (star == null) continue;
+
+                float distUnity = Vector3.Distance(thisTransform.position, star.transform.position);
+                if (distUnity > 0)
+                {
+                    float vraieDistanceMetres = distUnity * distanceToMetersScale;
+                    sommeEnergieStellaire += star.starLuminosity / (vraieDistanceMetres * vraieDistanceMetres);
+                }
+            }
+
+            if (sommeEnergieStellaire > 0f)
+            {
+                float sigma = 5.67e-8f;
+                float numerateur = sommeEnergieStellaire * (1f - albedo);
+    
+                float factor = Mathf.Lerp(4f, 16f, heatRedistributionFactor);
+                float denominateur = factor * Mathf.PI * sigma * emissivity;
+
+                float tempEquilibre = Mathf.Pow(numerateur / denominateur, 0.25f);
+                temperatureMagnitude = tempEquilibre + greenhouseEffect;
+            }
+            
+            else
+            {
+                temperatureMagnitude = greenhouseEffect;
+            }
         }
     }
 
@@ -333,68 +415,6 @@ public class ObjectProperties : MonoBehaviour
             if (body.EtoileParent == previousStar)
             {
                 body.EtoileParent = newStar;
-            }
-        }
-    }
-
-    void ChercherEtoileLaPlusProche()
-    {
-        float distMin = float.MaxValue;
-        foreach (var star in AllStarsInSystem)
-        {
-            if (star == null || star.gameObject == this.gameObject) continue;
-            
-            float d = Vector3.Distance(transform.position, star.transform.position);
-            if (d < distMin)
-            {
-                distMin = d;
-                EtoileParent = star.gameObject;
-            }
-        }
-    }
-
-    // Gestion propre de la température
-    void ActualiserTemperature()
-    {
-        if (isBlackHole)
-        {
-            temperatureMagnitude = 0f;
-            albedo = 0f; 
-        }
-        
-        else if (isStar)
-        {
-            temperatureMagnitude = starSurfaceTemperature;
-        }
-        
-        else
-        {
-            float sommeEnergieStellaire = 0f;
-
-            foreach (ObjectProperties star in AllStarsInSystem)
-            {
-                if (star == null) continue;
-
-                float distUnity = Vector3.Distance(thisTransform.position, star.transform.position);
-                if (distUnity > 0)
-                {
-                    float vraieDistanceMetres = distUnity * distanceToMetersScale;
-                    sommeEnergieStellaire += star.starLuminosity / (vraieDistanceMetres * vraieDistanceMetres);
-                }
-            }
-
-            if (sommeEnergieStellaire > 0f)
-            {
-                float sigma = 5.67e-8f;
-                float numerateur = sommeEnergieStellaire * (1f - albedo);
-                float denominateur = 16f * Mathf.PI * sigma;
-
-                float tempEquilibre = Mathf.Pow(numerateur / denominateur, 0.25f);
-                temperatureMagnitude = tempEquilibre + greenhouseEffect;
-            }
-            else
-            {
-                temperatureMagnitude = greenhouseEffect;
             }
         }
     }

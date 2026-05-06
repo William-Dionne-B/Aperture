@@ -192,6 +192,8 @@ MonoBehaviour:
   starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.3
+  emissivity: 0.95
+  heatRedistributionFactor: 0.9
   greenhouseEffect: 33
 --- !u!114 &1727176420624679751
 MonoBehaviour:
