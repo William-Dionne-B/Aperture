@@ -77,6 +77,10 @@ public class ObjectManager : MonoBehaviour
     private int SelectionLayerMask => (1 << SelectionLayer);
     private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
 
+    // ==========================================
+    // MÉTHODES UNITY
+    // ==========================================
+    
     void Start()
     {
         if (SelectionRenderTexture == null) SelectionRenderTexture = new RenderTexture(1024, 1024, 24);
@@ -103,182 +107,7 @@ public class ObjectManager : MonoBehaviour
         InitializeMultiplierButtons();
         updateUIVisibility();
     }
-
-    void InitializeCameraFocusButton()
-    {
-        if (CameraFocusButton == null) return;
-        Button button = CameraFocusButton.GetComponent<Button>();
-        if (button != null) button.onClick.AddListener(FocusMainCameraOnSelection);
-    }
-
-    void InitializeMultiplierButtons()
-    {
-        if (massMultiply10Button != null) massMultiply10Button.onClick.AddListener(OnMassMultiply10);
-        if (massDivide10Button != null) massDivide10Button.onClick.AddListener(OnMassDivide10);
-
-        if (speedMultiply10Button != null) speedMultiply10Button.onClick.AddListener(OnSpeedMultiply10);
-        if (speedDivide10Button != null) speedDivide10Button.onClick.AddListener(OnSpeedDivide10);
-
-        if (radiusMultiply10Button != null) radiusMultiply10Button.onClick.AddListener(OnRadiusMultiply10);
-        if (radiusDivide10Button != null) radiusDivide10Button.onClick.AddListener(OnRadiusDivide10);
-    }
-
-    void OnMassMultiply10()   => MultiplyMass(10f);
-    void OnMassDivide10()     => MultiplyMass(0.1f);
-    void OnSpeedMultiply10()  => MultiplySpeed(10f);
-    void OnSpeedDivide10()    => MultiplySpeed(0.1f);
-    void OnRadiusMultiply10() => MultiplyRadius(10f);
-    void OnRadiusDivide10()   => MultiplyRadius(0.1f);
-
-    void MultiplyMass(float factor)
-    {
-        var props = selection?.GetComponent<ObjectProperties>();
-        if (props == null) return;
-        props.Mass *= factor;
-        updateUIVisibility();
-        ClearUIFocus();
-    }
-
-    void MultiplySpeed(float factor)
-    {
-        var props = selection?.GetComponent<ObjectProperties>();
-        if (props == null) return;
-        props.speedMagnitude *= factor;
-        updateUIVisibility();
-        ClearUIFocus();
-    }
-
-    void MultiplyRadius(float factor)
-    {
-        var props = selection?.GetComponent<ObjectProperties>();
-        if (props == null) return;
-        props.radius *= factor;
-        updateUIVisibility();
-        ClearUIFocus();
-    }
-
-    void FocusMainCameraOnSelection()
-    {
-        if (selection == null || MainCamera == null) return;
-
-        var renderer = selection.GetComponentInChildren<Renderer>();
-        if (renderer == null) return;
-
-        Bounds bounds = renderer.bounds;
-        Vector3 center = bounds.center;
-        float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
-        float distance = size * cameraPadding;
-
-        MainCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
-        MainCamera.transform.LookAt(center);
-
-        AttachCameraToSelection();
-        ClearUIFocus();
-    }
-
-    GameObject CreateAnchor(string name)
-    {
-        var go = new GameObject(name);
-        return go;
-    }
-
-    void AttachCameraToSelection()
-    {
-        if (selection == null || MainCamera == null) return;
-
-        if (mainCameraAnchor == null)
-        {
-            mainCameraAnchor = CreateAnchor("MainCameraAnchor");
-        }
-
-        Vector3 camWorldPos = MainCamera.transform.position;
-        Quaternion camWorldRot = MainCamera.transform.rotation;
-
-        mainCameraAnchor.transform.position = camWorldPos;
-        mainCameraAnchor.transform.rotation = camWorldRot;
-        mainCameraAnchor.transform.SetParent(selection.transform, true);
-
-        MainCamera.transform.SetParent(mainCameraAnchor.transform, true);
-
-        mainCameraOffset = MainCamera.transform.position - selection.transform.position;
-        mainCameraRotationWhenLocked = MainCamera.transform.rotation;
-        cameraLockedToSelection = true;
-
-        if (selectionCameraAnchor != null)
-        {
-            if (SelectionCamera != null) SelectionCamera.transform.SetParent(null, true);
-            Destroy(selectionCameraAnchor);
-            selectionCameraAnchor = null;
-            selectionCameraLockedToSelection = false;
-        }
-    }
-
-    void DetachCameraFromSelection()
-    {
-
-        if (MainCamera != null) MainCamera.transform.SetParent(null, true);
-
-        if (mainCameraAnchor != null)
-        {
-            Destroy(mainCameraAnchor);
-            mainCameraAnchor = null;
-        }
-
-        if (SelectionCamera != null && SelectionCamera.transform.parent != null)
-        {
-            SelectionCamera.transform.SetParent(null, true);
-        }
-        if (selectionCameraAnchor != null)
-        {
-            Destroy(selectionCameraAnchor);
-            selectionCameraAnchor = null;
-        }
-        selectionCameraLockedToSelection = false;
-
-        cameraLockedToSelection = false;
-    }
-    void ReparentAnchorsToNewSelection()
-    {
-        if (selection == null) return;
-
-        if (mainCameraAnchor != null)
-        {
-            Vector3 camWorldPos = MainCamera.transform.position;
-            Quaternion camWorldRot = MainCamera.transform.rotation;
-
-            mainCameraAnchor.transform.SetParent(selection.transform, true);
-
-            mainCameraOffset = camWorldPos - selection.transform.position;
-            mainCameraRotationWhenLocked = camWorldRot;
-
-            mainCameraAnchor.transform.position = camWorldPos;
-            mainCameraAnchor.transform.rotation = camWorldRot;
-        }
-    }
-
-    void InitializeListUI()
-    {
-        if (ListObjet == null) return;
-
-        tmpDropdown = ListObjet.GetComponent<TMP_Dropdown>() ?? ListObjet.GetComponentInChildren<TMP_Dropdown>();
-        if (tmpDropdown != null)
-        {
-            tmpDropdown.onValueChanged.RemoveAllListeners();
-            tmpDropdown.onValueChanged.AddListener(OnTMPDropdownValueChanged);
-            tmpDropdown.ClearOptions();
-            return;
-        }
-
-        legacyDropdown = ListObjet.GetComponent<Dropdown>() ?? ListObjet.GetComponentInChildren<Dropdown>();
-        if (legacyDropdown != null)
-        {
-            legacyDropdown.onValueChanged.RemoveAllListeners();
-            legacyDropdown.onValueChanged.AddListener(OnLegacyDropdownValueChanged);
-            legacyDropdown.options.Clear();
-            return;
-        }
-    }
-
+    
     void Update()
     {
         if (MainCamera == null) return;
@@ -388,6 +217,203 @@ public class ObjectManager : MonoBehaviour
         updateUIVisibility();
     }
 
+    // ==========================================
+    // CONTROLE DE LA CAMERA
+    // ==========================================
+    
+    void FocusMainCameraOnSelection()
+    {
+        if (selection == null || MainCamera == null) return;
+
+        var renderer = selection.GetComponentInChildren<Renderer>();
+        if (renderer == null) return;
+
+        Bounds bounds = renderer.bounds;
+        Vector3 center = bounds.center;
+        float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+        float distance = size * cameraPadding;
+
+        MainCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
+        MainCamera.transform.LookAt(center);
+
+        AttachCameraToSelection();
+        ClearUIFocus();
+    }
+    
+    void InitializeCameraFocusButton()
+    {
+        if (CameraFocusButton == null) return;
+        Button button = CameraFocusButton.GetComponent<Button>();
+        if (button != null) button.onClick.AddListener(FocusMainCameraOnSelection);
+    }
+    
+    void AttachCameraToSelection()
+    {
+        if (selection == null || MainCamera == null) return;
+
+        if (mainCameraAnchor == null)
+        {
+            mainCameraAnchor = CreateAnchor("MainCameraAnchor");
+        }
+
+        Vector3 camWorldPos = MainCamera.transform.position;
+        Quaternion camWorldRot = MainCamera.transform.rotation;
+
+        mainCameraAnchor.transform.position = camWorldPos;
+        mainCameraAnchor.transform.rotation = camWorldRot;
+        mainCameraAnchor.transform.SetParent(selection.transform, true);
+
+        MainCamera.transform.SetParent(mainCameraAnchor.transform, true);
+
+        mainCameraOffset = MainCamera.transform.position - selection.transform.position;
+        mainCameraRotationWhenLocked = MainCamera.transform.rotation;
+        cameraLockedToSelection = true;
+
+        if (selectionCameraAnchor != null)
+        {
+            if (SelectionCamera != null) SelectionCamera.transform.SetParent(null, true);
+            Destroy(selectionCameraAnchor);
+            selectionCameraAnchor = null;
+            selectionCameraLockedToSelection = false;
+        }
+    }
+
+    void DetachCameraFromSelection()
+    {
+
+        if (MainCamera != null) MainCamera.transform.SetParent(null, true);
+
+        if (mainCameraAnchor != null)
+        {
+            Destroy(mainCameraAnchor);
+            mainCameraAnchor = null;
+        }
+
+        if (SelectionCamera != null && SelectionCamera.transform.parent != null)
+        {
+            SelectionCamera.transform.SetParent(null, true);
+        }
+        if (selectionCameraAnchor != null)
+        {
+            Destroy(selectionCameraAnchor);
+            selectionCameraAnchor = null;
+        }
+        selectionCameraLockedToSelection = false;
+
+        cameraLockedToSelection = false;
+    }
+    void ReparentAnchorsToNewSelection()
+    {
+        if (selection == null) return;
+
+        if (mainCameraAnchor != null)
+        {
+            Vector3 camWorldPos = MainCamera.transform.position;
+            Quaternion camWorldRot = MainCamera.transform.rotation;
+
+            mainCameraAnchor.transform.SetParent(selection.transform, true);
+
+            mainCameraOffset = camWorldPos - selection.transform.position;
+            mainCameraRotationWhenLocked = camWorldRot;
+
+            mainCameraAnchor.transform.position = camWorldPos;
+            mainCameraAnchor.transform.rotation = camWorldRot;
+        }
+    }
+    
+    void UpdateSelectionCamera()
+    {
+        if (SelectionCamera == null || selection == null) return;
+        var renderer = selection.GetComponentInChildren<Renderer>();
+        if (renderer == null) return;
+
+        Bounds bounds = renderer.bounds;
+        Vector3 center = bounds.center;
+        float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+        float distance = size * cameraPadding;
+
+        if (!selectionCameraLockedToSelection)
+        {
+            SelectionCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
+            SelectionCamera.transform.LookAt(center);
+        }
+    }
+
+    void InitializeMultiplierButtons()
+    {
+        if (massMultiply10Button != null) massMultiply10Button.onClick.AddListener(OnMassMultiply10);
+        if (massDivide10Button != null) massDivide10Button.onClick.AddListener(OnMassDivide10);
+
+        if (speedMultiply10Button != null) speedMultiply10Button.onClick.AddListener(OnSpeedMultiply10);
+        if (speedDivide10Button != null) speedDivide10Button.onClick.AddListener(OnSpeedDivide10);
+
+        if (radiusMultiply10Button != null) radiusMultiply10Button.onClick.AddListener(OnRadiusMultiply10);
+        if (radiusDivide10Button != null) radiusDivide10Button.onClick.AddListener(OnRadiusDivide10);
+    }
+
+    void OnMassMultiply10()   => MultiplyMass(10f);
+    void OnMassDivide10()     => MultiplyMass(0.1f);
+    void OnSpeedMultiply10()  => MultiplySpeed(10f);
+    void OnSpeedDivide10()    => MultiplySpeed(0.1f);
+    void OnRadiusMultiply10() => MultiplyRadius(10f);
+    void OnRadiusDivide10()   => MultiplyRadius(0.1f);
+
+    void MultiplyMass(float factor)
+    {
+        var props = selection?.GetComponent<ObjectProperties>();
+        if (props == null) return;
+        props.Mass *= factor;
+        updateUIVisibility();
+        ClearUIFocus();
+    }
+
+    void MultiplySpeed(float factor)
+    {
+        var props = selection?.GetComponent<ObjectProperties>();
+        if (props == null) return;
+        props.speedMagnitude *= factor;
+        updateUIVisibility();
+        ClearUIFocus();
+    }
+
+    void MultiplyRadius(float factor)
+    {
+        var props = selection?.GetComponent<ObjectProperties>();
+        if (props == null) return;
+        props.radius *= factor;
+        updateUIVisibility();
+        ClearUIFocus();
+    }
+
+    GameObject CreateAnchor(string name)
+    {
+        var go = new GameObject(name);
+        return go;
+    }
+
+    void InitializeListUI()
+    {
+        if (ListObjet == null) return;
+
+        tmpDropdown = ListObjet.GetComponent<TMP_Dropdown>() ?? ListObjet.GetComponentInChildren<TMP_Dropdown>();
+        if (tmpDropdown != null)
+        {
+            tmpDropdown.onValueChanged.RemoveAllListeners();
+            tmpDropdown.onValueChanged.AddListener(OnTMPDropdownValueChanged);
+            tmpDropdown.ClearOptions();
+            return;
+        }
+
+        legacyDropdown = ListObjet.GetComponent<Dropdown>() ?? ListObjet.GetComponentInChildren<Dropdown>();
+        if (legacyDropdown != null)
+        {
+            legacyDropdown.onValueChanged.RemoveAllListeners();
+            legacyDropdown.onValueChanged.AddListener(OnLegacyDropdownValueChanged);
+            legacyDropdown.options.Clear();
+            return;
+        }
+    }
+
     void UpdateObjectList()
     {
         ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
@@ -477,25 +503,10 @@ public class ObjectManager : MonoBehaviour
         var clickDetection = MainCamera?.GetComponent<ClickDetection>();
         if (clickDetection != null) clickDetection.selectedObject = obj;
     }
-
-    void UpdateSelectionCamera()
-    {
-        if (SelectionCamera == null || selection == null) return;
-        var renderer = selection.GetComponentInChildren<Renderer>();
-        if (renderer == null) return;
-
-        Bounds bounds = renderer.bounds;
-        Vector3 center = bounds.center;
-        float size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
-        float distance = size * cameraPadding;
-
-        if (!selectionCameraLockedToSelection)
-        {
-            SelectionCamera.transform.position = center + new Vector3(0f, 0f, -1f) * distance;
-            SelectionCamera.transform.LookAt(center);
-        }
-    }
-
+    
+    /// <summary>
+    /// Recupere les valeurs brutes du script ObjectPropreties et les convertit en unites lisibles.
+    /// </summary>
     void updateUIVisibility()
     {
         if (InfoUI == null) return;

@@ -309,6 +309,15 @@ public class ObjectProperties : MonoBehaviour
         }
     }
 
+    
+    // ==========================================
+    // TRANSITION SOLEIL AU TROU NOIR
+    // ==========================================
+    
+    /// <summary>
+    /// Surveille la masse de l'etoile. Si la masse depasse le seuil defini
+    /// (blackHoleFormationMassSolar), elle declenche l'effondrement gravitationnel.
+    /// </summary>
     void TryConvertStarToBlackHole()
     {
         if (!isStar || isBlackHole || hasConvertedToBlackHole)
@@ -342,6 +351,9 @@ public class ObjectProperties : MonoBehaviour
         Debug.Log($"{name} has collapsed into a black hole (mass threshold reached).");
     }
 
+    /// <summary>
+    /// Transforme un objet en trou noir.
+    /// </summary>
     void ReplaceByBlackHolePrefab()
     {
         GameObject sourceObject = thisObject != null ? thisObject : gameObject;
@@ -419,6 +431,9 @@ public class ObjectProperties : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Coroutine qui calcule que 10 fois par seconde pour mettre a jour l'affichage de la vitesse dans le menu sans ralentir le jeu.
+    /// </summary>
     private IEnumerator UpdateSpeedRoutine()
     {
         var wait = new WaitForSeconds(0.1f); // 10 Hz
