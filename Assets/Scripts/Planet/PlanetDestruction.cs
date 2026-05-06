@@ -167,14 +167,6 @@ public class PlanetDestruction : MonoBehaviour
         Vector3 loserStartScale = loser.transform.localScale;
         Vector3 combinedScale = Vector3.one * (combinedRadius * 2f);
 
-        if (winnerRigidbody != null)
-        {
-            winnerRigidbody.isKinematic = true;
-            winnerRigidbody.detectCollisions = false;
-            winnerRigidbody.linearVelocity = Vector3.zero;
-            winnerRigidbody.angularVelocity = Vector3.zero;
-        }
-
         if (loserRigidbody != null)
         {
             loserRigidbody.isKinematic = true;
@@ -199,10 +191,11 @@ public class PlanetDestruction : MonoBehaviour
             float normalized = Mathf.Clamp01(elapsed / duration);
             float blend = mergeCurve != null ? mergeCurve.Evaluate(normalized) : normalized;
 
-            Vector3 winnerStepPosition = Vector3.Lerp(winnerPosition, mergedPosition, blend);
-            Vector3 loserStepPosition = Vector3.Lerp(loserPosition, mergedPosition, blend * blend);
+            Vector3 winnerCurrentPosition = winnerRigidbody != null
+                ? winnerRigidbody.position
+                : winner.transform.position;
+            Vector3 loserStepPosition = Vector3.Lerp(loserPosition, winnerCurrentPosition, blend * blend);
 
-            SetObjectPosition(winner, winnerRigidbody, winnerStepPosition);
             SetObjectPosition(loser, loserRigidbody, loserStepPosition);
 
             winner.transform.localScale = Vector3.Lerp(winnerStartScale, combinedScale, blend);
@@ -213,12 +206,13 @@ public class PlanetDestruction : MonoBehaviour
 
         if (winner != null)
         {
+            mergedPosition = winnerRigidbody != null ? winnerRigidbody.position : winner.transform.position;
             ApplyMergedState(winner, combinedMass, combinedRadius, mergedPosition, mergedVelocity, mergedAngularVelocity);
         }
 
         if (loser != null)
         {
-            // détache ici toute caméra/anchor enfant de l'objet perdant
+            // dï¿½tache ici toute camï¿½ra/anchor enfant de l'objet perdant
             DetachCamerasParentedTo(loser);
             Destroy(loser);
         }
@@ -276,6 +270,7 @@ public class PlanetDestruction : MonoBehaviour
     {
         ObjectProperties properties = targetObject.GetComponent<ObjectProperties>();
         Rigidbody body = targetObject.GetComponent<Rigidbody>();
+        GravityBody gravityBody = targetObject.GetComponent<GravityBody>();
 
         if (properties != null)
         {
@@ -292,15 +287,22 @@ public class PlanetDestruction : MonoBehaviour
         {
             body.mass = combinedMass; 
             body.position = mergedPosition;
-            body.linearVelocity = mergedVelocity;
-            body.angularVelocity = mergedAngularVelocity;
             body.isKinematic = false;
             body.detectCollisions = true;
+            body.linearVelocity = mergedVelocity;
+            body.angularVelocity = mergedAngularVelocity;
             body.WakeUp();
         }
         else
         {
             targetObject.transform.position = mergedPosition;
+        }
+
+        if (gravityBody != null)
+        {
+            gravityBody.initialVelocity = mergedVelocity;
+            gravityBody.applyInitialVelocity = false;
+            gravityBody.Mass = combinedMass;
         }
 
         Renderer[] renderers = targetObject.GetComponentsInChildren<Renderer>(true);
@@ -321,6 +323,7 @@ public class PlanetDestruction : MonoBehaviour
             }
         }
     }
+
 
     float GetRadius(GameObject targetObject)
     {
@@ -360,12 +363,12 @@ public class PlanetDestruction : MonoBehaviour
         return 1f;
     }
 
-    // Détache toute caméra ou anchor parentée à l'objet cible pour éviter de détruire la caméra.
+    // Dï¿½tache toute camï¿½ra ou anchor parentï¿½e ï¿½ l'objet cible pour ï¿½viter de dï¿½truire la camï¿½ra.
     void DetachCamerasParentedTo(GameObject target)
     {
         if (target == null) return;
 
-        // Détacher toutes les caméras qui sont enfants du target
+        // Dï¿½tacher toutes les camï¿½ras qui sont enfants du target
         Camera[] allCams = FindObjectsOfType<Camera>();
         for (int i = 0; i < allCams.Length; i++)
         {
@@ -377,11 +380,11 @@ public class PlanetDestruction : MonoBehaviour
             }
         }
 
-        // Si un anchor nommé "MainCameraAnchor" est enfant du target, détacher ses enfants puis détruire l'anchor
+        // Si un anchor nommï¿½ "MainCameraAnchor" est enfant du target, dï¿½tacher ses enfants puis dï¿½truire l'anchor
         GameObject mainAnchor = GameObject.Find("MainCameraAnchor");
         if (mainAnchor != null && mainAnchor.transform.IsChildOf(target.transform))
         {
-            // détacher les enfants (typiquement la MainCamera)
+            // dï¿½tacher les enfants (typiquement la MainCamera)
             for (int i = mainAnchor.transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = mainAnchor.transform.GetChild(i);
@@ -391,7 +394,7 @@ public class PlanetDestruction : MonoBehaviour
             Destroy(mainAnchor);
         }
 
-        // Nettoyer ClickDetection.selectedObject si la camera principale y fait référence
+        // Nettoyer ClickDetection.selectedObject si la camera principale y fait rï¿½fï¿½rence
         if (Camera.main != null)
         {
             var click = Camera.main.GetComponent<ClickDetection>();

@@ -19,7 +19,7 @@ public static class SpaceTimeGridBootstrap
 
     private static void EnsureGridExists(Scene activeScene)
     {
-        if (!activeScene.IsValid() || activeScene.name != "SystemeSolaire")
+        if (!activeScene.IsValid())
         {
             return;
         }
