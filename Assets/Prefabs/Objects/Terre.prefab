@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 4367554715423903472}
   - component: {fileID: 4084151333199877063}
   - component: {fileID: -6649392429639390339}
+  - component: {fileID: 2453562442070068375}
   m_Layer: 0
   m_Name: Terre
   m_TagString: Untagged
@@ -376,3 +377,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabID: terre
+--- !u!114 &2453562442070068375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6831198506214678297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9277441bcdc7ad444a106eb07254a296, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoleilParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
