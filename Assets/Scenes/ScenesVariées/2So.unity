@@ -19382,7 +19382,7 @@ PrefabInstance:
     - target: {fileID: 5893172788963099703, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 964374285f3958b42bbdbed46e38e3a5, type: 2}
+      objectReference: {fileID: 2100000, guid: b643156f43cb7d5488fabed3b553f4ad, type: 2}
     - target: {fileID: 5893172788963099703, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
       value: 0
@@ -24982,10 +24982,6 @@ MonoBehaviour:
   orbitesOn: 1
   semiMajorAxis: 0
   mu: 0
-  lineAlphaMin: 0.05
-  lineAlphaMax: 0.6
-  lineAlphaDistanceMin: 50
-  lineAlphaDistanceMax: 2000
 --- !u!4 &1850705981
 Transform:
   m_ObjectHideFlags: 0
@@ -25941,7 +25937,7 @@ PrefabInstance:
     - target: {fileID: 5893172788963099703, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 964374285f3958b42bbdbed46e38e3a5, type: 2}
+      objectReference: {fileID: 2100000, guid: b643156f43cb7d5488fabed3b553f4ad, type: 2}
     - target: {fileID: 5893172788963099703, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
       value: 0
