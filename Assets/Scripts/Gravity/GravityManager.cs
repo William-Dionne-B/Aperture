@@ -203,8 +203,6 @@ public class GravityManager : MonoBehaviour
             float physicsResolution = Mathf.Clamp(speed / 3f, 1f, 4f);
             Time.fixedDeltaTime = 0.02f * physicsResolution;
         }
-        
-        Debug.Log("Simulation speed set to " + speed + "x");
     }
     
     // ==========================================

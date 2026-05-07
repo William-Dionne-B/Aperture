@@ -30,14 +30,12 @@ public class ConstrainUIToAspectRatio : MonoBehaviour
 
         if (scaleHeight < 1.0f)
         {
-            // Letterbox : barres haut/bas
             float newHeight = Screen.height * scaleHeight;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, newHeight);
         }
         else
         {
-            // Pillarbox : barres gauche/droite
             float scaleWidth = 1.0f / scaleHeight;
             float newWidth = Screen.width * scaleWidth;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, newWidth);

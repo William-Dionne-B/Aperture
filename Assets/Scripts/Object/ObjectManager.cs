@@ -30,7 +30,6 @@ public class ObjectManager : MonoBehaviour
     public Camera SelectionCamera;
     public RenderTexture SelectionRenderTexture;
 
-    [Header("Champs UI Textes")]
     public GameObject speed;
     public GameObject mass;
     public GameObject radius;
@@ -41,7 +40,6 @@ public class ObjectManager : MonoBehaviour
     public GameObject surface_gravity;
     public GameObject temperature;
 
-    [Header("Boutons ×10 / ÷10")]
     public Button massMultiply10Button;
     public Button massDivide10Button;
     public Button speedMultiply10Button;
@@ -49,15 +47,12 @@ public class ObjectManager : MonoBehaviour
     public Button radiusMultiply10Button;
     public Button radiusDivide10Button;
 
-    // private float initialYOffset = 95f;
     private RawImage selectionRawImage;
     public float cameraPadding = 1.5f;
 
-    [Header("Verrou caméra - déplacement")]
     public float lockedMoveSpeed = 5f;         
     public float previewLockedMoveSpeed = 2f; 
 
-    [Header("Buffer de sélection")]
     public float selectionBufferDuration = 0.15f; 
     private GameObject pendingSelection;
     private float pendingSelectionElapsed;
@@ -76,10 +71,6 @@ public class ObjectManager : MonoBehaviour
     private const int SelectionLayer = 31; 
     private int SelectionLayerMask => (1 << SelectionLayer);
     private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
-
-    // ==========================================
-    // MÉTHODES UNITY
-    // ==========================================
     
     void Start()
     {
@@ -182,7 +173,6 @@ public class ObjectManager : MonoBehaviour
 
         if (cameraLockedToSelection && selection != null && MainCamera != null && mainCameraAnchor != null)
         {
-            // N'utiliser que WASD pour déplacer l'ancre quand la caméra est verrouillée
             float h = 0f;
             float v = 0f;
             if (Input.GetKey(KeyCode.D)) h += 1f;
@@ -192,7 +182,6 @@ public class ObjectManager : MonoBehaviour
 
             if (Mathf.Abs(h) > 0.0001f || Mathf.Abs(v) > 0.0001f)
             {
-                // Calculer le déplacement relatif à la rotation verrouillée (pas à la rotation actuelle de l'objet caméra)
                 Vector3 right = mainCameraRotationWhenLocked * Vector3.right;
                 Vector3 forward = Vector3.ProjectOnPlane(mainCameraRotationWhenLocked * Vector3.forward, Vector3.up).normalized;
                 Vector3 move = (right * h + forward * v) * lockedMoveSpeed * Time.deltaTime;
@@ -201,7 +190,6 @@ public class ObjectManager : MonoBehaviour
             }
 
             mainCameraAnchor.transform.position = selection.transform.position + mainCameraOffset;
-            // Laisser la rotation de la caméra être gérée par le FreeFlyCamera (souris).
             mainCameraAnchor.transform.rotation = mainCameraRotationWhenLocked;
         }
 
@@ -216,10 +204,6 @@ public class ObjectManager : MonoBehaviour
         if (IsAnyFieldEditing()) return;
         updateUIVisibility();
     }
-
-    // ==========================================
-    // CONTROLE DE LA CAMERA
-    // ==========================================
     
     void FocusMainCameraOnSelection()
     {
@@ -504,9 +488,6 @@ public class ObjectManager : MonoBehaviour
         if (clickDetection != null) clickDetection.selectedObject = obj;
     }
     
-    /// <summary>
-    /// Recupere les valeurs brutes du script ObjectPropreties et les convertit en unites lisibles.
-    /// </summary>
     void updateUIVisibility()
     {
         if (InfoUI == null) return;
@@ -650,7 +631,6 @@ public class ObjectManager : MonoBehaviour
         return field.GetComponentInChildren<InputField>();
     }
 
-    // --- CALLBACKS D'ÉDITION ---
     void OnMassEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
