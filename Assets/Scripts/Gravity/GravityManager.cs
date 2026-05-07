@@ -39,12 +39,6 @@ public class GravityManager : MonoBehaviour
     private static readonly List<float> periodes = new List<float>();
     private float orbitPredictionTimer = 0f;
 
-    [Header("Orbit Line Appearance")]
-    public float lineAlphaMin = 0.05f;   // Très proche
-    public float lineAlphaMax = 0.6f;    // Très loin
-    public float lineAlphaDistanceMin = 50f;
-    public float lineAlphaDistanceMax = 2000f;
-
     private Camera mainCam;
 
     // ==========================================
@@ -75,7 +69,6 @@ public class GravityManager : MonoBehaviour
                 if (body != null && body.line != null)
                 {
                     PredictOrbitHybrid(body);
-                    UpdateOrbitLineColors();
                 }
             }
         }
@@ -442,32 +435,6 @@ public class GravityManager : MonoBehaviour
     // ==========================================
     // AFFICHAGE ET STABILITE VISUELLE
     // ==========================================
-
-    /// <summary>
-    /// Change la transparence des lignes d'orbites selon la distance de la camera.
-    /// Plus vous etes loin, plus les lignes deviennent opaques pour rester visibles.
-    /// </summary>
-    void UpdateOrbitLineColors()
-    {
-        if (mainCam == null) mainCam = Camera.main;
-        if (mainCam == null) return;
-
-        Vector3 camPos = mainCam.transform.position;
-
-        foreach (var body in bodies)
-        {
-            if (body == null || body.line == null || body.rb == null) continue;
-
-            float distance = Vector3.Distance(camPos, body.rb.position);
-
-            float t = Mathf.InverseLerp(lineAlphaDistanceMin, lineAlphaDistanceMax, distance);
-            float alpha = Mathf.Lerp(lineAlphaMin, lineAlphaMax, t);
-
-            Color c = new Color(1f, 1f, 1f, alpha);
-            body.line.startColor = c;
-            body.line.endColor = c;
-        }
-    }
     
     /// <summary>
     /// Fonction de securite si la trajectoire calculee fait des virages trop brusques ou des segments trop longs,

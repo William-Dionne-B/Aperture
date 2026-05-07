@@ -167,7 +167,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 964374285f3958b42bbdbed46e38e3a5, type: 2}
+  - {fileID: 2100000, guid: b643156f43cb7d5488fabed3b553f4ad, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -300,6 +300,8 @@ MonoBehaviour:
   starSurfaceTemperature: 35000
   starLuminosity: 3.52e+30
   albedo: 0
+  emissivity: 1
+  heatRedistributionFactor: 1
   greenhouseEffect: 0
 --- !u!114 &7738383565594045505
 MonoBehaviour:

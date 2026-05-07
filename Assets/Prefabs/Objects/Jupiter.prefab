@@ -183,7 +183,6 @@ MonoBehaviour:
   periode: 0
   density: 0
   EtoileParent: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
-  emissivity: 0.9
   radiusToMetersScale: 13900000
   distanceToMetersScale: 1.391609e+9
   unityToKgScale: 1.988e+24
@@ -194,6 +193,8 @@ MonoBehaviour:
   starSurfaceTemperature: 5778
   starLuminosity: 3.828e+26
   albedo: 0.52
+  emissivity: 0.9
+  heatRedistributionFactor: 1
   greenhouseEffect: 0
 --- !u!114 &1678318318768760463
 MonoBehaviour:
@@ -241,7 +242,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 964374285f3958b42bbdbed46e38e3a5, type: 2}
+  - {fileID: 2100000, guid: b643156f43cb7d5488fabed3b553f4ad, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
