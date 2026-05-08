@@ -44,22 +44,30 @@ public class GravityManager : MonoBehaviour
     // ==========================================
     // MÉTHODES UNITY
     // ==========================================
-    
+
     void Start()
     {
         mainCam = Camera.main;
-        OrbitesCheck.onValueChanged.AddListener(OnToggleChanged);
+        if (OrbitesCheck != null)
+            OrbitesCheck.onValueChanged.AddListener(OnToggleChanged);
     }
 
     void Awake()
     {
         Instance = this;
+        //bodies.Clear();
+        //periodes.Clear();
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
     }
 
     void Update()
     {
-        predictionTimer += Time.unscaledDeltaTime; 
-        
+        predictionTimer += Time.unscaledDeltaTime;
+
+        if (OrbitesCheck != null)
+            OrbitesCheck.isOn = orbitesOn;
+
         if (predictionTimer >= 0.06f && orbitesOn) 
         {
             predictionTimer = 0f;

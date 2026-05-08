@@ -38,7 +38,8 @@ public class MainMenuManager : MonoBehaviour
             Debug.LogWarning("Cannot load a scene because the scene name is empty.");
             return;
         }
-
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
         SceneManager.LoadScene(sceneName);
     }
 
