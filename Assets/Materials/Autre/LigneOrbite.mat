@@ -94,8 +94,8 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DistFadeIn: 29.71
-    - _DistFadeOut: 10.1
+    - _DistFadeIn: 24.61
+    - _DistFadeOut: 10.87
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
