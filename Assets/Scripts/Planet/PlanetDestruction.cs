@@ -15,6 +15,9 @@ public class PlanetDestruction : MonoBehaviour
     public AnimationCurve mergeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     private bool isMerging;
+    private float stayRetryTimer = 0f;
+    private const float StayRetryInterval = 0.3f;
+
     private Rigidbody sourceRigidbody;
     private ObjectProperties sourceProperties;
     private Renderer[] sourceRenderers;
@@ -31,55 +34,44 @@ public class PlanetDestruction : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         CollisionDetected?.Invoke(this, collision);
+        TryBeginMerge(collision);
+    }
 
-        if (isMerging || collision == null)
-        {
-            return;
-        }
+    void OnCollisionStay(Collision collision)
+    {
+        if (isMerging) return;
+        stayRetryTimer -= Time.deltaTime;
+        if (stayRetryTimer > 0f) return;
+        stayRetryTimer = StayRetryInterval;
+        TryBeginMerge(collision);
+    }
+
+    void TryBeginMerge(Collision collision)
+    {
+        if (isMerging || collision == null) return;
 
         GameObject otherObject = GetCollisionObject(collision);
-        if (otherObject == null || otherObject == gameObject)
-        {
-            return;
-        }
+        if (otherObject == null || otherObject == gameObject) return;
 
         PlanetDestruction otherDestruction = otherObject.GetComponent<PlanetDestruction>();
-        if (otherDestruction != null && otherDestruction.isMerging)
-        {
-            return;
-        }
+        if (otherDestruction != null && otherDestruction.isMerging) return;
 
-        if (requireGravityBodyOnOther && otherObject.GetComponent<GravityBody>() == null)
-        {
-            return;
-        }
+        if (requireGravityBodyOnOther && otherObject.GetComponent<GravityBody>() == null) return;
 
-        if (!ShouldHandleMerge(otherObject))
-        {
-            return;
-        }
+        if (!ShouldHandleMerge(otherObject)) return;
 
         isMerging = true;
-        if (otherDestruction != null)
-        {
-            otherDestruction.isMerging = true;
-        }
+        if (otherDestruction != null) otherDestruction.isMerging = true;
 
         StartCoroutine(MergeWithRoutine(otherObject, otherDestruction));
     }
 
     GameObject GetCollisionObject(Collision collision)
     {
-        if (collision.collider == null)
-        {
-            return null;
-        }
+        if (collision.collider == null) return null;
 
         Rigidbody otherRigidbody = collision.collider.attachedRigidbody;
-        if (otherRigidbody != null)
-        {
-            return otherRigidbody.gameObject;
-        }
+        if (otherRigidbody != null) return otherRigidbody.gameObject;
 
         return collision.collider.transform.root.gameObject;
     }
@@ -89,28 +81,14 @@ public class PlanetDestruction : MonoBehaviour
         float thisMass = GetMass(gameObject);
         float otherMass = GetMass(otherObject);
 
-        if (thisMass > otherMass)
-        {
-            return true;
-        }
-
-        if (thisMass < otherMass)
-        {
-            return false;
-        }
+        if (thisMass > otherMass) return true;
+        if (thisMass < otherMass) return false;
 
         float thisRadius = GetRadius(gameObject);
         float otherRadius = GetRadius(otherObject);
 
-        if (thisRadius > otherRadius)
-        {
-            return true;
-        }
-
-        if (thisRadius < otherRadius)
-        {
-            return false;
-        }
+        if (thisRadius > otherRadius) return true;
+        if (thisRadius < otherRadius) return false;
 
         return GetInstanceID() < otherObject.GetInstanceID();
     }
@@ -120,10 +98,7 @@ public class PlanetDestruction : MonoBehaviour
         if (otherObject == null)
         {
             isMerging = false;
-            if (otherDestruction != null)
-            {
-                otherDestruction.isMerging = false;
-            }
+            if (otherDestruction != null) otherDestruction.isMerging = false;
             yield break;
         }
 
@@ -143,23 +118,23 @@ public class PlanetDestruction : MonoBehaviour
         float loserMass = GetMass(loser);
 
         float combinedMass = Mathf.Max(0f, winnerMass + loserMass);
-        float combinedRadius = Mathf.Pow(Mathf.Pow(Mathf.Max(0f, winnerRadius), 3f) + Mathf.Pow(Mathf.Max(0f, loserRadius), 3f), 1f / 3f);
+        float combinedRadius = Mathf.Pow(
+            Mathf.Pow(Mathf.Max(0f, winnerRadius), 3f) + Mathf.Pow(Mathf.Max(0f, loserRadius), 3f),
+            1f / 3f
+        );
 
         Vector3 winnerPosition = winnerRigidbody != null ? winnerRigidbody.position : winner.transform.position;
         Vector3 loserPosition = loserRigidbody != null ? loserRigidbody.position : loser.transform.position;
-        Vector3 mergedPosition = combinedMass > 0f
-            ? ((winnerPosition * winnerMass) + (loserPosition * loserMass)) / combinedMass
-            : winner.transform.position;
 
         Vector3 winnerVelocity = winnerRigidbody != null ? winnerRigidbody.linearVelocity : Vector3.zero;
         Vector3 loserVelocity = loserRigidbody != null ? loserRigidbody.linearVelocity : Vector3.zero;
-        Vector3 mergedVelocity = combinedMass > 0f
-            ? ((winnerVelocity * winnerMass) + (loserVelocity * loserMass)) / combinedMass
-            : Vector3.zero;
-
         Vector3 winnerAngularVelocity = winnerRigidbody != null ? winnerRigidbody.angularVelocity : Vector3.zero;
         Vector3 loserAngularVelocity = loserRigidbody != null ? loserRigidbody.angularVelocity : Vector3.zero;
-        Vector3 mergedAngularVelocity = combinedMass > 0f
+
+        Vector3 finalVelocity = combinedMass > 0f
+            ? ((winnerVelocity * winnerMass) + (loserVelocity * loserMass)) / combinedMass
+            : winnerVelocity;
+        Vector3 finalAngularVelocity = combinedMass > 0f
             ? ((winnerAngularVelocity * winnerMass) + (loserAngularVelocity * loserMass)) / combinedMass
             : winnerAngularVelocity;
 
@@ -169,13 +144,22 @@ public class PlanetDestruction : MonoBehaviour
 
         if (loserRigidbody != null)
         {
-            loserRigidbody.isKinematic = true;
-            loserRigidbody.detectCollisions = false;
             loserRigidbody.linearVelocity = Vector3.zero;
             loserRigidbody.angularVelocity = Vector3.zero;
+            loserRigidbody.isKinematic = true;
+            loserRigidbody.detectCollisions = false;
+        }
+
+        if (winnerRigidbody != null)
+        {
+            winnerRigidbody.linearVelocity = Vector3.zero;
+            winnerRigidbody.angularVelocity = Vector3.zero;
+            winnerRigidbody.isKinematic = true;
+            winnerRigidbody.detectCollisions = false;
         }
 
         SetCollidersEnabled(loser, false);
+        SetCollidersEnabled(winner, false);
 
         float duration = Mathf.Max(0.01f, mergeDuration);
         float elapsed = 0f;
@@ -184,6 +168,8 @@ public class PlanetDestruction : MonoBehaviour
         {
             if (winner == null || loser == null)
             {
+                if (winnerDestruction != null) winnerDestruction.isMerging = false;
+                if (loserDestruction != null) loserDestruction.isMerging = false;
                 yield break;
             }
 
@@ -191,11 +177,7 @@ public class PlanetDestruction : MonoBehaviour
             float normalized = Mathf.Clamp01(elapsed / duration);
             float blend = mergeCurve != null ? mergeCurve.Evaluate(normalized) : normalized;
 
-            Vector3 winnerCurrentPosition = winnerRigidbody != null
-                ? winnerRigidbody.position
-                : winner.transform.position;
-            Vector3 loserStepPosition = Vector3.Lerp(loserPosition, winnerCurrentPosition, blend * blend);
-
+            Vector3 loserStepPosition = Vector3.Lerp(loserPosition, winnerPosition, blend * blend);
             SetObjectPosition(loser, loserRigidbody, loserStepPosition);
 
             winner.transform.localScale = Vector3.Lerp(winnerStartScale, combinedScale, blend);
@@ -204,15 +186,19 @@ public class PlanetDestruction : MonoBehaviour
             yield return null;
         }
 
+        if (winnerRigidbody != null)
+        {
+            winnerRigidbody.isKinematic = false;
+            winnerRigidbody.detectCollisions = true;
+        }
+
         if (winner != null)
         {
-            mergedPosition = winnerRigidbody != null ? winnerRigidbody.position : winner.transform.position;
-            ApplyMergedState(winner, combinedMass, combinedRadius, mergedPosition, mergedVelocity, mergedAngularVelocity);
+            ApplyMergedState(winner, combinedMass, combinedRadius, finalVelocity, finalAngularVelocity);
         }
 
         if (loser != null)
         {
-            // d�tache ici toute cam�ra/anchor enfant de l'objet perdant
             DetachCamerasParentedTo(loser);
             Destroy(loser);
         }
@@ -224,14 +210,45 @@ public class PlanetDestruction : MonoBehaviour
             Debug.Log($"Merged collision: {winnerName} absorbed {loserName}.", winnerDestruction);
         }
 
-        if (winnerDestruction != null)
-        {
-            winnerDestruction.isMerging = false;
-        }
+        if (winnerDestruction != null) winnerDestruction.isMerging = false;
+        if (loserDestruction != null) loserDestruction.isMerging = false;
 
-        if (loserDestruction != null)
+        if (winner != null)
         {
-            loserDestruction.isMerging = false;
+            PlanetDestruction winnerPD = winner.GetComponent<PlanetDestruction>();
+            if (winnerPD != null) winnerPD.StartCoroutine(winnerPD.CheckOverlappingAfterMerge());
+        }
+    }
+
+    IEnumerator CheckOverlappingAfterMerge()
+    {
+        yield return new WaitForFixedUpdate();
+        yield return new WaitForFixedUpdate();
+
+        if (gameObject == null || isMerging) yield break;
+
+        float radius = GetRadius(gameObject);
+        Collider[] hits = Physics.OverlapSphere(transform.position, radius * 1.05f);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i] == null) continue;
+
+            Rigidbody rb = hits[i].attachedRigidbody;
+            GameObject other = rb != null ? rb.gameObject : hits[i].transform.root.gameObject;
+
+            if (other == null || other == gameObject) continue;
+            if (isMerging) break;
+
+            PlanetDestruction otherPD = other.GetComponent<PlanetDestruction>();
+            if (otherPD != null && otherPD.isMerging) continue;
+            if (requireGravityBodyOnOther && other.GetComponent<GravityBody>() == null) continue;
+            if (!ShouldHandleMerge(other)) continue;
+
+            isMerging = true;
+            if (otherPD != null) otherPD.isMerging = true;
+            StartCoroutine(MergeWithRoutine(other, otherPD));
+            break;
         }
     }
 
@@ -243,30 +260,21 @@ public class PlanetDestruction : MonoBehaviour
             return;
         }
 
-        if (targetObject != null)
-        {
-            targetObject.transform.position = position;
-        }
+        if (targetObject != null) targetObject.transform.position = position;
     }
 
     void SetCollidersEnabled(GameObject targetObject, bool enabledState)
     {
-        if (targetObject == null)
-        {
-            return;
-        }
+        if (targetObject == null) return;
 
         Collider[] colliders = targetObject.GetComponentsInChildren<Collider>(true);
         for (int index = 0; index < colliders.Length; index++)
         {
-            if (colliders[index] != null)
-            {
-                colliders[index].enabled = enabledState;
-            }
+            if (colliders[index] != null) colliders[index].enabled = enabledState;
         }
     }
 
-    void ApplyMergedState(GameObject targetObject, float combinedMass, float combinedRadius, Vector3 mergedPosition, Vector3 mergedVelocity, Vector3 mergedAngularVelocity)
+    void ApplyMergedState(GameObject targetObject, float combinedMass, float combinedRadius, Vector3 mergedVelocity, Vector3 mergedAngularVelocity)
     {
         ObjectProperties properties = targetObject.GetComponent<ObjectProperties>();
         Rigidbody body = targetObject.GetComponent<Rigidbody>();
@@ -285,17 +293,9 @@ public class PlanetDestruction : MonoBehaviour
 
         if (body != null)
         {
-            body.mass = combinedMass; 
-            body.position = mergedPosition;
-            body.isKinematic = false;
-            body.detectCollisions = true;
+            body.mass = combinedMass;
             body.linearVelocity = mergedVelocity;
             body.angularVelocity = mergedAngularVelocity;
-            body.WakeUp();
-        }
-        else
-        {
-            targetObject.transform.position = mergedPosition;
         }
 
         if (gravityBody != null)
@@ -308,67 +308,47 @@ public class PlanetDestruction : MonoBehaviour
         Renderer[] renderers = targetObject.GetComponentsInChildren<Renderer>(true);
         for (int index = 0; index < renderers.Length; index++)
         {
-            if (renderers[index] != null)
-            {
-                renderers[index].enabled = true;
-            }
+            if (renderers[index] != null) renderers[index].enabled = true;
         }
 
         Collider[] colliders = targetObject.GetComponentsInChildren<Collider>(true);
         for (int index = 0; index < colliders.Length; index++)
         {
-            if (colliders[index] != null)
-            {
-                colliders[index].enabled = true;
-            }
+            if (colliders[index] != null) colliders[index].enabled = true;
         }
     }
 
-
     float GetRadius(GameObject targetObject)
     {
-        if (targetObject == null)
-        {
-            return 0f;
-        }
+        if (targetObject == null) return 0f;
 
         ObjectProperties properties = targetObject.GetComponent<ObjectProperties>();
-        if (properties != null && properties.radius > 0f)
-        {
-            return properties.radius;
-        }
+        if (properties != null && properties.radius > 0f) return properties.radius;
 
-        return Mathf.Max(targetObject.transform.lossyScale.x, targetObject.transform.lossyScale.y, targetObject.transform.lossyScale.z) * 0.5f;
+        return Mathf.Max(
+            targetObject.transform.lossyScale.x,
+            targetObject.transform.lossyScale.y,
+            targetObject.transform.lossyScale.z
+        ) * 0.5f;
     }
 
     float GetMass(GameObject targetObject)
     {
-        if (targetObject == null)
-        {
-            return 0f;
-        }
+        if (targetObject == null) return 0f;
 
         ObjectProperties properties = targetObject.GetComponent<ObjectProperties>();
-        if (properties != null && properties.Mass > 0f)
-        {
-            return properties.Mass;
-        }
+        if (properties != null && properties.Mass > 0f) return properties.Mass;
 
         Rigidbody body = targetObject.GetComponent<Rigidbody>();
-        if (body != null)
-        {
-            return body.mass;
-        }
+        if (body != null) return body.mass;
 
         return 1f;
     }
 
-    // D�tache toute cam�ra ou anchor parent�e � l'objet cible pour �viter de d�truire la cam�ra.
     void DetachCamerasParentedTo(GameObject target)
     {
         if (target == null) return;
 
-        // D�tacher toutes les cam�ras qui sont enfants du target
         Camera[] allCams = FindObjectsOfType<Camera>();
         for (int i = 0; i < allCams.Length; i++)
         {
@@ -380,21 +360,17 @@ public class PlanetDestruction : MonoBehaviour
             }
         }
 
-        // Si un anchor nomm� "MainCameraAnchor" est enfant du target, d�tacher ses enfants puis d�truire l'anchor
         GameObject mainAnchor = GameObject.Find("MainCameraAnchor");
         if (mainAnchor != null && mainAnchor.transform.IsChildOf(target.transform))
         {
-            // d�tacher les enfants (typiquement la MainCamera)
             for (int i = mainAnchor.transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = mainAnchor.transform.GetChild(i);
-                if (child != null)
-                    child.SetParent(null, true);
+                if (child != null) child.SetParent(null, true);
             }
             Destroy(mainAnchor);
         }
 
-        // Nettoyer ClickDetection.selectedObject si la camera principale y fait r�f�rence
         if (Camera.main != null)
         {
             var click = Camera.main.GetComponent<ClickDetection>();
