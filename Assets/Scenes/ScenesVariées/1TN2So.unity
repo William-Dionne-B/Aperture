@@ -6969,6 +6969,10 @@ PrefabInstance:
       propertyPath: objectName
       value: Soleil
       objectReference: {fileID: 0}
+    - target: {fileID: -8802154727256929741, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: EtoileParent
+      value: 
+      objectReference: {fileID: 561251429}
     - target: {fileID: 1262627819960287473, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: initialVelocity.z
       value: -30
@@ -7835,6 +7839,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 551683475}
   m_CullTransparentMesh: 1
+--- !u!1 &561251429 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  m_PrefabInstance: {fileID: 1444054683}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &562553714
 GameObject:
   m_ObjectHideFlags: 0
@@ -19252,6 +19261,10 @@ PrefabInstance:
       propertyPath: objectName
       value: Soleil
       objectReference: {fileID: 0}
+    - target: {fileID: -8802154727256929741, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: EtoileParent
+      value: 
+      objectReference: {fileID: 2013735379}
     - target: {fileID: 1262627819960287473, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: initialVelocity.z
       value: 30
@@ -26529,6 +26542,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: -8, y: -5, z: -8, w: -5}
   m_Softness: {x: 0, y: 0}
+--- !u!1 &2013735379 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  m_PrefabInstance: {fileID: 495631063}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2015040067
 GameObject:
   m_ObjectHideFlags: 0

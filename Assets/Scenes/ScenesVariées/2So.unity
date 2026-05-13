@@ -1161,6 +1161,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 131026299}
   m_CullTransparentMesh: 1
+--- !u!1 &132647577 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  m_PrefabInstance: {fileID: 1444054683}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &136494347
 GameObject:
   m_ObjectHideFlags: 0
@@ -19323,6 +19328,10 @@ PrefabInstance:
       propertyPath: objectName
       value: Soleil
       objectReference: {fileID: 0}
+    - target: {fileID: -8802154727256929741, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: EtoileParent
+      value: 
+      objectReference: {fileID: 2064319416}
     - target: {fileID: 1262627819960287473, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: initialVelocity.z
       value: -10
@@ -25878,6 +25887,10 @@ PrefabInstance:
       propertyPath: objectName
       value: Soleil
       objectReference: {fileID: 0}
+    - target: {fileID: -8802154727256929741, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+      propertyPath: EtoileParent
+      value: 
+      objectReference: {fileID: 132647577}
     - target: {fileID: 1262627819960287473, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
       propertyPath: initialVelocity.z
       value: 10
@@ -27257,6 +27270,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 20}
   m_SizeDelta: {x: 320, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &2064319416 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  m_PrefabInstance: {fileID: 1984425348}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2067040350
 GameObject:
   m_ObjectHideFlags: 0
