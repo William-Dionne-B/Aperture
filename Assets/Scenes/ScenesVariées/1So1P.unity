@@ -13695,6 +13695,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2453562442070068375, guid: 5bb7045707e76694aac707c7201e9d90, type: 3}
+      propertyPath: SoleilParent
+      value: 
+      objectReference: {fileID: 1444054684}
     - target: {fileID: 2927543802744553740, guid: 5bb7045707e76694aac707c7201e9d90, type: 3}
       propertyPath: radius
       value: 30
@@ -18781,6 +18785,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+--- !u!1 &1444054684 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1544941027984095034, guid: 529c203c88953c64599d6bed956c93ba, type: 3}
+  m_PrefabInstance: {fileID: 1444054683}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1449561223
 GameObject:
   m_ObjectHideFlags: 0
