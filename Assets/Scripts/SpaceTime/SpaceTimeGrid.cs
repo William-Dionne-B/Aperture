@@ -29,8 +29,8 @@ public class SpaceTimeGrid : MonoBehaviour
     public float fadeEndDistance = 750f;
 
     [Header("Camera Distance Transparency")]
-    public float alphaMin = 0.0f;   // Alpha quand très proche
-    public float alphaMax = 1.0f;   // Alpha quand très loin
+    public float alphaMin = 0.0f;   // Alpha quand trï¿½s proche
+    public float alphaMax = 1.0f;   // Alpha quand trï¿½s loin
 
     // Shader property IDs
     static readonly int GridScaleId = Shader.PropertyToID("_GridScale");
@@ -46,6 +46,9 @@ public class SpaceTimeGrid : MonoBehaviour
 
     private Material materialInstance;
 
+    /// <summary>
+    /// Construit la grille, cree le mesh et applique les reglages de material.
+    /// </summary>
     void Start()
     {
         resolution = Mathf.Max(1, resolution);
@@ -53,10 +56,10 @@ public class SpaceTimeGrid : MonoBehaviour
         gridCellWorldSize = Mathf.Max(0.01f, gridCellWorldSize);
         fadeEndDistance = Mathf.Max(fadeStartDistance + 0.01f, fadeEndDistance);
 
-        // Crée une instance du material propre à cet objet
+        // Crï¿½e une instance du material propre ï¿½ cet objet
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer.sharedMaterial != null)
-            materialInstance = meshRenderer.material; // crée l'instance
+            materialInstance = meshRenderer.material; // crï¿½e l'instance
 
         ApplyVerticalOffset();
         ApplyCameraFollow();
@@ -115,6 +118,9 @@ public class SpaceTimeGrid : MonoBehaviour
         ApplyGridMaterialSettings();
     }
 
+    /// <summary>
+    /// Valide les reglages en editeur et met a jour le material.
+    /// </summary>
     void OnValidate()
     {
         resolution = Mathf.Max(1, resolution);
@@ -125,6 +131,9 @@ public class SpaceTimeGrid : MonoBehaviour
         ApplyGridMaterialSettings();
     }
 
+    /// <summary>
+    /// Met a jour la position de la grille et le fondu selon la camera.
+    /// </summary>
     void LateUpdate()
     {
         ApplyCameraFollow();
@@ -135,6 +144,9 @@ public class SpaceTimeGrid : MonoBehaviour
     // POSITION DE LA GRILLE
     // ==========================================
 
+    /// <summary>
+    /// Applique le decalage vertical de la grille.
+    /// </summary>
     void ApplyVerticalOffset()
     {
         Vector3 position = transform.position;
@@ -142,6 +154,9 @@ public class SpaceTimeGrid : MonoBehaviour
         transform.position = position;
     }
 
+    /// <summary>
+    /// Aligne la grille sur la camera tout en conservant le decalage Y.
+    /// </summary>
     void ApplyCameraFollow()
     {
         Vector3 position = transform.position;
@@ -163,6 +178,9 @@ public class SpaceTimeGrid : MonoBehaviour
         transform.position = position;
     }
 
+    /// <summary>
+    /// Calcule la hauteur Y cible pour la grille.
+    /// </summary>
     float ResolveGridY()
     {
         if (!followCenterOfMassY)
@@ -175,6 +193,9 @@ public class SpaceTimeGrid : MonoBehaviour
     // MATERIAL
     // ==========================================
 
+    /// <summary>
+    /// Applique les proprietes du shader pour la grille.
+    /// </summary>
     void ApplyGridMaterialSettings()
     {
         Material mat = GetActiveMaterial();
@@ -193,6 +214,9 @@ public class SpaceTimeGrid : MonoBehaviour
         mat.renderQueue = (int)RenderQueue.Transparent - 100;
     }
 
+    /// <summary>
+    /// Met a jour la transparence selon la distance a la camera.
+    /// </summary>
     void UpdateCameraDistanceFade()
     {
         Material mat = GetActiveMaterial();
@@ -206,7 +230,10 @@ public class SpaceTimeGrid : MonoBehaviour
         mat.SetFloat(AlphaMaxId, alphaMax);
     }
 
-    // Retourne l'instance du material (en jeu) ou le sharedMaterial (en éditeur)
+    // Retourne l'instance du material (en jeu) ou le sharedMaterial (en ï¿½diteur)
+    /// <summary>
+    /// Retourne le material actif selon le mode (jeu ou editeur).
+    /// </summary>
     Material GetActiveMaterial()
     {
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
@@ -222,6 +249,9 @@ public class SpaceTimeGrid : MonoBehaviour
         return meshRenderer.sharedMaterial;
     }
 
+    /// <summary>
+    /// Nettoie l'instance de material creee en jeu.
+    /// </summary>
     void OnDestroy()
     {
         if (materialInstance != null)

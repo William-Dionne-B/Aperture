@@ -23,6 +23,9 @@ public class PlanetDestruction : MonoBehaviour
     private Renderer[] sourceRenderers;
     private Collider[] sourceColliders;
 
+    /// <summary>
+    /// Met en cache les references utiles pour la fusion.
+    /// </summary>
     void Awake()
     {
         sourceRigidbody = GetComponent<Rigidbody>();
@@ -31,12 +34,18 @@ public class PlanetDestruction : MonoBehaviour
         sourceColliders = GetComponentsInChildren<Collider>(true);
     }
 
+    /// <summary>
+    /// Detecte une collision et tente de lancer une fusion.
+    /// </summary>
     void OnCollisionEnter(Collision collision)
     {
         CollisionDetected?.Invoke(this, collision);
         TryBeginMerge(collision);
     }
 
+    /// <summary>
+    /// Retente la fusion a intervalle regulier pendant la collision.
+    /// </summary>
     void OnCollisionStay(Collision collision)
     {
         if (isMerging) return;
@@ -46,6 +55,9 @@ public class PlanetDestruction : MonoBehaviour
         TryBeginMerge(collision);
     }
 
+    /// <summary>
+    /// Verifie les conditions et demarre la fusion si possible.
+    /// </summary>
     void TryBeginMerge(Collision collision)
     {
         if (isMerging || collision == null) return;
@@ -66,6 +78,9 @@ public class PlanetDestruction : MonoBehaviour
         StartCoroutine(MergeWithRoutine(otherObject, otherDestruction));
     }
 
+    /// <summary>
+    /// Recupere l'objet principal touche par la collision.
+    /// </summary>
     GameObject GetCollisionObject(Collision collision)
     {
         if (collision.collider == null) return null;
@@ -76,6 +91,9 @@ public class PlanetDestruction : MonoBehaviour
         return collision.collider.transform.root.gameObject;
     }
 
+    /// <summary>
+    /// Determine quel objet doit gerer la fusion.
+    /// </summary>
     bool ShouldHandleMerge(GameObject otherObject)
     {
         float thisMass = GetMass(gameObject);
@@ -93,6 +111,9 @@ public class PlanetDestruction : MonoBehaviour
         return GetInstanceID() < otherObject.GetInstanceID();
     }
 
+    /// <summary>
+    /// Anime et applique la fusion entre deux corps.
+    /// </summary>
     IEnumerator MergeWithRoutine(GameObject otherObject, PlanetDestruction otherDestruction)
     {
         if (otherObject == null)
@@ -220,6 +241,9 @@ public class PlanetDestruction : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Verifie les recouvrements apres la fusion pour enchainees.
+    /// </summary>
     IEnumerator CheckOverlappingAfterMerge()
     {
         yield return new WaitForFixedUpdate();
@@ -252,6 +276,9 @@ public class PlanetDestruction : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deplace un objet en preferant le rigidbody si present.
+    /// </summary>
     void SetObjectPosition(GameObject targetObject, Rigidbody body, Vector3 position)
     {
         if (body != null)
@@ -263,6 +290,9 @@ public class PlanetDestruction : MonoBehaviour
         if (targetObject != null) targetObject.transform.position = position;
     }
 
+    /// <summary>
+    /// Active ou desactive tous les colliders d'un objet.
+    /// </summary>
     void SetCollidersEnabled(GameObject targetObject, bool enabledState)
     {
         if (targetObject == null) return;
@@ -274,6 +304,9 @@ public class PlanetDestruction : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Applique masse, rayon et vitesses a l'objet vainqueur.
+    /// </summary>
     void ApplyMergedState(GameObject targetObject, float combinedMass, float combinedRadius, Vector3 mergedVelocity, Vector3 mergedAngularVelocity)
     {
         ObjectProperties properties = targetObject.GetComponent<ObjectProperties>();
@@ -318,6 +351,9 @@ public class PlanetDestruction : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calcule le rayon a partir des proprietes ou de l'echelle.
+    /// </summary>
     float GetRadius(GameObject targetObject)
     {
         if (targetObject == null) return 0f;
@@ -332,6 +368,9 @@ public class PlanetDestruction : MonoBehaviour
         ) * 0.5f;
     }
 
+    /// <summary>
+    /// Calcule la masse a partir des proprietes ou du rigidbody.
+    /// </summary>
     float GetMass(GameObject targetObject)
     {
         if (targetObject == null) return 0f;
@@ -345,6 +384,9 @@ public class PlanetDestruction : MonoBehaviour
         return 1f;
     }
 
+    /// <summary>
+    /// Detache les cameras d'un objet avant sa destruction.
+    /// </summary>
     void DetachCamerasParentedTo(GameObject target)
     {
         if (target == null) return;

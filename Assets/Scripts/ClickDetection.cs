@@ -23,12 +23,18 @@ public class ClickDetection : MonoBehaviour
 
     [SerializeField] private float hoverRotationSpeed = 45f;
 
+    /// <summary>
+    /// Initialise la camera principale et les spheres de selection.
+    /// </summary>
     void Start()
     {
         mainCam = Camera.main;
         CreateSelectionSpheres();
     }
 
+    /// <summary>
+    /// Gere le survol, la selection au clic et le sprite de selection.
+    /// </summary>
     void Update()
     {
         if (mainCam == null) return;
@@ -90,6 +96,9 @@ public class ClickDetection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Recentre le sprite de selection sur la cible apres les updates.
+    /// </summary>
     void LateUpdate()
     {
         GameObject target = currentLookedAt != null ? currentLookedAt : selectedObject;
@@ -101,6 +110,9 @@ public class ClickDetection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Cree des spheres de selection autour des objets selectionnables.
+    /// </summary>
     void CreateSelectionSpheres()
     {
         ObjectProperties[] objects = FindObjectsOfType<ObjectProperties>();
@@ -126,18 +138,27 @@ public class ClickDetection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Retourne l'objet racine porteur de ObjectProperties.
+    /// </summary>
     GameObject GetRootObject(GameObject obj)
     {
         ObjectProperties prop = obj.GetComponentInParent<ObjectProperties>();
         return prop != null ? prop.gameObject : null;
     }
 
+    /// <summary>
+    /// Recupere le rayon defini dans ObjectProperties.
+    /// </summary>
     float GetObjectRadius(GameObject obj)
     {
         float radius = obj.GetComponent<ObjectProperties>().radius;
         return radius;
     }
 
+    /// <summary>
+    /// Attend deux frames avant de deseletionner l'objet.
+    /// </summary>
     private IEnumerator DelayedDeselect(GameObject obj)
     {
         yield return null;
@@ -147,6 +168,9 @@ public class ClickDetection : MonoBehaviour
             selectedObject = null;
     }
 
+    /// <summary>
+    /// Cree le sprite de selection pour l'objet cible.
+    /// </summary>
     private void CreateSelectionSprite(GameObject obj)
     {
         RemoveSprite();
@@ -164,6 +188,9 @@ public class ClickDetection : MonoBehaviour
         selectionSpriteGO.transform.position = center + selectionSpriteOffset;
     }
 
+    /// <summary>
+    /// Met a jour la taille et l'orientation du sprite de selection.
+    /// </summary>
     private void UpdateSprite(GameObject target)
     {
         if (selectionSpriteGO == null) return;
@@ -187,6 +214,9 @@ public class ClickDetection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Detruit le sprite de selection et nettoie les references.
+    /// </summary>
     private void RemoveSprite()
     {
         if (selectionSpriteGO != null)

@@ -13,6 +13,9 @@ public class SystemeSauvegarde : MonoBehaviour
     private Dictionary<string, GameObject> prefabLookup;
 
 
+    /// <summary>
+    /// Prepare la table de correspondance prefabID vers prefab.
+    /// </summary>
     void Start()
     {
         prefabLookup = new Dictionary<string, GameObject>();
@@ -31,11 +34,15 @@ public class SystemeSauvegarde : MonoBehaviour
         }
     }
 
+
     void Awake()
     {
         Instance = this;
     }
 
+    /// <summary>
+    /// Ecoute le raccourci clavier pour creer une sauvegarde.
+    /// </summary>
     void Update()
     {
 
@@ -49,6 +56,9 @@ public class SystemeSauvegarde : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Sauvegarde l'etat de la scene courante dans un fichier JSON.
+    /// </summary>
     public void SaveScene(string saveName)
     {
         SceneData data = new SceneData();
@@ -128,6 +138,9 @@ public class SystemeSauvegarde : MonoBehaviour
         Debug.Log("Saved to: " + fullPath);
     }
 
+    /// <summary>
+    /// Charge une sauvegarde JSON et reconstruit la scene.
+    /// </summary>
     public void LoadScene(string saveName)
     {
         string fullPath = Path.Combine(Application.persistentDataPath, saveName);
@@ -206,6 +219,9 @@ public class SystemeSauvegarde : MonoBehaviour
         Debug.Log("Scene loaded.");
     }
 
+    /// <summary>
+    /// Detruit tous les objets geres par le GravityManager.
+    /// </summary>
     void ClearScene()
     {
         var bodies = new List<GravityBody>(GravityManager.Bodies);
@@ -217,6 +233,9 @@ public class SystemeSauvegarde : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Applique la vitesse au prochain frame pour eviter l'ecrasement Unity.
+    /// </summary>
     private IEnumerator ApplyVelocityNextFrame(GravityBody body, Vector3 vel)
     {
         yield return null;

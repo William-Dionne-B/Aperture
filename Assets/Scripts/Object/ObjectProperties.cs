@@ -92,15 +92,18 @@ public class ObjectProperties : MonoBehaviour
 
     public static List<ObjectProperties> AllStarsInSystem = new List<ObjectProperties>();
     
-    // ==========================================
-    // MÉTHODES UNITY
-    // ==========================================
     
+    /// <summary>
+    /// Enregistre l'astre dans le registre des etoiles si besoin.
+    /// </summary>
     void OnEnable()
     {
         EnsureStarRegistryState();
     }
 
+    /// <summary>
+    /// Retire l'astre du registre des etoiles a la desactivation.
+    /// </summary>
     void OnDisable()
     {
         if (AllStarsInSystem.Contains(this))
@@ -109,6 +112,9 @@ public class ObjectProperties : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Initialise les references, valeurs par defaut et demarre les calculs.
+    /// </summary>
     void Start()
     {
         thisObject = (transform.parent != null) ? transform.parent.gameObject : this.gameObject;
@@ -133,6 +139,9 @@ public class ObjectProperties : MonoBehaviour
         else speedMagnitude = 0f;
     }
     
+    /// <summary>
+    /// Met a jour echelle, distances, gravite, densite et temperature.
+    /// </summary>
     void Update()
     {
         if (thisTransform != null) thisTransform.localScale = new Vector3(2 * radius, 2 * radius, 2 * radius);
@@ -354,6 +363,9 @@ public class ObjectProperties : MonoBehaviour
     /// <summary>
     /// Transforme un objet en trou noir.
     /// </summary>
+    /// <summary>
+    /// Remplace l'astre par le prefab de trou noir.
+    /// </summary>
     void ReplaceByBlackHolePrefab()
     {
         GameObject sourceObject = thisObject != null ? thisObject : gameObject;
@@ -408,6 +420,9 @@ public class ObjectProperties : MonoBehaviour
         Destroy(sourceObject);
     }
 
+    /// <summary>
+    /// Reassigne les satellites qui pointaient vers l'ancienne etoile.
+    /// </summary>
     void ReassignChildrenStarParent(GameObject previousStar, GameObject newStar)
     {
         if (previousStar == null || newStar == null)

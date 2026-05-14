@@ -14,12 +14,17 @@ public class SaveMenuUI : MonoBehaviour
     private string selectedSave = null;
     private List<string> saves = new List<string>();
 
+    /// <summary>
+    /// Initialise la liste des sauvegardes.
+    /// </summary>
     void Start()
     {
         RefreshList();
     }
 
-    // Refresh save list UI
+    /// <summary>
+    /// Rafraichit l'UI de la liste des sauvegardes.
+    /// </summary>
     public void RefreshList()
     {
         // Clear UI
@@ -56,7 +61,9 @@ public class SaveMenuUI : MonoBehaviour
         }
     }
 
-    // Select a save
+    /// <summary>
+    /// Selectionne une sauvegarde et met en surbrillance le bouton.
+    /// </summary>
     void SelectSave(string saveName, GameObject buttonObj)
     {
         selectedSave = saveName;
@@ -72,7 +79,9 @@ public class SaveMenuUI : MonoBehaviour
         buttonObj.GetComponent<Image>().color = Color.green;
     }
 
-    // Create new save
+    /// <summary>
+    /// Cree une nouvelle sauvegarde avec le nom saisi.
+    /// </summary>
     public void CreateSave()
     {
         string saveName = inputField.text;
@@ -88,7 +97,9 @@ public class SaveMenuUI : MonoBehaviour
         RefreshList();
     }
 
-    // Load selected save
+    /// <summary>
+    /// Charge la sauvegarde selectionnee.
+    /// </summary>
     public void LoadSelected()
     {
         if (string.IsNullOrEmpty(selectedSave))
@@ -100,7 +111,9 @@ public class SaveMenuUI : MonoBehaviour
         SystemeSauvegarde.Instance.LoadScene(selectedSave);
     }
 
-    // Delete selected save
+    /// <summary>
+    /// Supprime la sauvegarde selectionnee.
+    /// </summary>
     public void DeleteSelected()
     {
         if (string.IsNullOrEmpty(selectedSave))

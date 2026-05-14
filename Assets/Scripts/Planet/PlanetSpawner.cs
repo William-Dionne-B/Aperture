@@ -5,10 +5,10 @@ public class PlanetSpawner : MonoBehaviour
     private GameObject selectedPrefab;
     private int spawnCount = 0;
 
-    // ==========================================
-    // MÉTHODES UNITY
-    // ==========================================
     
+    /// <summary>
+    /// Fait apparaitre un astre au clic droit et initialise son orbite si possible.
+    /// </summary>
     void Update()
     {
         if (!Input.GetMouseButtonDown(1)) return;

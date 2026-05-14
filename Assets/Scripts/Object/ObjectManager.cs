@@ -72,6 +72,9 @@ public class ObjectManager : MonoBehaviour
     private int SelectionLayerMask => (1 << SelectionLayer);
     private Dictionary<Transform, int> savedLayers = new Dictionary<Transform, int>();
     
+    /// <summary>
+    /// Initialise la camera de selection, l'UI et les boutons.
+    /// </summary>
     void Start()
     {
         if (SelectionRenderTexture == null) SelectionRenderTexture = new RenderTexture(1024, 1024, 24);
@@ -99,6 +102,9 @@ public class ObjectManager : MonoBehaviour
         updateUIVisibility();
     }
     
+    /// <summary>
+    /// Gere la selection, l'attache camera et la mise a jour UI.
+    /// </summary>
     void Update()
     {
         if (MainCamera == null) return;
@@ -205,6 +211,9 @@ public class ObjectManager : MonoBehaviour
         updateUIVisibility();
     }
     
+    /// <summary>
+    /// Centre la camera principale sur la selection.
+    /// </summary>
     void FocusMainCameraOnSelection()
     {
         if (selection == null || MainCamera == null) return;
@@ -224,6 +233,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
     
+    /// <summary>
+    /// Branche le bouton de focus camera.
+    /// </summary>
     void InitializeCameraFocusButton()
     {
         if (CameraFocusButton == null) return;
@@ -231,6 +243,9 @@ public class ObjectManager : MonoBehaviour
         if (button != null) button.onClick.AddListener(FocusMainCameraOnSelection);
     }
     
+    /// <summary>
+    /// Attache la camera principale a l'objet selectionne.
+    /// </summary>
     void AttachCameraToSelection()
     {
         if (selection == null || MainCamera == null) return;
@@ -262,6 +277,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Detache les cameras de la selection et nettoie les ancres.
+    /// </summary>
     void DetachCameraFromSelection()
     {
 
@@ -286,6 +304,9 @@ public class ObjectManager : MonoBehaviour
 
         cameraLockedToSelection = false;
     }
+    /// <summary>
+    /// Re-attache les ancres camera a la nouvelle selection.
+    /// </summary>
     void ReparentAnchorsToNewSelection()
     {
         if (selection == null) return;
@@ -305,6 +326,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Met a jour la camera de previsualisation.
+    /// </summary>
     void UpdateSelectionCamera()
     {
         if (SelectionCamera == null || selection == null) return;
@@ -323,6 +347,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Branche les boutons de multiplication/division.
+    /// </summary>
     void InitializeMultiplierButtons()
     {
         if (massMultiply10Button != null) massMultiply10Button.onClick.AddListener(OnMassMultiply10);
@@ -342,6 +369,9 @@ public class ObjectManager : MonoBehaviour
     void OnRadiusMultiply10() => MultiplyRadius(10f);
     void OnRadiusDivide10()   => MultiplyRadius(0.1f);
 
+    /// <summary>
+    /// Multiplie la masse de l'objet selectionne.
+    /// </summary>
     void MultiplyMass(float factor)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -351,6 +381,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Multiplie la vitesse de l'objet selectionne.
+    /// </summary>
     void MultiplySpeed(float factor)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -360,6 +393,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Multiplie le rayon de l'objet selectionne.
+    /// </summary>
     void MultiplyRadius(float factor)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -369,12 +405,18 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Cree une ancre vide pour la camera.
+    /// </summary>
     GameObject CreateAnchor(string name)
     {
         var go = new GameObject(name);
         return go;
     }
 
+    /// <summary>
+    /// Initialise la liste deroulante des objets.
+    /// </summary>
     void InitializeListUI()
     {
         if (ListObjet == null) return;
@@ -398,6 +440,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Met a jour la liste d'objets selectionnables.
+    /// </summary>
     void UpdateObjectList()
     {
         ObjectProperties[] allObjectsInScene = FindObjectsOfType<ObjectProperties>();
@@ -468,6 +513,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gere le changement de selection via TMP_Dropdown.
+    /// </summary>
     void OnTMPDropdownValueChanged(int index)
     {
         if (index < 0 || index >= dropdownObjects.Count) return;
@@ -475,6 +523,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Gere le changement de selection via Dropdown legacy.
+    /// </summary>
     void OnLegacyDropdownValueChanged(int index)
     {
         if (index < 0 || index >= dropdownObjects.Count) return;
@@ -482,12 +533,18 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Definit l'objet selectionne via ClickDetection.
+    /// </summary>
     void SelectObject(GameObject obj)
     {
         var clickDetection = MainCamera?.GetComponent<ClickDetection>();
         if (clickDetection != null) clickDetection.selectedObject = obj;
     }
     
+    /// <summary>
+    /// Affiche ou masque l'UI et rafraichit les valeurs.
+    /// </summary>
     void updateUIVisibility()
     {
         if (InfoUI == null) return;
@@ -540,6 +597,9 @@ public class ObjectManager : MonoBehaviour
         else InfoUI.SetActive(false);
     }
 
+    /// <summary>
+    /// Ecrit du texte dans un champ UI quel que soit son type.
+    /// </summary>
     void SetText(GameObject field, string value)
     {
         if (field == null) return;
@@ -557,11 +617,17 @@ public class ObjectManager : MonoBehaviour
         if (uiText != null) { uiText.text = value; return; }
     }
 
+    /// <summary>
+    /// Indique si un champ est en cours d'edition.
+    /// </summary>
     bool IsAnyFieldEditing()
     {
         return IsFieldEditing(mass) || IsFieldEditing(speed) || IsFieldEditing(radius) || IsFieldEditing(obj_name) || IsFieldEditing(dist_etoile);
     }
 
+    /// <summary>
+    /// Verifie si un champ specifique est en cours d'edition.
+    /// </summary>
     bool IsFieldEditing(GameObject field)
     {
         if (field == null) return false;
@@ -576,6 +642,9 @@ public class ObjectManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Branche les listeners de saisie sur les champs.
+    /// </summary>
     void BindFieldListeners()
     {
         UnbindAllFieldListeners();
@@ -596,6 +665,9 @@ public class ObjectManager : MonoBehaviour
         else if (nameUi != null) { nameListener = (s) => OnNameEndEdit(s); nameUi.onEndEdit.AddListener(nameListener); }
     }
 
+    /// <summary>
+    /// Supprime tous les listeners de saisie.
+    /// </summary>
     void UnbindAllFieldListeners()
     {
         if (massTmp != null && massListener != null) massTmp.onEndEdit.RemoveListener(massListener);
@@ -615,6 +687,9 @@ public class ObjectManager : MonoBehaviour
         nameTmp = null; nameUi = null; nameListener = null;
     }
 
+    /// <summary>
+    /// Recupere un TMP_InputField a partir d'un objet UI.
+    /// </summary>
     TMP_InputField GetTMPInput(GameObject field)
     {
         if (field == null) return null;
@@ -623,6 +698,9 @@ public class ObjectManager : MonoBehaviour
         return field.GetComponentInChildren<TMP_InputField>();
     }
 
+    /// <summary>
+    /// Recupere un InputField legacy a partir d'un objet UI.
+    /// </summary>
     InputField GetLegacyInput(GameObject field)
     {
         if (field == null) return null;
@@ -631,6 +709,9 @@ public class ObjectManager : MonoBehaviour
         return field.GetComponentInChildren<InputField>();
     }
 
+    /// <summary>
+    /// Applique la masse saisie par l'utilisateur.
+    /// </summary>
     void OnMassEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -649,6 +730,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Applique la vitesse saisie par l'utilisateur.
+    /// </summary>
     void OnSpeedEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -661,6 +745,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Applique le rayon saisi par l'utilisateur.
+    /// </summary>
     void OnRadiusEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -679,6 +766,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Applique le nom saisi par l'utilisateur.
+    /// </summary>
     void OnNameEndEdit(string input)
     {
         var props = selection?.GetComponent<ObjectProperties>();
@@ -695,6 +785,9 @@ public class ObjectManager : MonoBehaviour
         ClearUIFocus();
     }
 
+    /// <summary>
+    /// Retire le focus des elements UI.
+    /// </summary>
     private void ClearUIFocus()
     {
         if (EventSystem.current != null)
@@ -703,6 +796,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Parse une entree utilisateur avec unite eventuelle.
+    /// </summary>
     bool LireEntreeUtilisateur(string input, out float resultatFinal)
     {
         resultatFinal = 0f;
@@ -725,6 +821,9 @@ public class ObjectManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Formate un nombre en notation scientifique pour TMP.
+    /// </summary>
     string FormaterScientifiqueTMP(float valeur)
     {
         if (valeur == 0f) return "0";
@@ -740,6 +839,9 @@ public class ObjectManager : MonoBehaviour
         return formatStandard;
     }
 
+    /// <summary>
+    /// Nettoie les listeners et restaure l'etat des couches.
+    /// </summary>
     void OnDestroy()
     {
         UnbindAllFieldListeners();
@@ -756,6 +858,9 @@ public class ObjectManager : MonoBehaviour
         if (radiusDivide10Button != null) radiusDivide10Button.onClick.RemoveListener(OnRadiusDivide10);
     }
 
+    /// <summary>
+    /// Force la couche de selection sur l'objet et ses enfants.
+    /// </summary>
     private void ApplySelectionLayer(GameObject root)
     {
         if (root == null) return;
@@ -770,6 +875,9 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Restaure les couches originales apres selection.
+    /// </summary>
     private void RestoreSelectionLayers()
     {
         if (savedLayers == null || savedLayers.Count == 0) return;

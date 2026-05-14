@@ -18,11 +18,17 @@ public class SpaceTimeController : MonoBehaviour
     readonly Vector4[] cachedPositions = new Vector4[MaxMasses];
     readonly float[] cachedValues = new float[MaxMasses];
 
+    /// <summary>
+    /// Recupere le materiau utilise pour la deformation spatio-temporelle.
+    /// </summary>
     void Start()
     {
         mat = GetComponent<Renderer>().material;
     }
 
+    /// <summary>
+    /// Met a jour les sources de masse et leurs valeurs dans le shader.
+    /// </summary>
     void Update()
     {
         if (mat == null)
@@ -42,6 +48,9 @@ public class SpaceTimeController : MonoBehaviour
         mat.SetFloatArray("_MassValues", cachedValues);
     }
 
+    /// <summary>
+    /// Remplit les sources de masse depuis les objets de la scene.
+    /// </summary>
     int FillFromGravityBodies(Vector4[] positions, float[] values)
     {
         int count = 0;
@@ -98,6 +107,9 @@ public class SpaceTimeController : MonoBehaviour
         return count;
     }
 
+    /// <summary>
+    /// Ajoute une source de masse si elle est valide et unique.
+    /// </summary>
     void AddMassSource(Transform source, float mass, Vector4[] positions, float[] values, HashSet<int> seenTransforms, ref int count)
     {
         if (source == null || mass <= 0f || count >= MaxMasses)
@@ -116,6 +128,9 @@ public class SpaceTimeController : MonoBehaviour
         count++;
     }
 
+    /// <summary>
+    /// Remplit les sources de masse depuis la liste manuelle.
+    /// </summary>
     int FillFromManualSources(Vector4[] positions, float[] values)
     {
         int sourceCount = gravitySources != null ? gravitySources.Length : 0;
@@ -138,6 +153,9 @@ public class SpaceTimeController : MonoBehaviour
         return count;
     }
 
+    /// <summary>
+    /// Determine la masse d'un GravityBody avec fallback.
+    /// </summary>
     float ResolveMassFromBody(GravityBody body)
     {
         if (body.rb != null && body.rb.mass > 0f)
@@ -153,6 +171,9 @@ public class SpaceTimeController : MonoBehaviour
         return Mathf.Max(defaultMass, 0.0001f);
     }
 
+    /// <summary>
+    /// Determine la masse a utiliser pour une source donnee.
+    /// </summary>
     float ResolveMass(int index, Transform source)
     {
         if (masses != null && index < masses.Length && masses[index] > 0f)

@@ -7,12 +7,18 @@ public class ConstrainUIToAspectRatio : MonoBehaviour
     private RectTransform rt;
     private Vector2 lastScreenSize;
 
+    /// <summary>
+    /// Initialise le RectTransform et applique le ratio cible.
+    /// </summary>
     void Start()
     {
         rt = GetComponent<RectTransform>();
         Apply();
     }
 
+    /// <summary>
+    /// Reapplique le ratio quand la taille de l'ecran change.
+    /// </summary>
     void Update()
     {
         Vector2 currentSize = new Vector2(Screen.width, Screen.height);
@@ -23,6 +29,9 @@ public class ConstrainUIToAspectRatio : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Ajuste la taille du RectTransform pour respecter l'aspect cible.
+    /// </summary>
     void Apply()
     {
         float windowAspect = (float)Screen.width / (float)Screen.height;

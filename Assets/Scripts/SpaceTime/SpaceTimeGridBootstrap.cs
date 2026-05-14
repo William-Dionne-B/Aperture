@@ -5,6 +5,9 @@ public static class SpaceTimeGridBootstrap
 {
     private const string SpaceTimeWarpShaderName = "Unlit/SpaceTimeWarp";
 
+    /// <summary>
+    /// Enregistre le hook de chargement de scene au demarrage.
+    /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void RegisterSceneLoadHook()
     {
@@ -12,11 +15,17 @@ public static class SpaceTimeGridBootstrap
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    /// <summary>
+    /// Declenche la creation de la grille apres le chargement d'une scene.
+    /// </summary>
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         EnsureGridExists(scene);
     }
 
+    /// <summary>
+    /// Cree la grille spatio-temporelle si aucune n'existe deja.
+    /// </summary>
     private static void EnsureGridExists(Scene activeScene)
     {
         if (!activeScene.IsValid())

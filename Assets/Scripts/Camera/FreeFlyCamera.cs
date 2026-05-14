@@ -33,12 +33,10 @@ public class FreeFlyCamera : MonoBehaviour
     private float yaw;
     private float pitch;
     
-    // private static bool isPaused = false;
-
-    // ==========================================
-    // MÉTHODES UNITY
-    // ==========================================
     
+    /// <summary>
+    /// Initialise la camera et charge les parametres sauvegardes.
+    /// </summary>
     void Start()
     {
         if (playerCamera == null) playerCamera = GetComponent<Camera>();
@@ -55,6 +53,9 @@ public class FreeFlyCamera : MonoBehaviour
         pitch = transform.eulerAngles.x;
     }
 
+    /// <summary>
+    /// Gere l'input utilisateur, la rotation et le deplacement.
+    /// </summary>
     void Update()
     {
         if (Input.GetKeyDown(unlockCursorKey))
@@ -189,18 +190,27 @@ public class FreeFlyCamera : MonoBehaviour
     // GESTION DU CURSEUR
     // ==========================================
 
+    /// <summary>
+    /// Bascule l'etat de verrouillage du curseur.
+    /// </summary>
     void ToggleCursor()
     {
         if (Cursor.lockState == CursorLockMode.Locked) UnlockCursor();
         else LockCursor();
     }
 
+    /// <summary>
+    /// Verrouille et masque le curseur.
+    /// </summary>
     void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
+    /// <summary>
+    /// Deverrouille et affiche le curseur.
+    /// </summary>
     void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
@@ -211,7 +221,18 @@ public class FreeFlyCamera : MonoBehaviour
     // MÉTHODES PUBLIQUES (Utilisées par l'UI)
     // ==========================================
 
+    /// <summary>
+    /// Met a jour le champ de vision de la camera.
+    /// </summary>
     public void ChangerFieldOfView(float newFieldOfView) { playerCamera.fieldOfView = newFieldOfView; }
+
+    /// <summary>
+    /// Met a jour la sensibilite de la souris.
+    /// </summary>
     public void ChangerMouseSensitivity(float newMouseSensitivity) { mouseSensitivity = newMouseSensitivity; }
+
+    /// <summary>
+    /// Met a jour la vitesse de deplacement.
+    /// </summary>
     public void ChangerVitesse(float newSpeed) { moveSpeed = newSpeed; }
 }

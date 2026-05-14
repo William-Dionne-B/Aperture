@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Contrôle la vitesse optimale pour qu'un astre orbite un soleil. [OLD]
-/// </summary>
 public static class CalculateurVitesseOptimale
 {
     /// <summary>
@@ -22,7 +19,6 @@ public static class CalculateurVitesseOptimale
         // v = sqrt(G * M / r)
         float vitesseOrbitale = Mathf.Sqrt((G * multiplicateurGravite * masseCentrale) / distance);
         
-        // Velocity direction: perpendicular to radius, in the XZ plane (reversed)
         Vector3 directionVitesse = Vector3.Cross(Vector3.up, versCentre).normalized;
 
         return directionVitesse * vitesseOrbitale;

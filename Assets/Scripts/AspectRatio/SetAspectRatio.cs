@@ -11,11 +11,17 @@ public class SetAspectRatio : MonoBehaviour
     private RectTransform barLeft;
     private RectTransform barRight;
 
+    /// <summary>
+    /// Cree les barres de masque pour l'aspect cible.
+    /// </summary>
     void Start()
     {
         CreateOverlayBars();
     }
 
+    /// <summary>
+    /// Initialise le canvas et les barres noires d'overlay.
+    /// </summary>
     void CreateOverlayBars()
     {
         GameObject canvasGO = new GameObject("AspectRatioOverlay");
@@ -33,6 +39,9 @@ public class SetAspectRatio : MonoBehaviour
         barRight = CreateBar(canvasGO.transform, "BarRight");
     }
 
+    /// <summary>
+    /// Cree une barre UI noire et renvoie son RectTransform.
+    /// </summary>
     RectTransform CreateBar(Transform parent, string name)
     {
         GameObject go = new GameObject(name);
@@ -43,11 +52,17 @@ public class SetAspectRatio : MonoBehaviour
         return go.GetComponent<RectTransform>();
     }
 
+    /// <summary>
+    /// Applique le ratio d'aspect a chaque frame.
+    /// </summary>
     void Update()
     {
         ApplyAspectRatio();
     }
 
+    /// <summary>
+    /// Ajuste la camera et les barres selon la taille de l'ecran.
+    /// </summary>
     void ApplyAspectRatio()
     {
         float windowAspect = (float)Screen.width / (float)Screen.height;
@@ -83,6 +98,9 @@ public class SetAspectRatio : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Positionne et dimensionne une barre.
+    /// </summary>
     void SetBarRect(RectTransform rt, float x, float y, float w, float h)
     {
         rt.anchorMin = Vector2.zero;
@@ -93,11 +111,17 @@ public class SetAspectRatio : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Masque une barre en la reduisant a zero.
+    /// </summary>
     void SetBarRect(RectTransform rt, Vector4 _)
     {
         rt.sizeDelta = Vector2.zero;
     }
 
+    /// <summary>
+    /// Detruit le canvas d'overlay a la destruction.
+    /// </summary>
     void OnDestroy()
     {
         if (overlayCanvas != null)

@@ -19,6 +19,9 @@ public class AjoutComete : MonoBehaviour
 
     readonly Queue<GameObject> activeProjectiles = new Queue<GameObject>();
 
+    /// <summary>
+    /// Initialise la camera source avec un fallback sur Camera.main.
+    /// </summary>
     void Awake()
     {
         if (sourceCamera == null)
@@ -32,6 +35,9 @@ public class AjoutComete : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gere le nettoyage des projectiles et le tir sur input.
+    /// </summary>
     void Update()
     {
         CleanupFarProjectiles();
@@ -42,11 +48,17 @@ public class AjoutComete : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Nettoie la file de projectiles lors de la destruction de l'objet.
+    /// </summary>
     void OnDestroy()
     {
         activeProjectiles.Clear();
     }
 
+    /// <summary>
+    /// Cree et lance un asteroid depuis la camera, avec ses parametres physiques.
+    /// </summary>
     void ShootAsteroid()
     {
         Camera cameraToUse = sourceCamera != null ? sourceCamera : Camera.main;
@@ -94,6 +106,9 @@ public class AjoutComete : MonoBehaviour
         RegisterProjectile(asteroid);
     }
 
+    /// <summary>
+    /// Cree un projectile simple si aucun prefab n'est fourni.
+    /// </summary>
     GameObject CreateFallbackAsteroid(Vector3 spawnPosition)
     {
         GameObject fallback = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -102,12 +117,18 @@ public class AjoutComete : MonoBehaviour
         return fallback;
     }
 
+    /// <summary>
+    /// Enregistre un projectile et purge les references manquantes.
+    /// </summary>
     void RegisterProjectile(GameObject projectile)
     {
         RemoveMissingProjectiles();
         activeProjectiles.Enqueue(projectile);
     }
 
+    /// <summary>
+    /// Supprime les projectiles detruits en tete de file.
+    /// </summary>
     void RemoveMissingProjectiles()
     {
         while (activeProjectiles.Count > 0 && activeProjectiles.Peek() == null)
@@ -116,6 +137,9 @@ public class AjoutComete : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Detruit les projectiles trop eloignes de la camera.
+    /// </summary>
     void CleanupFarProjectiles()
     {
         if (activeProjectiles.Count == 0)

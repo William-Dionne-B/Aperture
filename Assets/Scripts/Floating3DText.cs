@@ -108,7 +108,7 @@ public class Floating3DText : MonoBehaviour
     }
 
     /// <summary>
-    /// TODO La description
+    /// Calcule un rayon representatif de l'objet pour positionner et dimensionner le texte.
     /// </summary>
     float ResolveObjectRadius()
     {

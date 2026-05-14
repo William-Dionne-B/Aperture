@@ -13,6 +13,9 @@ public class GravityBody : MonoBehaviour
 
     private bool initialized = false;
 
+    /// <summary>
+    /// Initialise le rigidbody et le line renderer avec les valeurs de depart.
+    /// </summary>
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -24,6 +27,9 @@ public class GravityBody : MonoBehaviour
         rb.angularDamping = 0;
     }
 
+    /// <summary>
+    /// Enregistre le corps dans le gestionnaire et applique la vitesse initiale.
+    /// </summary>
     void OnEnable()
     {
         GravityManager.Register(this);
@@ -36,6 +42,9 @@ public class GravityBody : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Retire le corps du gestionnaire de gravite.
+    /// </summary>
     void OnDisable()
     {
         GravityManager.Unregister(this);
