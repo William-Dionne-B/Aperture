@@ -43,6 +43,8 @@ public class PauseMenu : MonoBehaviour
     
     void Start()
     {
+        Resume();
+        
         if (mouseSensitivitySlider != null && cameraScript != null)
             mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity", 3.5f);
         
@@ -59,7 +61,6 @@ public class PauseMenu : MonoBehaviour
         }
         
         DesactivateAllMenus();
-        Debug.Log("PauseMenu initialized. Press ESC to open the menu, SPACE to toggle simulation pause.");
     }
 
     void Update()
@@ -222,9 +223,7 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void QuitGame()
     {
-        Debug.Log("Saving Simulation !");
         SystemeSauvegarde.Instance.SaveScene("Autosave");
-        Debug.Log("Ending Simulator !");
         SceneManager.LoadScene("MenuAccueil");
     }
 
@@ -308,8 +307,6 @@ public class PauseMenu : MonoBehaviour
         if (fieldOfViewSlider != null) fieldOfViewSlider.value = PlayerPrefs.GetFloat("FieldOfView");
         if (mouseSensitivitySlider != null) mouseSensitivitySlider.value = PlayerPrefs.GetFloat("MouseSensitivity");
         if (movementSpeedSlider != null) movementSpeedSlider.value = PlayerPrefs.GetFloat("MoveSpeed");
-        
-        Debug.Log("Paramètres réinitialisés aux valeurs enregistrées !");
     }
 
     /// <summary>
@@ -338,7 +335,6 @@ public class PauseMenu : MonoBehaviour
             }
 
             PlayerPrefs.Save();
-            Debug.Log("Paramètres sauvegardés avec succès !");
         }
     }
     
