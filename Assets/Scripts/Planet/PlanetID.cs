@@ -10,7 +10,6 @@ public class PlanetID : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        // If no ID exists, generate one once
         if (string.IsNullOrEmpty(id))
         {
             id = Guid.NewGuid().ToString();

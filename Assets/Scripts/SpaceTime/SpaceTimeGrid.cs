@@ -56,7 +56,7 @@ public class SpaceTimeGrid : MonoBehaviour
         gridCellWorldSize = Mathf.Max(0.01f, gridCellWorldSize);
         fadeEndDistance = Mathf.Max(fadeStartDistance + 0.01f, fadeEndDistance);
 
-        // Cr�e une instance du material propre � cet objet
+        // Cree une instance du material propre de cet objet
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer.sharedMaterial != null)
             materialInstance = meshRenderer.material; // cr�e l'instance
@@ -230,7 +230,6 @@ public class SpaceTimeGrid : MonoBehaviour
         mat.SetFloat(AlphaMaxId, alphaMax);
     }
 
-    // Retourne l'instance du material (en jeu) ou le sharedMaterial (en �diteur)
     /// <summary>
     /// Retourne le material actif selon le mode (jeu ou editeur).
     /// </summary>

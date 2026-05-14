@@ -363,9 +363,6 @@ public class ObjectProperties : MonoBehaviour
     /// <summary>
     /// Transforme un objet en trou noir.
     /// </summary>
-    /// <summary>
-    /// Remplace l'astre par le prefab de trou noir.
-    /// </summary>
     void ReplaceByBlackHolePrefab()
     {
         GameObject sourceObject = thisObject != null ? thisObject : gameObject;

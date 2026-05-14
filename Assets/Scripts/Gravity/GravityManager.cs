@@ -41,9 +41,6 @@ public class GravityManager : MonoBehaviour
 
     private Camera mainCam;
 
-    // ==========================================
-    // MÉTHODES UNITY
-    // ==========================================
 
     /// <summary>
     /// Initialise la camera et le toggle d'affichage des orbites.
@@ -61,8 +58,6 @@ public class GravityManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        //bodies.Clear();
-        //periodes.Clear();
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
     }
@@ -157,9 +152,6 @@ public class GravityManager : MonoBehaviour
     /// <summary>
     /// Permet de calculer les mouvements a chaque pas de temps physique des objets de la simulation et d'appliquer les mouvements.
     /// </summary>
-    /// <summary>
-    /// Applique la gravite et declenche les predictions d'orbite.
-    /// </summary>
     void FixedUpdate()
     {
         CleanupInvalidBodies();
@@ -195,9 +187,6 @@ public class GravityManager : MonoBehaviour
     /// <summary>
     /// Calcule la force d'attraction entre deux objets en utilisant la formule F = G*(m1*m2)/(d^2),
     /// ajoute un parametre de softening pour eviter que les forces deviennent infinies.
-    /// </summary>
-    /// <summary>
-    /// Applique la force gravitationnelle entre deux corps.
     /// </summary>
     void ApplyGravity(GravityBody a, GravityBody b)
     {
@@ -236,9 +225,6 @@ public class GravityManager : MonoBehaviour
     /// Determine quelle methode de dessin utiliser, si une planete est domincee par une seule etoile,
     /// dessine une ellipse propre. Si plusieurs forces s'affrontent, elle simule une trajectoire complexe.
     /// </summary>
-    /// <summary>
-    /// Choisit la methode de prediction d'orbite selon le contexte.
-    /// </summary>
     void PredictOrbitHybrid(GravityBody body)
     {
         if (body == null || body.rb == null || body.line == null)
@@ -269,9 +255,6 @@ public class GravityManager : MonoBehaviour
     /// Verifie si un objet est principalement attire par un seul corps.
     /// Si la force de l'astre principal est 5 fois superieure a la seconde,
     /// on considere que c'est une orbite stable a 2 corps.
-    /// </summary>
-    /// <summary>
-    /// Determine si une orbite est dominee par un seul attracteur.
     /// </summary>
     bool IsTwoBodyDominated(GravityBody body, out GravityBody mainAttractor)
     {
@@ -304,9 +287,6 @@ public class GravityManager : MonoBehaviour
     /// <summary>
     /// Utilise la 3e loi de Kepler et l'energie orbitale pour calculer la duree exacte d'une revolution complete.
     /// Permet de savoir quelle longueur de ligne dessiner pour faire un cercle parfait.
-    /// </summary>
-    /// <summary>
-    /// Calcule la periode orbitale a partir de la vitesse et de la distance.
     /// </summary>
     float CalculateOrbitalPeriod(GravityBody body, GravityBody centralBody)
     {
@@ -409,9 +389,6 @@ public class GravityManager : MonoBehaviour
     /// en iterant rapidements sans impacter la vraie position des objets.
     /// Optimisee pour les cas ou les objets bougent de facon previsible autour d'un astre.
     /// </summary>
-    /// <summary>
-    /// Trace une orbite simplifiee pour un cas proche a deux corps.
-    /// </summary>
     void DrawOrbitHybrid(GravityBody body, GravityBody centralBody, float period, int steps)
     {
         float maxDt = 0.5f;
@@ -474,10 +451,7 @@ public class GravityManager : MonoBehaviour
     
     /// <summary>
     /// Fonction de securite si la trajectoire calculee fait des virages trop brusques ou des segments trop longs,
-    /// la focntion refuse de dessiner la ligne pour eviter des glitchs.
-    /// </summary>
-    /// <summary>
-    /// Verifie la stabilite visuelle d'une trajectoire calculee.
+    /// la fonction refuse de dessiner la ligne pour eviter des glitchs.
     /// </summary>
     bool IsOrbitPredictionStable(List<Vector3> points, Vector3 origin)
     {
@@ -627,9 +601,6 @@ public class GravityManager : MonoBehaviour
     
     /// <summary>
     /// Cette fonction sert à garder la liste d'astres propre et à éviter que le jeu plante.
-    /// </summary>
-    /// <summary>
-    /// Retire les corps invalides de la liste.
     /// </summary>
     void CleanupInvalidBodies()
     {

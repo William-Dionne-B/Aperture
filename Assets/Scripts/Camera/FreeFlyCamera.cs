@@ -64,22 +64,6 @@ public class FreeFlyCamera : MonoBehaviour
         if (Cursor.visible)
             return;
         
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     if (PauseMenu.isPaused)
-        //     {
-        //         TimeManager.Resume();
-        //         PauseMenu.isPaused = false;
-        //     }
-        //     
-        //         
-        //     else
-        //     {
-        //         TimeManager.Pause();
-        //         PauseMenu.isPaused = true;
-        //     }
-        //     
-        // }
 
         HandleInputs();
         
